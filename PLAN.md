@@ -49,9 +49,20 @@ D1 « fairway-db » : departments · golfs · sources · events · crawl_runs
       ajout au calendrier `.ics`, partage), mode sombre, PWA installable
 - [x] Tests locaux : 203 compétitions réelles importées depuis la ffgolf, Grands Prix typés, dédoublonnage vérifié
 
+## Fait (lot 2, 23/10 soir)
+
+- [x] Splash screen 2 s (artwork, FAIRWAY, baseline), eyebrow « ‹ Fairway » qui le rouvre, bannière dans Réglages
+- [x] Vue carte de l'onglet Compétitions (un marqueur par golf, filtres appliqués)
+- [x] Fiche compétition : valeurs à gauche, libellés à droite
+- [x] Fiche golf : bandeau carte (photo ffgolf par-dessus si elle se charge), adresse, e-mail
+- [x] Golfs en favoris + onglets Compétitions / Golfs dans Favoris
+- [x] Badge « croix » des golfs : ▲ département · ▶ trous · ▼ compétitions à venir · ◀ km
+- [x] Golfs enrichis depuis l'annuaire ffgolf (adresse, e-mail, photo) ; ré-import automatique quand le fichier de référence change (version)
+
 ## Sprint 1 — mise en production (à faire)
 
-- [ ] Secrets Cloudflare : `ANTHROPIC_API_KEY`, `ADMIN_TOKEN`
+- [x] Secrets Cloudflare : `ANTHROPIC_API_KEY`, `ADMIN_TOKEN`
+- [ ] Photos des golfs : le serveur ffgolf bloque l'affichage hors de son site, et les droits d'usage sont à demander. Alternative : photos fournies par les clubs.
 - [ ] Premier passage complet depuis l'admin (« Lancer une collecte » jusqu'à 0 source restante), puis relecture des sources en erreur
 - [ ] Vérifier les 6 golfs « hors annuaire » (Thouarsais, Champs-Romain, Sorbier, Rochebois, Saint-Junien, Idron)
 - [ ] Accents des noms de golfs (l'annuaire ffgolf est en majuscules sans accents) : correction manuelle ou passe Haiku unique

@@ -82,3 +82,42 @@ export function toggleFavorite(id: number): boolean {
   setPrefs({ favorites: has ? state.favorites.filter((f) => f !== id) : [...state.favorites, id] });
   return !has;
 }
+
+// --- Golfs favoris ----------------------------------------------------------
+
+const GOLF_KEY = 'fairway:golf-favorites:v1';
+
+function loadGolfFavs(): number[] {
+  try {
+    const raw = localStorage.getItem(GOLF_KEY);
+    const p = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(p) ? p.filter((n): n is number => typeof n === 'number') : [];
+  } catch {
+    return [];
+  }
+}
+
+let golfFavs: number[] = loadGolfFavs();
+const golfListeners = new Set<() => void>();
+
+export function toggleGolfFavorite(id: number): boolean {
+  const has = golfFavs.includes(id);
+  golfFavs = has ? golfFavs.filter((f) => f !== id) : [...golfFavs, id];
+  try {
+    localStorage.setItem(GOLF_KEY, JSON.stringify(golfFavs));
+  } catch {
+    /* stockage indisponible : on continue en mémoire */
+  }
+  golfListeners.forEach((l) => l());
+  return !has;
+}
+
+export function useGolfFavorites(): number[] {
+  return useSyncExternalStore(
+    (l) => {
+      golfListeners.add(l);
+      return () => golfListeners.delete(l);
+    },
+    () => golfFavs,
+  );
+}

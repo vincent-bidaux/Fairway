@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { usePrefs } from '../store';
 import { useUi } from '../ui';
 import { zoneLabel } from '../lib';
 import { Icon } from './Icon';
 
-export function ZonePill() {
+export function ZonePill({ extra }: { extra?: ReactNode }) {
   const { zone } = usePrefs();
   const ui = useUi();
   return (
@@ -13,6 +14,7 @@ export function ZonePill() {
         <span className="zone-pill-label">{zoneLabel(zone, ui.departments)}</span>
         <Icon name="chevron-down" size={14} strokeWidth={2.6} />
       </button>
+      {extra}
     </div>
   );
 }

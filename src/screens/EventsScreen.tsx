@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { EventsQuery, GolfEvent } from '../../shared/types';
 import { getEvents } from '../api';
+import { EventsMap } from '../components/EventsMap';
 import { EventCell } from '../components/EventCell';
 import { FiltersSheet } from '../components/FiltersSheet';
 import { Icon } from '../components/Icon';
@@ -66,6 +67,7 @@ export function EventsScreen() {
   const { zone, period, types, q, favorites } = usePrefs();
   const ui = useUi();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [isMap, setIsMap] = useState(false);
   const today = todayISO();
 
   const query = useMemo<EventsQuery>(
@@ -89,42 +91,75 @@ export function EventsScreen() {
   const activeFilters = types.length + (q.trim() ? 1 : 0);
   const groups = useMemo(() => groupByDate(data?.items ?? []), [data]);
 
+  const filterRow = (
+    <div className="filter-row">
+      <button
+        type="button"
+        className={`chip chip--filters${activeFilters ? ' is-active' : ''}`}
+        onClick={() => setFiltersOpen(true)}
+      >
+        <Icon name="filter" size={16} />
+        Filtres
+        {activeFilters > 0 && <span className="chip-count">{activeFilters}</span>}
+      </button>
+      <div className="chips" role="group" aria-label="Période">
+        {PERIODS.map((p) => (
+          <button
+            key={p.value}
+            type="button"
+            className={`chip${period === p.value ? ' is-active' : ''}`}
+            aria-pressed={period === p.value}
+            onClick={() => setPrefs({ period: p.value })}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const mapButton = (
+    <button
+      type="button"
+      className="round-btn"
+      onClick={() => setIsMap((v) => !v)}
+      aria-label={isMap ? 'Afficher la liste' : 'Afficher la carte'}
+      aria-pressed={isMap}
+    >
+      <Icon name={isMap ? 'list' : 'map'} size={22} />
+    </button>
+  );
+
+  const mapMode = isMap && !!zone;
+
   return (
     <Screen
       title="Compétitions"
+      eyebrow
+      large={!mapMode}
+      fill={mapMode}
       right={zone ? <NavIconButton icon="refresh" label="Actualiser" onClick={reload} spinning={loading} /> : undefined}
     >
       {!zone ? (
         <Welcome />
       ) : (
         <>
-          <ZonePill />
-          <div className="filter-row">
-            <button
-              type="button"
-              className={`chip chip--filters${activeFilters ? ' is-active' : ''}`}
-              onClick={() => setFiltersOpen(true)}
-            >
-              <Icon name="filter" size={16} />
-              Filtres
-              {activeFilters > 0 && <span className="chip-count">{activeFilters}</span>}
-            </button>
-            <div className="chips" role="group" aria-label="Période">
-              {PERIODS.map((p) => (
-                <button
-                  key={p.value}
-                  type="button"
-                  className={`chip${period === p.value ? ' is-active' : ''}`}
-                  aria-pressed={period === p.value}
-                  onClick={() => setPrefs({ period: p.value })}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <ZonePill extra={mapButton} />
+          {filterRow}
 
-          {error && !data ? (
+          {mapMode ? (
+            <div className="fill">
+              {error && !data ? (
+                <ErrorState message={error.message} onRetry={reload} />
+              ) : (
+                <EventsMap
+                  events={data?.items ?? []}
+                  zone={zone}
+                  onOpenGolf={(id) => ui.push({ type: 'golf', id })}
+                />
+              )}
+            </div>
+          ) : error && !data ? (
             <ErrorState message={error.message} onRetry={reload} />
           ) : loading && !data ? (
             <SkeletonList />

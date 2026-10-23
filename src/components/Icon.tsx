@@ -55,6 +55,12 @@ const paths: Record<string, ReactNode> = {
     </>
   ),
   phone: <path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />,
+  mail: (
+    <>
+      <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" />
+      <path d="M4 7.5l8 6 8-6" />
+    </>
+  ),
   check: <path d="M4.500 12.500l5 5 10-11" />,
   'check-circle': (
     <>

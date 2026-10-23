@@ -5,7 +5,8 @@ import { LocationSheet } from './components/LocationSheet';
 import { Page } from './components/Screen';
 import { TabBar, type TabId } from './components/TabBar';
 import { pushLayer } from './nav';
-import { usePrefs, type ZoneMode } from './store';
+import { Splash } from './components/Splash';
+import { useGolfFavorites, usePrefs, type ZoneMode } from './store';
 import { UiContext, type Route, type Ui } from './ui';
 import { AdminScreen } from './screens/AdminScreen';
 import { EventDetail } from './screens/EventDetail';
@@ -17,6 +18,8 @@ import { SettingsScreen } from './screens/SettingsScreen';
 
 export function App() {
   const { favorites } = usePrefs();
+  const golfFavs = useGolfFavorites();
+  const [splash, setSplash] = useState<{ run: number } | null>({ run: 0 });
   const [tab, setTab] = useState<TabId>('events');
   const [visited, setVisited] = useState<Set<TabId>>(new Set(['events']));
   const [stack, setStack] = useState<Route[]>([]);
@@ -61,6 +64,7 @@ export function App() {
       back: () => history.back(),
       openZone: (mode, locate) => setZoneSheet({ open: true, mode, locate }),
       toast,
+      showSplash: () => setSplash((s) => ({ run: (s?.run ?? 0) + 1 })),
       departments,
     }),
     [push, toast, departments],
@@ -80,7 +84,7 @@ export function App() {
         {panel('golfs', <GolfsScreen active={tab === 'golfs' && stack.length === 0} />)}
         {panel('favorites', <FavoritesScreen active={tab === 'favorites'} />)}
         {panel('settings', <SettingsScreen />)}
-        <TabBar active={tab} onChange={selectTab} favCount={favorites.length} />
+        <TabBar active={tab} onChange={selectTab} favCount={favorites.length + golfFavs.length} />
 
         {stack.map((r, i) => (
           <Page key={i}>
@@ -94,6 +98,8 @@ export function App() {
           {toastMsg}
         </div>
       </div>
+
+      {splash && <Splash runId={splash.run} onDone={() => setSplash(null)} />}
 
       <LocationSheet
         open={zoneSheet.open}

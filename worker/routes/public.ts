@@ -164,7 +164,7 @@ publicApi.get('/golfs/:id{[0-9]+}', async (c) => {
   )
     .bind(id, todayParis())
     .all<EventRowDb>();
-  return c.json({ ...toGolf(golf), events: results.map(toEvent) });
+  return c.json({ ...toGolf({ ...golf, upcoming_count: results.length }), events: results.map(toEvent) });
 });
 
 /** City autocomplete, proxied from the French government geo API (free, no key). */

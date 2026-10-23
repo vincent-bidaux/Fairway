@@ -1,21 +1,22 @@
 import { useMemo, useState } from 'react';
 import type { Golf } from '../../shared/types';
 import { getGolfs } from '../api';
-import { Badge, SearchField, Segmented } from '../components/Controls';
-import { Icon } from '../components/Icon';
+import { SearchField, Segmented } from '../components/Controls';
+import { GolfCell } from '../components/GolfCell';
 import { MapView } from '../components/MapView';
 import { NavIconButton, Screen } from '../components/Screen';
 import { EmptyState, ErrorState, SkeletonList } from '../components/States';
 import { ZonePill } from '../components/ZonePill';
 import { useAsync, useDebounced } from '../hooks';
-import { deptName, formatKm, holesLabel, zoneQuery } from '../lib';
-import { usePrefs } from '../store';
+import { deptName, zoneQuery } from '../lib';
+import { toggleGolfFavorite, useGolfFavorites, usePrefs } from '../store';
 import { useUi } from '../ui';
 
 type View = 'list' | 'map';
 
 export function GolfsScreen({ active }: { active: boolean }) {
   const { zone } = usePrefs();
+  const golfFavs = useGolfFavorites();
   const ui = useUi();
   const [view, setView] = useState<View>('list');
   const [q, setQ] = useState('');
@@ -57,6 +58,7 @@ export function GolfsScreen({ active }: { active: boolean }) {
   return (
     <Screen
       title="Golfs"
+      eyebrow
       large={!isMap}
       fill={isMap}
       right={<NavIconButton icon="refresh" label="Actualiser" onClick={reload} spinning={loading} />}
@@ -83,30 +85,25 @@ export function GolfsScreen({ active }: { active: boolean }) {
         </EmptyState>
       ) : (
         <div className={loading ? 'is-dimmed' : ''}>
-          {groups.map((g) => (
+          {groups.map((g, gi) => (
             <section className="date-section" key={g.code}>
               <h3 className="section-head">
                 {g.name} <span className="section-count">{g.golfs.length}</span>
               </h3>
               <div className="group">
-                {g.golfs.map((golf) => {
-                  const meta = [golf.city, holesLabel(golf.holes), formatKm(golf.distanceKm)].filter(Boolean).join(' · ');
-                  return (
-                    <button type="button" key={golf.id} className="row row--tap golf-row" onClick={() => open(golf)}>
-                      <span className="row-main">
-                        <span className="row-label">{golf.name}</span>
-                        <span className="row-sub">{meta}</span>
-                      </span>
-                      {!!golf.upcomingCount && (
-                        <Badge tone="green">
-                          {golf.upcomingCount} compét.
-                        </Badge>
-                      )}
-                      <Icon name="chevron" size={14} strokeWidth={2.6} className="chevron" />
-                    </button>
-                  );
-                })}
+                {g.golfs.map((golf) => (
+                  <GolfCell
+                    key={golf.id}
+                    golf={golf}
+                    favorite={golfFavs.includes(golf.id)}
+                    onToggleFav={() => toggleGolfFavorite(golf.id)}
+                    onOpen={() => open(golf)}
+                  />
+                ))}
               </div>
+              {gi === 0 && (
+                <p className="group-footer cross-legend">▲ département · ▶ trous · ▼ compétitions à venir · ◀ km</p>
+              )}
             </section>
           ))}
         </div>

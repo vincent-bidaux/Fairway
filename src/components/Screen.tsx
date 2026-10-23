@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode, type UIEvent } from 'react';
+import { useUi } from '../ui';
 import { Icon } from './Icon';
 
 interface Props {
@@ -9,10 +10,13 @@ interface Props {
   right?: ReactNode;
   /** Le contenu remplit l'écran sans défiler (carte). */
   fill?: boolean;
+  /** Écran racine d'onglet : affiche « ‹ Fairway » (ré-affiche le splash). */
+  eyebrow?: boolean;
   children: ReactNode;
 }
 
-export function Screen({ title, large = true, left, right, fill, children }: Props) {
+export function Screen({ title, large = true, left, right, fill, eyebrow, children }: Props) {
+  const ui = useUi();
   const [collapsed, setCollapsed] = useState(!large);
 
   useEffect(() => {
@@ -38,6 +42,12 @@ export function Screen({ title, large = true, left, right, fill, children }: Pro
           <div className="nav-side nav-side--right">{right}</div>
         </div>
       </header>
+      {large && eyebrow && (
+        <button type="button" className="nav-btn nav-btn--back eyebrow" onClick={ui.showSplash} aria-label="Fairway, afficher l'écran d'accueil">
+          <Icon name="chevron-left" size={22} strokeWidth={2.6} />
+          <span>Fairway</span>
+        </button>
+      )}
       {large && <h1 className="large-title">{title}</h1>}
       {children}
     </div>

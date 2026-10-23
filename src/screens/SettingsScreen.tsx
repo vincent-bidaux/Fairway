@@ -1,3 +1,4 @@
+import { Artwork } from '../components/Artwork';
 import { Group, Row } from '../components/Controls';
 import { Icon } from '../components/Icon';
 import { Screen } from '../components/Screen';
@@ -12,7 +13,14 @@ export function SettingsScreen() {
   const ui = useUi();
 
   return (
-    <Screen title="Réglages">
+    <Screen title="Réglages" eyebrow>
+      <section className="about-hero">
+        <Artwork size={92} className="about-art" />
+        <h2 className="about-title">FAIRWAY</h2>
+        <p className="about-tag">Trouvez les prochaines compétitions de golf autour de vous.</p>
+        <span className="about-version">Version {APP_VERSION}</span>
+      </section>
+
       <Group title="Zone" footer="La zone est partagée entre les onglets Compétitions et Golfs.">
         <Row
           icon={<Icon name="locate" size={16} fill />}

@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react';
 import type { Golf } from '../../shared/types';
 import { getGolf, type GolfDetailData } from '../api';
+import { GolfBanner } from '../components/GolfBanner';
+import { GolfCross } from '../components/GolfCross';
 import { EventCell } from '../components/EventCell';
-import { Group } from '../components/Controls';
+import { Group, Row } from '../components/Controls';
 import { Icon } from '../components/Icon';
 import { BackButton, Screen } from '../components/Screen';
 import { ErrorState } from '../components/States';
 import { useAsync } from '../hooks';
 import { deptName, golfDirections, holesLabel } from '../lib';
-import { toggleFavorite, usePrefs } from '../store';
+import { toggleFavorite, toggleGolfFavorite, useGolfFavorites, usePrefs } from '../store';
 import { useUi } from '../ui';
 
 export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
   const ui = useUi();
   const { favorites } = usePrefs();
+  const golfFavs = useGolfFavorites();
   const { data, error, reload } = useAsync((s) => getGolf(id, s), [id]);
   const [golf, setGolf] = useState<(Golf & { events?: GolfDetailData['events'] }) | undefined>(initial);
 
@@ -36,10 +39,30 @@ export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
   const subtitle = [golf.city, deptName(ui.departments, golf.department), holesLabel(golf.holes)]
     .filter(Boolean)
     .join(' · ');
+  const isFav = golfFavs.includes(golf.id);
+  const cityLine = [golf.postcode, golf.city].filter(Boolean).join(' ');
+  const crossGolf: Golf = { ...golf, upcomingCount: golf.upcomingCount ?? events?.length };
 
   return (
     <Screen title={golf.name} left={back}>
-      <p className="detail-sub">{subtitle}</p>
+      <GolfBanner golf={golf} />
+
+      <div className="golf-hero">
+        <GolfCross golf={crossGolf} size={96} />
+        <div className="golf-hero-text">
+          <p className="detail-sub golf-hero-sub">{subtitle}</p>
+          <button
+            type="button"
+            className={`chip golf-fav${isFav ? ' is-active' : ''}`}
+            aria-pressed={isFav}
+            aria-label={isFav ? `Retirer ${golf.name} des favoris` : `Ajouter ${golf.name} aux favoris`}
+            onClick={() => toggleGolfFavorite(golf.id)}
+          >
+            <Icon name="star" size={16} fill={isFav} />
+            {isFav ? 'Favori' : 'Ajouter aux favoris'}
+          </button>
+        </div>
+      </div>
 
       <div className="action-grid">
         {website ? (
@@ -70,6 +93,27 @@ export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
         </a>
       </div>
 
+      <Group title="Coordonnées">
+        <Row
+          icon={<Icon name="pin" size={17} />}
+          iconColor="var(--tint)"
+          label={golf.address || cityLine || golf.city}
+          sub={golf.address ? cityLine : undefined}
+          value="Itinéraire"
+          href={golfDirections(golf)}
+          chevron
+        />
+        {golf.email && (
+          <Row
+            icon={<Icon name="mail" size={17} />}
+            iconColor="var(--blue)"
+            label={golf.email}
+            href={`mailto:${golf.email}`}
+            chevron
+          />
+        )}
+      </Group>
+
       <Group title="Compétitions à venir">
         {!events && !error && <div className="row row--muted">Chargement…</div>}
         {error && !events && (
@@ -92,11 +136,6 @@ export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
           />
         ))}
       </Group>
-      {golf.postcode && (
-        <p className="disclaimer">
-          {golf.city} {golf.postcode}
-        </p>
-      )}
     </Screen>
   );
 }

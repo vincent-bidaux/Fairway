@@ -12,6 +12,7 @@ export interface Ui {
   back: () => void;
   openZone: (mode?: ZoneMode, locate?: boolean) => void;
   toast: (msg: string) => void;
+  showSplash: () => void;
   departments: Department[];
 }
 

@@ -126,10 +126,12 @@ interface RowProps {
   destructive?: boolean;
   disabled?: boolean;
   sub?: ReactNode;
+  /** Valeur à gauche (couleur principale), libellé à droite (gris). */
+  swap?: boolean;
 }
 
 /** Ligne de liste groupée : lien, bouton ou statique. */
-export function Row({ icon, iconColor, label, value, href, onClick, chevron, destructive, disabled, sub }: RowProps) {
+export function Row({ icon, iconColor, label, value, href, onClick, chevron, destructive, disabled, sub, swap }: RowProps) {
   const inner = (
     <>
       {icon && (
@@ -138,10 +140,14 @@ export function Row({ icon, iconColor, label, value, href, onClick, chevron, des
         </span>
       )}
       <span className="row-main">
-        <span className={`row-label${destructive ? ' is-destructive' : ''}`}>{label}</span>
+        <span className={`row-label${destructive ? ' is-destructive' : ''}`}>{swap && value !== undefined ? value : label}</span>
         {sub && <span className="row-sub">{sub}</span>}
       </span>
-      {value !== undefined && <span className="row-value">{value}</span>}
+      {swap ? (
+        <span className="row-value row-value--label">{label}</span>
+      ) : (
+        value !== undefined && <span className="row-value">{value}</span>
+      )}
       {chevron && <Icon name="chevron" size={14} strokeWidth={2.6} className="chevron" />}
     </>
   );

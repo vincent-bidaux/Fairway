@@ -77,16 +77,17 @@ export function EventDetail({ id, initial }: { id: number; initial?: GolfEvent }
       </div>
 
       <Group>
-        <Row label="Date" value={formatDateRange(ev)} />
-        {time && <Row label="Heure" value={time} />}
+        <Row swap label="Date" value={formatDateRange(ev)} />
+        {time && <Row swap label="Heure" value={time} />}
         <Row
+          swap
           label="Golf"
           value={ev.golfName}
           chevron
           onClick={() => ui.push({ type: 'golf', id: ev.golfId })}
         />
-        <Row label="Ville" value={ev.golfCity} />
-        {dist && <Row label="Distance" value={dist} />}
+        <Row swap label="Ville" value={ev.golfCity} />
+        {dist && <Row swap label="Distance" value={dist} />}
       </Group>
 
       {ev.format && (
