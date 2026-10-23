@@ -1,4 +1,4 @@
-const UA = 'FairwayBot/0.1 (+https://github.com/vincent-bidaux/Fairway; agenda des compétitions de golf)';
+const UA = 'FairwayBot/0.1 (+https://github.com/vincent-bidaux/Fairway; golf competitions calendar)';
 const MAX_TEXT = 45_000;
 const MAX_PDF_BYTES = 8 * 1024 * 1024;
 

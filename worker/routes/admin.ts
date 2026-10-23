@@ -2,6 +2,8 @@ import { Hono } from 'hono';
 import type { CrawlRun, SourceRow } from '../../shared/types';
 import type { Env } from '../env';
 import { runCrawl } from '../crawl/runner';
+import { discoverSources } from '../crawl/discover';
+import { applySeed } from '../seed';
 import { todayParis } from '../lib/dates';
 
 export const adminApi = new Hono<{ Bindings: Env }>();
@@ -95,6 +97,13 @@ adminApi.post('/crawl', async (c) => {
   const b = await c.req.json<{ sourceId?: number; force?: boolean }>().catch(() => ({}) as { sourceId?: number; force?: boolean });
   const run = await runCrawl(c.env, { trigger: 'manual', sourceId: b.sourceId, force: b.force });
   return c.json(run);
+});
+
+adminApi.post('/seed', async (c) => c.json(await applySeed(c.env)));
+
+adminApi.post('/discover', async (c) => {
+  const report = await discoverSources(c.env, 10);
+  return c.json(report);
 });
 
 interface RunDb {

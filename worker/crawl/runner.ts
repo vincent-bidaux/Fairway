@@ -4,11 +4,15 @@ import { todayParis } from '../lib/dates';
 import { extractIcal } from './extract-ical';
 import { extractWithLlm } from './extract-llm';
 import { fetchPage } from './fetch-page';
+import { extractFfgolf, isFfgolfSource } from './ffgolf';
 import type { ExtractedEvent, SourceDb } from './types';
 
 const SOURCE_SELECT = `
   SELECT s.id, s.golf_id, s.kind, s.parser, s.label, s.url, s.last_hash, g.name AS golf_name, g.city AS golf_city
   FROM sources s LEFT JOIN golfs g ON g.id = s.golf_id`;
+
+/** Without an API key only sources that need no LLM are collected (ffgolf JSON, single-golf iCal). */
+const NO_LLM_FILTER = `AND (s.kind = 'ffgolf' OR (s.parser = 'ical' AND s.golf_id IS NOT NULL))`;
 
 interface Options {
   trigger: 'cron' | 'manual';
@@ -42,7 +46,8 @@ export async function runCrawl(env: Env, opts: Options): Promise<CrawlRun> {
           .prepare(
             `${SOURCE_SELECT} WHERE s.enabled = 1
                AND (s.last_run_at IS NULL OR s.last_run_at < datetime('now', ?))
-             ORDER BY s.last_run_at IS NOT NULL, s.last_run_at LIMIT ?`,
+               ${env.ANTHROPIC_API_KEY ? '' : NO_LLM_FILTER}
+             ORDER BY s.last_run_at IS NOT NULL, (s.kind = 'ffgolf') DESC, s.last_run_at, s.id LIMIT ?`,
           )
           .bind(`-${minHours} hours`, batch)
           .all<SourceDb>()
@@ -53,26 +58,34 @@ export async function runCrawl(env: Env, opts: Options): Promise<CrawlRun> {
 
   for (const source of sources) {
     try {
-      const page = await fetchPage(source.url);
-      if (page.hash === source.last_hash && !opts.force && !opts.sourceId) {
-        await db
-          .prepare(`UPDATE sources SET last_run_at = datetime('now'), last_status = 'unchanged', last_error = NULL WHERE id = ?`)
-          .bind(source.id)
-          .run();
-        results.push({ sourceId: source.id, status: 'unchanged', newCount: 0, updatedCount: 0 });
-        continue;
-      }
-
       let events: ExtractedEvent[];
-      if (page.kind === 'ical') {
-        events = extractIcal(page.raw, source);
+      let hash: string;
+      if (isFfgolfSource(source)) {
+        // Structured JSON: always re-read (cheap, no LLM) so newly entered competitions appear.
+        ({ events, hash } = await extractFfgolf(env, source));
       } else {
-        if (!source.golf_id && !golfRefs) {
-          golfRefs = (
-            await db.prepare(`SELECT id, name, city FROM golfs WHERE active = 1 ORDER BY name`).all<{ id: number; name: string; city: string }>()
-          ).results;
+        const page = await fetchPage(source.url);
+        hash = page.hash;
+        if (page.hash === source.last_hash && !opts.force && !opts.sourceId) {
+          await db
+            .prepare(`UPDATE sources SET last_run_at = datetime('now'), last_status = 'unchanged', last_error = NULL WHERE id = ?`)
+            .bind(source.id)
+            .run();
+          results.push({ sourceId: source.id, status: 'unchanged', newCount: 0, updatedCount: 0 });
+          continue;
         }
-        events = await extractWithLlm(env, source, page, golfRefs ?? []);
+        if (page.kind === 'ical' && source.golf_id) {
+          events = extractIcal(page.raw, source);
+        } else {
+          if (!source.golf_id && !golfRefs) {
+            golfRefs = (
+              await db.prepare(`SELECT id, name, city FROM golfs WHERE active = 1 ORDER BY name`).all<{ id: number; name: string; city: string }>()
+            ).results;
+          }
+          // A regional iCal (several venues) is read by the LLM, which maps LOCATION to a golf.
+          const llmPage = page.kind === 'ical' ? { kind: 'text' as const, text: page.raw.slice(0, 45_000), hash: page.hash, finalUrl: page.finalUrl } : page;
+          events = await extractWithLlm(env, source, llmPage, golfRefs ?? []);
+        }
       }
 
       const { newCount, updatedCount } = await saveEvents(db, source.id, events);
@@ -84,7 +97,7 @@ export async function runCrawl(env: Env, opts: Options): Promise<CrawlRun> {
         .prepare(
           `UPDATE sources SET last_run_at = datetime('now'), last_status = 'ok', last_error = NULL, last_hash = ?, event_count = ? WHERE id = ?`,
         )
-        .bind(page.hash, total?.n ?? 0, source.id)
+        .bind(hash, total?.n ?? 0, source.id)
         .run();
       results.push({ sourceId: source.id, status: 'ok', newCount, updatedCount });
     } catch (err) {
@@ -101,7 +114,10 @@ export async function runCrawl(env: Env, opts: Options): Promise<CrawlRun> {
     ? 0
     : ((
         await db
-          .prepare(`SELECT COUNT(*) AS n FROM sources WHERE enabled = 1 AND (last_run_at IS NULL OR last_run_at < datetime('now', ?))`)
+          .prepare(
+            `SELECT COUNT(*) AS n FROM sources s WHERE s.enabled = 1 AND (s.last_run_at IS NULL OR s.last_run_at < datetime('now', ?))
+             ${env.ANTHROPIC_API_KEY ? '' : NO_LLM_FILTER}`,
+          )
           .bind(`-${minHours} hours`)
           .first<{ n: number }>()
       )?.n ?? 0);
@@ -142,6 +158,7 @@ export function fingerprint(e: Pick<ExtractedEvent, 'golfId' | 'startDate' | 'ti
 }
 
 async function saveEvents(db: D1Database, sourceId: number, events: ExtractedEvent[]) {
+  const runStart = (await db.prepare(`SELECT datetime('now') AS t`).first<{ t: string }>())!.t;
   // Deduplicate inside the batch (same competition listed twice on a page).
   const byFp = new Map<string, ExtractedEvent>();
   for (const e of events) byFp.set(fingerprint(e), e);
@@ -157,8 +174,26 @@ async function saveEvents(db: D1Database, sourceId: number, events: ExtractedEve
     results.forEach((r) => existing.add(r.fingerprint));
   }
 
+  // Cross-source twins: same golf, same day, similar title already listed by another source
+  // (typically ffgolf + the club's own page). Enrich the existing row instead of duplicating it.
+  const twins = await findTwins(db, sourceId, [...byFp.entries()].filter(([fp]) => !existing.has(fp)));
+
   const stmts: D1PreparedStatement[] = [];
   for (const [fp, e] of byFp) {
+    const twinId = twins.get(fp);
+    if (twinId) {
+      stmts.push(
+        db
+          .prepare(
+            `UPDATE events SET start_time = COALESCE(start_time, ?), eligibility = COALESCE(eligibility, ?), price = COALESCE(price, ?),
+               registration_url = COALESCE(registration_url, ?), description = COALESCE(description, ?),
+               status = CASE WHEN ? != 'scheduled' THEN ? ELSE status END, updated_at = datetime('now')
+             WHERE id = ?`,
+          )
+          .bind(e.startTime, e.eligibility, e.price, e.registrationUrl, e.description, e.status, e.status, twinId),
+      );
+      continue;
+    }
     stmts.push(
       db
         .prepare(
@@ -183,20 +218,63 @@ async function saveEvents(db: D1Database, sourceId: number, events: ExtractedEve
   // Upcoming events this source published before but no longer lists are hidden.
   // Skipped when nothing was extracted, so a broken page never wipes the agenda.
   if (fps.length > 0) {
-    const placeholders = fps.map(() => '?').join(',');
-    if (fps.length <= 90) {
-      stmts.push(
-        db
-          .prepare(
-            `UPDATE events SET status = 'removed', updated_at = datetime('now')
-             WHERE source_id = ? AND start_date >= ? AND status != 'removed' AND fingerprint NOT IN (${placeholders})`,
-          )
-          .bind(sourceId, todayParis(), ...fps),
-      );
-    }
+    stmts.push(
+      db
+        .prepare(
+          `UPDATE events SET status = 'removed', updated_at = datetime('now')
+           WHERE source_id = ? AND start_date >= ? AND status != 'removed' AND last_seen_at < ?`,
+        )
+        .bind(sourceId, todayParis(), runStart),
+    );
   }
 
   for (let i = 0; i < stmts.length; i += 50) await db.batch(stmts.slice(i, i + 50));
-  const newCount = fps.filter((f) => !existing.has(f)).length;
+  const newCount = fps.filter((f) => !existing.has(f) && !twins.has(f)).length;
   return { newCount, updatedCount: fps.length - newCount };
+}
+
+function words(title: string) {
+  return new Set(
+    title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length > 2 && !/^(20\d\d|golf|club|competition|the|des|les|and)$/.test(w)),
+  );
+}
+
+function similar(a: string, b: string) {
+  const A = words(a);
+  const B = words(b);
+  if (!A.size || !B.size) return false;
+  let common = 0;
+  for (const w of A) if (B.has(w)) common++;
+  // Same golf + same day already narrows it down a lot: two shared words, or most of the shorter title.
+  return common >= 2 || common / Math.min(A.size, B.size) >= 0.6;
+}
+
+async function findTwins(db: D1Database, sourceId: number, candidates: [string, ExtractedEvent][]) {
+  const out = new Map<string, number>();
+  if (!candidates.length) return out;
+  const keys = [...new Set(candidates.map(([, e]) => `${e.golfId}|${e.startDate}`))];
+  const rows: { id: number; golf_id: number; start_date: string; title: string }[] = [];
+  for (let i = 0; i < keys.length; i += 45) {
+    const chunk = keys.slice(i, i + 45);
+    const where = chunk.map(() => '(golf_id = ? AND start_date = ?)').join(' OR ');
+    const params = chunk.flatMap((k) => {
+      const [g, d] = k.split('|');
+      return [Number(g), d];
+    });
+    const { results } = await db
+      .prepare(`SELECT id, golf_id, start_date, title FROM events WHERE status != 'removed' AND (source_id IS NULL OR source_id != ?) AND (${where})`)
+      .bind(sourceId, ...params)
+      .all<{ id: number; golf_id: number; start_date: string; title: string }>();
+    rows.push(...results);
+  }
+  for (const [fp, e] of candidates) {
+    const twin = rows.find((r) => r.golf_id === e.golfId && r.start_date === e.startDate && similar(r.title, e.title));
+    if (twin) out.set(fp, twin.id);
+  }
+  return out;
 }

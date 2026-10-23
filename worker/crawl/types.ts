@@ -40,7 +40,7 @@ export function guessType(title: string): EventType {
   if (/championnat|champ\.|criterium/.test(t)) return 'championnat';
   if (/senior|veteran|\bas\s?sen/.test(t)) return 'senior';
   if (/dame|ladies|feminin/.test(t)) return 'dames';
-  if (/jeune|junior|u1[0-9]|ecole de golf|kids|benjamin|minime/.test(t)) return 'jeunes';
+  if (/jeune|junior|u1[0-9]|ecoles? de golf|kids|benjamin|minime/.test(t)) return 'jeunes';
   if (/scramble|greensome|foursome|patsome/.test(t)) return 'scramble';
   if (/\bopen\b|pro-?am/.test(t)) return 'open';
   if (/trophee|coupe|challenge|cup\b|tour\b/.test(t)) return 'sponsor';

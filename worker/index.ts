@@ -3,6 +3,8 @@ import type { Env } from './env';
 import { adminApi } from './routes/admin';
 import { publicApi } from './routes/public';
 import { runCrawl } from './crawl/runner';
+import { discoverSources } from './crawl/discover';
+import { seedIfEmpty } from './seed';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -23,9 +25,16 @@ export default {
   fetch: app.fetch,
   async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext) {
     ctx.waitUntil(
-      runCrawl(env, { trigger: 'cron' }).then((run) =>
-        console.log(`crawl #${run.id}: ok=${run.sourcesOk} unchanged=${run.sourcesUnchanged} failed=${run.sourcesFailed} new=${run.eventsNew} remaining=${run.remaining}`),
-      ),
+      (async () => {
+        // First run on a fresh database: load the bundled golf list and sources.
+        const seeded = await seedIfEmpty(env);
+        if (seeded) console.log('seeded', JSON.stringify(seeded));
+        const run = await runCrawl(env, { trigger: 'cron' });
+        console.log(`crawl #${run.id}: ok=${run.sourcesOk} unchanged=${run.sourcesUnchanged} failed=${run.sourcesFailed} new=${run.eventsNew} remaining=${run.remaining}`);
+        // Find calendar pages for golfs that have none yet (a few per hour).
+        const found = await discoverSources(env, 4);
+        if (found.length) console.log('discover', JSON.stringify(found));
+      })(),
     );
   },
 } satisfies ExportedHandler<Env>;

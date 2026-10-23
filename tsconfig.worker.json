@@ -9,7 +9,8 @@
     "noEmit": true,
     "skipLibCheck": true,
     "isolatedModules": true,
+    "resolveJsonModule": true,
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["worker", "shared"]
+  "include": ["worker", "shared", "db/seed/*.json"]
 }

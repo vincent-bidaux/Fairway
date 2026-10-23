@@ -1,0 +1,44 @@
+[
+  {
+    "label": "ffgolf — compétitions des clubs (Nouvelle-Aquitaine)",
+    "kind": "ffgolf",
+    "parser": "llm",
+    "url": "https://www.ffgolf.org/search/club-tournament?search%5Bleagues%5D%5B%5D=03&limit=500"
+  },
+  {
+    "label": "ffgolf — Grands Prix 2026",
+    "kind": "ffgolf",
+    "parser": "llm",
+    "url": "https://www.ffgolf.org/search/tournament/amateur_tournament/87810?limit=500"
+  },
+  {
+    "label": "ffgolf — Grands Prix et Trophées seniors 2026",
+    "kind": "ffgolf",
+    "parser": "llm",
+    "url": "https://www.ffgolf.org/search/tournament/amateur_tournament/87725?limit=500"
+  },
+  {
+    "label": "ffgolf — Grands Prix jeunes 2026",
+    "kind": "ffgolf",
+    "parser": "llm",
+    "url": "https://www.ffgolf.org/search/tournament/amateur_tournament/87988?limit=500"
+  },
+  {
+    "label": "ffgolf — Grands Prix et Classics mid-amateurs 2026",
+    "kind": "ffgolf",
+    "parser": "llm",
+    "url": "https://www.ffgolf.org/search/tournament/amateur_tournament/87802?limit=500"
+  },
+  {
+    "label": "ffgolf — National et international 2026",
+    "kind": "ffgolf",
+    "parser": "llm",
+    "url": "https://www.ffgolf.org/search/tournament/amateur_tournament/88279?limit=500"
+  },
+  {
+    "label": "Comité de golf de la Gironde — calendrier (iCal)",
+    "kind": "comite",
+    "parser": "ical",
+    "url": "https://cdgolf33.com/wp-content/uploads/2026/10/Calendrier-competitions-Comite-Golf-Gironde.ics"
+  }
+]
