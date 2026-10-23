@@ -1,8 +1,8 @@
 [
  {
-  "name": "Angouleme Golf l'Hirondelle",
+  "name": "Angoulême Golf L'Hirondelle",
   "department": "16",
-  "city": "Angouleme",
+  "city": "Angoulême",
   "postcode": "16000",
   "lat": 45.63615,
   "lng": 0.14259,
@@ -17,9 +17,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/00/0048/0048_p1.jpg"
  },
  {
-  "name": "Golf International de la Preze",
+  "name": "Golf International de la Prèze",
   "department": "16",
-  "city": "Rouzede",
+  "city": "Rouzède",
   "postcode": "16220",
   "lat": 45.71124,
   "lng": 0.58234,
@@ -70,7 +70,7 @@
  {
   "name": "Golf du Cognac",
   "department": "16",
-  "city": "Saint Brice",
+  "city": "Saint-Brice",
   "postcode": "16100",
   "lat": 45.67833,
   "lng": -0.24917,
@@ -85,9 +85,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/03/0365/0365_p1.jpg"
  },
  {
-  "name": "Golf Bluegreen Rochefort Ocean",
+  "name": "Golf Bluegreen Rochefort Océan",
   "department": "17",
-  "city": "Saint-Laurent de la Pree",
+  "city": "Saint-Laurent-de-la-Prée",
   "postcode": "17450",
   "lat": 45.98384,
   "lng": -1.00805,
@@ -102,9 +102,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/13/1339/1339_p1.jpeg"
  },
  {
-  "name": "Golf Club d'Oleron",
+  "name": "Golf Club d'Oléron",
   "department": "17",
-  "city": "Saint Pierre d'Oleron",
+  "city": "Saint-Pierre-d'Oléron",
   "postcode": "17310",
   "lat": 45.95061,
   "lng": -1.24065,
@@ -138,7 +138,7 @@
  {
   "name": "Golf de Royan",
   "department": "17",
-  "city": "Saint Palais sur Mer",
+  "city": "Saint-Palais-sur-Mer",
   "postcode": "17420",
   "lat": 45.6548,
   "lng": -1.10201,
@@ -172,7 +172,7 @@
  {
   "name": "Golf de Trousse-Chemise",
   "department": "17",
-  "city": "Les Portes en Re",
+  "city": "Les Portes-en-Ré",
   "postcode": "17880",
   "lat": 46.236,
   "lng": -1.48758,
@@ -187,7 +187,7 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/07/0714/0714_p1.jpg"
  },
  {
-  "name": "Golf de la Pree - la Rochelle",
+  "name": "Golf de la Prée La Rochelle",
   "department": "17",
   "city": "Marsilly",
   "postcode": "17137",
@@ -204,9 +204,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/04/0489/0489_p1.jpeg"
  },
  {
-  "name": "Golf du Chateau de la Vallade",
+  "name": "Golf du Château de la Vallade",
   "department": "17",
-  "city": "Saint Porchaire",
+  "city": "Saint-Porchaire",
   "postcode": "17250",
   "lat": 45.80222,
   "lng": -0.75111,
@@ -221,7 +221,7 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/18/1866/1866_p1.jpg"
  },
  {
-  "name": "Golf la Rochelle Sud",
+  "name": "Golf La Rochelle Sud",
   "department": "17",
   "city": "La Jarne",
   "postcode": "17220",
@@ -257,7 +257,7 @@
  {
   "name": "CAB Golf de Brive Planchetorte",
   "department": "19",
-  "city": "Brive la Gaillarde",
+  "city": "Brive-la-Gaillarde",
   "postcode": "19100",
   "lat": 45.13889,
   "lng": 1.50278,
@@ -272,7 +272,7 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/10/1079/1079_p1.jpg"
  },
  {
-  "name": "Golf Club d'Aubazine-Correze",
+  "name": "Golf Club d'Aubazine-Corrèze",
   "department": "19",
   "city": "Aubazine",
   "postcode": "19190",
@@ -340,7 +340,7 @@
   "photo_url": null
  },
  {
-  "name": "Golf de la Jonchere",
+  "name": "Golf de la Jonchère",
   "department": "23",
   "city": "Gouzon",
   "postcode": "23230",
@@ -357,7 +357,7 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/04/0473/0473_p1.jpg"
  },
  {
-  "name": "Golf Chateau les Merles",
+  "name": "Golf Château les Merles",
   "department": "24",
   "city": "Mouleydier",
   "postcode": "24520",
@@ -376,7 +376,7 @@
  {
   "name": "Golf Club de Montravel",
   "department": "24",
-  "city": "Saint Meard de Gurcon",
+  "city": "Saint-Méard-de-Gurçon",
   "postcode": "24610",
   "lat": 44.88289,
   "lng": 0.16844,
@@ -391,9 +391,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/23/2385/2385_p1.jpg"
  },
  {
-  "name": "Golf Club de Perigueux",
+  "name": "Golf Club de Périgueux",
   "department": "24",
-  "city": "Marsac sur l'Isle",
+  "city": "Marsac-sur-l'Isle",
   "postcode": "24430",
   "lat": 45.19583,
   "lng": 0.6725,
@@ -410,7 +410,7 @@
  {
   "name": "Golf Domaine d'Essendieras",
   "department": "24",
-  "city": "Saint Medard d'Excideuil",
+  "city": "Saint-Médard-d'Excideuil",
   "postcode": "24160",
   "lat": 45.3556,
   "lng": 1.09385,
@@ -461,7 +461,7 @@
  {
   "name": "Golf de la Forge",
   "department": "24",
-  "city": "Siorac en Perigord",
+  "city": "Siorac-en-Périgord",
   "postcode": "24170",
   "lat": 44.81861,
   "lng": 0.99278,
@@ -478,7 +478,7 @@
  {
   "name": "Golf de la Marterie",
   "department": "24",
-  "city": "Saint Felix Reilhac Mortemart",
+  "city": "Saint-Félix-Reilhac-Mortemart",
   "postcode": "24260",
   "lat": 44.99778,
   "lng": 0.88056,
@@ -529,7 +529,7 @@
  {
   "name": "Lolivarie Golf Club",
   "department": "24",
-  "city": "Saint Germain de Belves",
+  "city": "Saint-Germain-de-Belvès",
   "postcode": "24170",
   "lat": 44.80932,
   "lng": 1.01348,
@@ -546,7 +546,7 @@
  {
   "name": "Cabot Bordeaux",
   "department": "33",
-  "city": "Le Pian Medoc",
+  "city": "Le Pian-Médoc",
   "postcode": "33290",
   "lat": 44.95083,
   "lng": -0.71111,
@@ -580,7 +580,7 @@
  {
   "name": "Golf Bluegreen Gujan-Mestras",
   "department": "33",
-  "city": "Gujan Mestras",
+  "city": "Gujan-Mestras",
   "postcode": "33470",
   "lat": 44.60333,
   "lng": -1.09167,
@@ -595,9 +595,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/07/0774/0774_p1.jpg"
  },
  {
-  "name": "Golf Bluegreen Lacanau - la Mejanne",
+  "name": "Golf Bluegreen Lacanau La Méjanne",
   "department": "33",
-  "city": "Lacanau Ocean",
+  "city": "Lacanau-Océan",
   "postcode": "33680",
   "lat": 45.00066,
   "lng": -1.17712,
@@ -648,7 +648,7 @@
  {
   "name": "Golf Cap Ferret",
   "department": "33",
-  "city": "Lege Cap Ferret",
+  "city": "Lège-Cap-Ferret",
   "postcode": "33950",
   "lat": 44.73085,
   "lng": -1.19819,
@@ -699,7 +699,7 @@
  {
   "name": "Golf de Teynac",
   "department": "33",
-  "city": "Beychac et Caillau",
+  "city": "Beychac-et-Caillau",
   "postcode": "33750",
   "lat": 44.85919,
   "lng": -0.36525,
@@ -750,7 +750,7 @@
  {
   "name": "Golf du Sauternais",
   "department": "33",
-  "city": "Saint Pardon de Conques",
+  "city": "Saint-Pardon-de-Conques",
   "postcode": "33210",
   "lat": 44.53472,
   "lng": -0.19,
@@ -765,9 +765,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/06/0655/0655_p1.jpg"
  },
  {
-  "name": "Grand Saint-Emilionnais Golf Club",
+  "name": "Grand Saint-Émilionnais Golf Club",
   "department": "33",
-  "city": "Gardegan et Tourtirac",
+  "city": "Gardegan-et-Tourtirac",
   "postcode": "33350",
   "lat": 44.89564,
   "lng": -0.02182,
@@ -784,7 +784,7 @@
  {
   "name": "UGolf Bordeaux Cameyrac",
   "department": "33",
-  "city": "Saint Sulpice et Cameyrac",
+  "city": "Saint-Sulpice-et-Cameyrac",
   "postcode": "33450",
   "lat": 44.88694,
   "lng": -0.38917,
@@ -886,7 +886,7 @@
  {
   "name": "Golf de Moliets",
   "department": "40",
-  "city": "Moliets et Maa",
+  "city": "Moliets-et-Maâ",
   "postcode": "40660",
   "lat": 43.84722,
   "lng": -1.37778,
@@ -901,9 +901,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/05/0591/0591_p1.jpeg"
  },
  {
-  "name": "Golf de Mont de Marsan",
+  "name": "Golf de Mont-de-Marsan",
   "department": "40",
-  "city": "Saint Avit",
+  "city": "Saint-Avit",
   "postcode": "40090",
   "lat": 43.94115,
   "lng": -0.42027,
@@ -952,7 +952,7 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/08/0804/0804_p1.jpg"
  },
  {
-  "name": "Golf de la Cite Verte",
+  "name": "Golf de la Cité Verte",
   "department": "40",
   "city": "Hagetmau",
   "postcode": "40700",
@@ -969,9 +969,9 @@
   "photo_url": null
  },
  {
-  "name": "Les Greens d'Eugenie",
+  "name": "Les Greens d'Eugénie",
   "department": "40",
-  "city": "Bahus Soubiran",
+  "city": "Bahus-Soubiran",
   "postcode": "40320",
   "lat": 43.68549,
   "lng": -0.36655,
@@ -1003,9 +1003,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/02/0232/0232_p1.jpg"
  },
  {
-  "name": "Golf Agen Bon Encontre",
+  "name": "Golf Agen Bon-Encontre",
   "department": "47",
-  "city": "Bon Encontre",
+  "city": "Bon-Encontre",
   "postcode": "47240",
   "lat": 44.20043,
   "lng": 0.68044,
@@ -1071,9 +1071,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/03/0376/0376_p1.jpg"
  },
  {
-  "name": "Golf de Villeneuve sur Lot",
+  "name": "Golf de Villeneuve-sur-Lot",
   "department": "47",
-  "city": "Castelnaud de Gratecambe",
+  "city": "Castelnaud-de-Gratecambe",
   "postcode": "47290",
   "lat": 44.48629,
   "lng": 0.67634,
@@ -1088,9 +1088,9 @@
   "photo_url": null
  },
  {
-  "name": "Golf du Chateau d'Allot",
+  "name": "Golf du Château d'Allot",
   "department": "47",
-  "city": "Boe",
+  "city": "Boé",
   "postcode": "47550",
   "lat": 44.15526,
   "lng": 0.65853,
@@ -1209,7 +1209,7 @@
  {
   "name": "Golf de Chantaco",
   "department": "64",
-  "city": "Saint Jean de Luz",
+  "city": "Saint-Jean-de-Luz",
   "postcode": "64500",
   "lat": 43.37972,
   "lng": -1.63972,
@@ -1241,9 +1241,9 @@
   "photo_url": null
  },
  {
-  "name": "Golf de Salies de Bearn",
+  "name": "Golf de Salies-de-Béarn",
   "department": "64",
-  "city": "Salies de Bearn",
+  "city": "Salies-de-Béarn",
   "postcode": "64270",
   "lat": 43.47361,
   "lng": -0.91528,
@@ -1277,7 +1277,7 @@
  {
   "name": "Pau Golf Club 1856",
   "department": "64",
-  "city": "Billere",
+  "city": "Billère",
   "postcode": "64140",
   "lat": 43.29643,
   "lng": -0.39335,
@@ -1309,9 +1309,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/10/1077/1077_p1.png"
  },
  {
-  "name": "Golf Bluegreen Mazieres en Gatine",
+  "name": "Golf Bluegreen Mazières-en-Gâtine",
   "department": "79",
-  "city": "Mazieres en Gatine",
+  "city": "Mazières-en-Gâtine",
   "postcode": "79310",
   "lat": 46.50897,
   "lng": -0.3373,
@@ -1396,7 +1396,7 @@
  {
   "name": "Beauvoir Golf Club",
   "department": "86",
-  "city": "Mignaloux Beauvoir",
+  "city": "Mignaloux-Beauvoir",
   "postcode": "86550",
   "lat": 46.53038,
   "lng": 0.42573,
@@ -1413,7 +1413,7 @@
  {
   "name": "Golf de Loudun-Fontevraud",
   "department": "86",
-  "city": "Roiffe",
+  "city": "Roiffé",
   "postcode": "86120",
   "lat": 47.15889,
   "lng": 0.04472,
@@ -1428,7 +1428,7 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/02/0236/0236_p1.jpg"
  },
  {
-  "name": "Golf de Poitiers-Chalons",
+  "name": "Golf de Poitiers-Châlons",
   "department": "86",
   "city": "Poitiers",
   "postcode": "86000",
@@ -1462,9 +1462,9 @@
   "photo_url": "https://xnet.ffgolf.org/share/photos/03/0399/0399_p1.jpeg"
  },
  {
-  "name": "Golf la Roche Posay",
+  "name": "Golf La Roche-Posay",
   "department": "86",
-  "city": "La Roche Posay",
+  "city": "La Roche-Posay",
   "postcode": "86270",
   "lat": 46.77505,
   "lng": 0.80371,

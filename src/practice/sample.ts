@@ -14,7 +14,7 @@ const rounds: RoundStats = {
   holesPlayed: rels.length * 18,
   rel18: 20.4,
   best: { id: 's0', rel: 17, strokes: 89, holes: 18, date: iso(12), golf: 'Golf de Démonstration' },
-  series: rels.map((r, i) => ({ id: `s${i}`, date: iso((rels.length - i) * 14), rel18: r, strokes: 72 + r, holes: 18 })),
+  series: rels.map((r, i) => ({ id: `s${i}`, date: iso((rels.length - i) * 14), rel18: r, strokes: 72 + r, holes: 18, putts18: 34 - Math.round(i / 3), firPct: 40 + ((i * 7) % 20), girPct: 10 + ((i * 5) % 18), pen18: 3 - (i % 3), udPct: 15 + ((i * 6) % 20) })),
   dist: { eagle: 0, birdie: 11, par: 62, bogey: 88, double: 41, triple: 14 },
   byPar: { 3: 0.9, 4: 1.2, 5: 1.1 },
   fairways: { n: 160, hit: 78, left: 34, right: 42, short: 6, pct: 49 },

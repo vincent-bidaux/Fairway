@@ -64,7 +64,6 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
   const [penTouched, setPenTouchedState] = useState<number[]>(() => (session ? (readDraft(session.id)?.penTouched ?? []) : []));
   const [sync, setSync] = useState<Sync>('ok');
   const [busy, setBusy] = useState(false);
-  const [confirmLeave, setConfirmLeave] = useState(false);
   const [confirmEmpty, setConfirmEmpty] = useState(false);
   const [rev, setRev] = useState(0);
 
@@ -281,7 +280,6 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
         onConfirm={() => void doFinish()}
         onClose={() => setConfirmEmpty(false)}
       />
-      <ConfirmSheet open={confirmLeave} title="Quitter ?" confirmLabel="Quitter" destructive onConfirm={leave} onClose={() => setConfirmLeave(false)} />
     </>
   );
 }

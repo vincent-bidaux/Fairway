@@ -35,6 +35,7 @@ export function roundStats(rounds: RoundRow[]): RoundStats {
     if (!played.length) continue;
     let rel = 0;
     let strokes = 0;
+    const per = { putts: 0, puttHoles: 0, fwN: 0, fwHit: 0, girN: 0, girHit: 0, pen: 0, udN: 0, udMade: 0 };
     for (const h of played) {
       const d = h.strokes! - h.par;
       rel += d;
@@ -49,16 +50,23 @@ export function roundStats(rounds: RoundRow[]): RoundStats {
       bp.sum += d;
       bp.n++;
       pen += h.penalties ?? 0;
+      per.pen += h.penalties ?? 0;
       if (h.par >= 4 && h.fairway) {
         fw.n++;
         fw[h.fairway]++;
+        per.fwN++;
+        if (h.fairway === 'hit') per.fwHit++;
       }
       const g = girOf(h);
       if (g != null) {
         gir.n++;
         gir.hit += g;
+        per.girN++;
+        per.girHit += g;
       }
       if (h.putts != null) {
+        per.putts += h.putts;
+        per.puttHoles++;
         putts.sum += h.putts;
         putts.holes++;
         if (h.putts >= 3) putts.three++;
@@ -70,14 +78,30 @@ export function roundStats(rounds: RoundRow[]): RoundStats {
       if (g === 0 && h.up_down != null) {
         ud.n++;
         ud.made += h.up_down;
+        per.udN++;
+        per.udMade += h.up_down;
       }
     }
     holesPlayed += played.length;
     relSum += rel;
     const rel18 = r1((rel * 18) / played.length);
     const date = r.played_at.slice(0, 10);
-    series.push({ id: r.id, date, rel18, strokes, holes: played.length });
-    if (played.length >= 9 && (!best || rel18 < (best.rel * 18) / best.holes)) {
+    series.push({
+      id: r.id,
+      date,
+      rel18,
+      strokes,
+      holes: played.length,
+      putts18: per.puttHoles ? r1((per.putts * 18) / per.puttHoles) : null,
+      firPct: pct(per.fwHit, per.fwN),
+      girPct: pct(per.girHit, per.girN),
+      pen18: r1((per.pen * 18) / played.length),
+      udPct: pct(per.udMade, per.udN),
+    });
+    // Meilleure partie : les 18 trous complets d'abord, puis les 9 trous complets.
+    const tier = played.length >= 18 ? 2 : played.length >= 9 ? 1 : 0;
+    const bestTier = best ? (best.holes >= 18 ? 2 : 1) : -1;
+    if (tier > 0 && (tier > bestTier || (tier === bestTier && rel < best!.rel))) {
       best = { id: r.id, rel, strokes, holes: played.length, date, golf: r.golf_name };
     }
   }

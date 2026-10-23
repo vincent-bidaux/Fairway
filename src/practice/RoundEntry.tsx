@@ -164,7 +164,7 @@ const HoleView = memo(function HoleView({ e, locked, penTouched, onScore, onPar,
 // ------------------------------------------------------------------ bandeau
 function HoleStrip({ entries, cur, onGo }: { entries: HoleEntry[]; cur: number; onGo: (i: number) => void }) {
   return (
-    <div className="hs" role="tablist" aria-label="Trous" style={{ gridTemplateColumns: `repeat(${entries.length}, 1fr)` }}>
+    <div className={`hs${entries.length > 9 ? ' hs--many' : ''}`} role="tablist" aria-label="Trous" style={{ gridTemplateColumns: `repeat(${entries.length}, 1fr)` }}>
       {entries.map((e, i) => {
         const k = e.strokes != null ? resKey(e.strokes - e.par) : null;
         return (

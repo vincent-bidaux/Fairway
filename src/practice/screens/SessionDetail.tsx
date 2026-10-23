@@ -150,7 +150,7 @@ export function SessionDetail({ id }: { id: string }) {
 
   const isRound = s.kind === 'round';
   const place = s.golf_name ?? s.place ?? 'Autre lieu';
-  const title = isRound ? place : `Practice · ${place}`;
+  const title = place;
 
   const share = async () => {
     const lines: string[] = [];
@@ -200,18 +200,20 @@ export function SessionDetail({ id }: { id: string }) {
       <button type="button" className="nav-btn nav-btn--icon" aria-label="Partager le résumé" onClick={share}>
         <Icon name="share" size={22} />
       </button>
-      <button type="button" className="text-btn" onClick={() => ui.push({ type: 'session-editor', session: s })}>
-        Modifier
+      <button type="button" className="nav-btn nav-btn--icon" aria-label="Modifier la séance" onClick={() => ui.push({ type: 'session-editor', session: s })}>
+        <Icon name="edit" size={22} />
       </button>
     </>
   );
 
   const rel = tot.rel;
   const a = avg && avg.count >= 2 ? avg : null;
+  const puttsComplete = !!nums.putts && nums.putts.holes >= tot.played * 0.75;
 
   return (
     <Screen title={title} left={back} right={right}>
       <p className="detail-when">
+        {isRound ? '' : 'Practice · '}
         {fmtDate(s.played_at)}
         {isRound && teeLabel(s.tee) ? ` · Repère ${teeLabel(s.tee)!.toLowerCase()}` : ''}
       </p>
@@ -265,10 +267,10 @@ export function SessionDetail({ id }: { id: string }) {
                   <StatLine
                     label="Putts"
                     value={`${nums.putts.sum}`}
-                    sub={`${nf(nums.putts.per18)} par 18 trous`}
-                    avg={a && a.putts.per18 != null ? { text: nf(a.putts.per18), diff: nums.putts.per18 - a.putts.per18, unit: '', lowerIsBetter: true } : null}
+                    sub={puttsComplete ? `${nf(nums.putts.per18)} par 18 trous` : `saisis sur ${nums.putts.holes} trou${nums.putts.holes > 1 ? 's' : ''}`}
+                    avg={puttsComplete && a && a.putts.per18 != null ? { text: nf(a.putts.per18), diff: nums.putts.per18 - a.putts.per18, unit: '', lowerIsBetter: true } : null}
                   />
-                  <StatLine label="3 putts ou plus" value={`${nums.putts.three}`} sub={`${Math.round((100 * nums.putts.three) / nums.putts.holes)} % des trous`} />
+                  <StatLine label="3 putts ou plus" value={`${nums.putts.three}`} sub={`sur ${nums.putts.holes} trou${nums.putts.holes > 1 ? 's' : ''} saisi${nums.putts.holes > 1 ? 's' : ''}`} />
                 </>
               )}
               {nums.pen && (

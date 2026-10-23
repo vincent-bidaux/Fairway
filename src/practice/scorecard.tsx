@@ -25,7 +25,7 @@ export function ariaScore(strokes: number, par: number): string {
   return `${strokes} coup${strokes > 1 ? 's' : ''}, ${name}`;
 }
 
-export const fmtRel = (rel: number) => (rel === 0 ? 'E' : rel > 0 ? `+${rel}` : `−${Math.abs(rel)}`);
+export const fmtRel = (rel: number) => (rel === 0 ? '±0' : rel > 0 ? `+${rel}` : `−${Math.abs(rel)}`);
 
 export interface Totals {
   strokes: number;

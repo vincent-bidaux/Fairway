@@ -37,7 +37,9 @@ function smooth(pts: Pt[]): string {
     const hi = Math.max(p1[1], p2[1]);
     const c1y = Math.min(hi, Math.max(lo, p1[1] + (p2[1] - p0[1]) * t));
     const c2y = Math.min(hi, Math.max(lo, p2[1] - (p3[1] - p1[1]) * t));
-    d += `C${(p1[0] + (p2[0] - p0[0]) * t).toFixed(1)},${c1y.toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) * t).toFixed(1)},${c2y.toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+    const c1x = Math.min(p2[0], Math.max(p1[0], p1[0] + (p2[0] - p0[0]) * t));
+    const c2x = Math.min(p2[0], Math.max(p1[0], p2[0] - (p3[0] - p1[0]) * t));
+    d += `C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
   }
   return d;
 }

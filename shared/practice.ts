@@ -55,7 +55,19 @@ export interface RoundStats {
   holesPlayed: number;
   rel18: number | null; // score relatif moyen ramené à 18 trous
   best: { id: string; rel: number; strokes: number; holes: number; date: string; golf: string | null } | null;
-  series: Array<{ id: string; date: string; rel18: number; strokes: number; holes: number }>;
+  /** Une entrée par partie (ordre chronologique). Pourcentages null quand la donnée n'a pas été saisie. */
+  series: Array<{
+    id: string;
+    date: string;
+    rel18: number;
+    strokes: number;
+    holes: number;
+    putts18: number | null;
+    firPct: number | null;
+    girPct: number | null;
+    pen18: number;
+    udPct: number | null;
+  }>;
   dist: { eagle: number; birdie: number; par: number; bogey: number; double: number; triple: number }; // nombres de trous
   byPar: { 3: number | null; 4: number | null; 5: number | null }; // coups moyens relatifs au par
   fairways: { n: number; hit: number; left: number; right: number; short: number; pct: number | null };

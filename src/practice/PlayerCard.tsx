@@ -10,17 +10,19 @@ export interface CardSummary {
   ranges: number;
 }
 
-/** Meilleure partie (≥ 9 trous saisis), comparée au par et ramenée à 18 trous. */
+/** Meilleure partie : parmi les 18 trous saisis en entier ; à défaut, parmi les 9 trous. */
 export function bestRound(sessions: PlaySession[]): { strokes: number; rel: number; holes: number } | null {
-  let best: { strokes: number; rel: number; holes: number; r18: number } | null = null;
-  for (const s of sessions) {
-    const sum = s.summary;
-    if (s.kind !== 'round' || !sum || sum.played < 9) continue;
-    const r = sum.strokes - sum.par;
-    const r18 = (r * 18) / sum.played;
-    if (!best || r18 < best.r18) best = { strokes: sum.strokes, rel: r, holes: sum.played, r18 };
-  }
-  return best;
+  const pick = (full: boolean) => {
+    let best: { strokes: number; rel: number; holes: number } | null = null;
+    for (const s of sessions) {
+      const sum = s.summary;
+      if (s.kind !== 'round' || !sum || (full ? sum.played < 18 : sum.played < 9)) continue;
+      const r = sum.strokes - sum.par;
+      if (!best || (r * 18) / sum.played < (best.rel * 18) / best.holes) best = { strokes: sum.strokes, rel: r, holes: sum.played };
+    }
+    return best;
+  };
+  return pick(true) ?? pick(false);
 }
 
 export function PlayerCard({

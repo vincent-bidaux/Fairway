@@ -840,3 +840,6 @@
 .pe-index-row .row-main {
   gap: 1px;
 }
+
+.legend .legend-name { overflow: visible; white-space: normal; }
+.legend .legend-item { align-items: flex-start; }

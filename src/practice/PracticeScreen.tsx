@@ -10,7 +10,7 @@ import { useUi } from '../ui';
 import { useAccount, useDataVersion } from './account';
 import { getProfile, getStats, listSessions, type Profile } from './api';
 import { Dashboard } from './Dashboard';
-import { PlayerCard, bestRound } from './PlayerCard';
+import { PlayerCard } from './PlayerCard';
 import { sampleProfile, sampleSessions, sampleStats } from './sample';
 import { SessionCell } from './SessionCell';
 import { PERIODS, readPeriod, writePeriod } from './statsFormat';
@@ -157,7 +157,7 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
         profile={data.profile}
         fallbackName={me.demo ? 'Demo' : me.user.name}
         counts={{ rounds: me.rounds, ranges: me.ranges }}
-        best={bestRound(data.sessions)}
+        best={stats.rounds.best ? { strokes: stats.rounds.best.strokes, rel: stats.rounds.best.rel, holes: stats.rounds.best.holes } : null}
         onOpenProfile={() => ui.push({ type: 'profile' })}
         onOpenIndex={() => ui.push({ type: 'stat', metric: 'index' })}
       />

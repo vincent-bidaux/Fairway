@@ -120,7 +120,7 @@ export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; pr
               {r.rel18 == null ? '—' : rel(r.rel18)}
             </Value>
             <span className="tile-sub">
-              {r.count} {r.count > 1 ? 'parties' : 'partie'}{r.best ? ` · meilleure ${r.best.strokes} (${rel(r.best.rel, 0)})` : ''}
+              {r.count === 0 ? 'Aucune partie sur la période' : `${r.count} ${r.count > 1 ? 'parties' : 'partie'}`}{r.best ? ` · meilleure ${r.best.strokes} (${rel(r.best.rel, 0)})` : ''}
             </span>
           </span>
           {r.series.length > 1 && <Sparkline values={r.series.map((s) => s.rel18)} width={112} height={54} color="var(--tint)" />}

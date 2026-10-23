@@ -203,16 +203,13 @@ function Body({ metric, stats, profile, sessions, period }: { metric: StatMetric
   const need = <Notice>Saisissez au moins {MIN_ROUNDS} parties sur la période pour voir cette statistique.</Notice>;
   const none = <Notice>Aucune partie sur cette période.</Notice>;
 
-  // putts par partie (ramenés à 18 trous), pour la courbe
-  const puttSeries: LinePoint[] = useMemo(
-    () =>
-      sessions
-        .filter((s) => s.summary && s.summary.putts != null && s.summary.played >= 9 && (!stats.from || s.played_at.slice(0, 10) >= stats.from))
-        .sort((a, b) => a.played_at.localeCompare(b.played_at))
-        .map((s) => ({ t: ts(s.played_at), y: Math.round(((s.summary!.putts! * 18) / s.summary!.played) * 10) / 10, label: fmtDateFull(s.played_at) })),
-    [sessions, stats.from],
-  );
+  const curve = (pick: (s: StatsResponse['rounds']['series'][number]) => number | null): LinePoint[] =>
+    r.series.flatMap((s) => {
+      const y = pick(s);
+      return y == null ? [] : [{ t: ts(s.date), y, label: `${s.holes} trous` }];
+    });
 
+  const puttSeries = curve((s) => s.putts18);
   switch (metric) {
     case 'score': {
       if (r.series.length === 0) return <Card>{none}</Card>;
@@ -326,6 +323,7 @@ function Body({ metric, stats, profile, sessions, period }: { metric: StatMetric
         <Card>
           <Big value={pctText(f.pct)} unit={`${f.hit} sur ${f.n} fairways`} color={color} />
           <Delta cur={f.pct} prev={p?.fairways.pct} better="up" digits={0} unit=" pts" />
+          <Curve data={curve((s) => s.firPct)} color={color} unit="% de fairways" fmt={(n) => `${Math.round(n)}`} name="Fairways touchés" />
           <div style={{ marginTop: 16 }}>
             <StackedBar segments={segs} height={22} gap={3} />
           </div>
@@ -348,6 +346,7 @@ function Body({ metric, stats, profile, sessions, period }: { metric: StatMetric
               <Delta cur={r.gir.pct} prev={p?.gir.pct} better="up" digits={0} unit=" pts" />
             </div>
           </div>
+          <Curve data={curve((s) => s.girPct)} color={color} unit="% de greens" fmt={(n) => `${Math.round(n)}`} name="Greens en régulation" />
           <dl className="sd-stat-row">
             <div>
               <dt>Putts / GIR</dt>
@@ -371,24 +370,7 @@ function Body({ metric, stats, profile, sessions, period }: { metric: StatMetric
         <Card>
           <Big value={r.putts.per18 == null ? '—' : nf(r.putts.per18)} unit="putts sur 18 trous" color={color} />
           <Delta cur={r.putts.per18} prev={p?.putts.per18} better="down" />
-          {puttSeries.length > 0 && (
-            <LineChart
-              data={puttSeries}
-              color={color}
-              rolling={puttSeries.length >= 5 ? 5 : undefined}
-              yFormat={(n) => nf(n, 0)}
-              ariaLabel={`Putts par partie (ramenés à 18 trous), ${puttSeries.length} parties`}
-              placeholder="Touchez le graphe pour voir une partie"
-              describe={(pt) => (
-                <>
-                  <span>{pt.label}</span>
-                  <span>
-                    <b>{nf(pt.y)}</b> putts / 18 trous
-                  </span>
-                </>
-              )}
-            />
-          )}
+          <Curve data={puttSeries} color={color} unit="putts / 18 trous" fmt={(n) => nf(n)} name="Putts" />
           <dl className="sd-stat-row">
             <div>
               <dt>3-putts</dt>
@@ -419,6 +401,7 @@ function Body({ metric, stats, profile, sessions, period }: { metric: StatMetric
               <Delta cur={r.upDown.pct} prev={p?.upDown.pct} better="up" digits={0} unit=" pts" />
             </div>
           </div>
+          <Curve data={curve((s) => s.udPct)} color={color} unit="% d’up & down" fmt={(n) => `${Math.round(n)}`} name="Up & down" />
         </Card>
       );
 
@@ -428,6 +411,7 @@ function Body({ metric, stats, profile, sessions, period }: { metric: StatMetric
         <Card>
           <Big value={r.penalties.per18 == null ? '—' : nf(r.penalties.per18)} unit="pénalités sur 18 trous" color={color} />
           <Delta cur={r.penalties.per18} prev={p?.penalties.per18} better="down" />
+          <Curve data={curve((s) => s.pen18)} color={color} unit="pénalités / 18 trous" fmt={(n) => nf(n)} name="Pénalités" />
           <dl className="sd-stat-row">
             <div>
               <dt>Période préc.</dt>
@@ -485,6 +469,30 @@ function Body({ metric, stats, profile, sessions, period }: { metric: StatMetric
   }
 }
 
+
+function Curve({ data, color, unit, fmt, name }: { data: LinePoint[]; color: string; unit: string; fmt: (n: number) => string; name: string }) {
+  if (data.length < 2) return null;
+  return (
+    <LineChart
+      data={data}
+      color={color}
+      rolling={data.length >= 5 ? 5 : undefined}
+      yFormat={fmt}
+      ariaLabel={`${name} par partie, ${data.length} parties`}
+      placeholder="Touchez le graphe pour voir une partie"
+      describe={(pt, avg) => (
+        <>
+          <span>{fmtDateShortYear(toIsoLocal(pt.t))}</span>
+          <span>
+            <b>{fmt(pt.y)}</b> {unit}
+            {avg != null && <> · moy. {fmt(avg)}</>}
+          </span>
+        </>
+      )}
+    />
+  );
+}
+
 const toIsoLocal = (t: number) => {
   const d = new Date(t);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -506,7 +514,7 @@ function PracticeBody({ stats, period, color }: { stats: StatsResponse; period: 
   return (
     <Card>
       <Big value={what === 'minutes' ? duration(rg.minutes) : rg.balls.toLocaleString('fr-FR')} unit={what === 'minutes' ? `en ${rg.count} séance${rg.count > 1 ? 's' : ''}` : 'balles frappées'} color={color} />
-      <Delta cur={what === 'minutes' ? rg.minutes : rg.balls} prev={stats.prevRange ? (what === 'minutes' ? stats.prevRange.minutes : stats.prevRange.balls) : null} better="up" digits={0} />
+      <Delta cur={what === 'minutes' ? rg.minutes : rg.balls} prev={stats.prevRange ? (what === 'minutes' ? stats.prevRange.minutes : stats.prevRange.balls) : null} better="up" digits={0} unit={what === 'minutes' ? ' min' : ' balles'} />
       <div style={{ margin: '12px 0 4px' }}>
         <Segmented value={what} onChange={setWhat} label="Mesure" options={[{ value: 'minutes', label: 'Minutes' }, { value: 'balls', label: 'Balles' }]} />
       </div>

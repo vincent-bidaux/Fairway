@@ -64,7 +64,6 @@ export function PlaceDate({ s, onChange }: PlaceDateProps) {
           iconColor="var(--tint)"
           label="Golf"
           value={<span className={golfLabel ? '' : 'si-placeholder'}>{golfLabel ?? 'Choisir'}</span>}
-          sub={s.golf_id != null ? s.golf_city : undefined}
           chevron
           onClick={() => setPick(true)}
         />

@@ -16,6 +16,7 @@ function H() {
   });
   const [deps, setDeps] = useState<any[]>([]);
   const [toastMsg, setToast] = useState('');
+  useEffect(() => { pushLayer(() => setStack((s) => s.slice(0, -1))); }, []);
   useEffect(() => { getDepartments().then(setDeps).catch(() => {}); }, []);
   const push = useCallback((r: Route) => { setStack((s) => [...s, r]); pushLayer(() => setStack((s) => s.slice(0, -1))); }, []);
   const ui = useMemo<Ui>(() => ({ push, back: () => history.back(), openZone() {}, toast: (m) => { setToast(m); (window as any).__toasts = [...((window as any).__toasts || []), m]; setTimeout(() => setToast(''), 2200); }, showSplash() {}, openLogin() {}, departments: deps }), [push, deps]);

@@ -22,7 +22,7 @@ interface SeedGolf {
 }
 
 /** Bump when db/seed/*.json changes: the next cron re-applies the seed (upsert, nothing is deleted). */
-export const SEED_VERSION = '2026-10-23.3';
+export const SEED_VERSION = '2026-10-23.4';
 
 interface SeedSource {
   label: string;
