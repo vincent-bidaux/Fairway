@@ -1,11 +1,15 @@
 import { Icon, type IconName } from './Icon';
 
-export type TabId = 'events' | 'golfs' | 'favorites' | 'settings';
+/** Nom de l'onglet (provisoire, voir PLAN-MES-PARTIES.md). */
+export const PARTIES_LABEL = 'Mes parties';
+
+export type TabId = 'events' | 'golfs' | 'favorites' | 'parties' | 'settings';
 
 const TABS: Array<{ id: TabId; label: string; icon: IconName }> = [
   { id: 'events', label: 'Compétitions', icon: 'flag' },
   { id: 'golfs', label: 'Golfs', icon: 'pin' },
   { id: 'favorites', label: 'Favoris', icon: 'star' },
+  { id: 'parties', label: PARTIES_LABEL, icon: 'chart' },
   { id: 'settings', label: 'Réglages', icon: 'gear' },
 ];
 

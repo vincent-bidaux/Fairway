@@ -4,6 +4,8 @@ export interface Env {
   ANTHROPIC_API_KEY?: string;
   ANTHROPIC_MODEL: string;
   ADMIN_TOKEN?: string;
+  RESEND_API_KEY?: string;
+  BETTER_AUTH_SECRET?: string;
   CRAWL_BATCH_SIZE: string;
   CRAWL_MIN_INTERVAL_HOURS: string;
 }

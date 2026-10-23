@@ -16,6 +16,7 @@
     "seed:build": "node ./scripts/build-seed.mjs"
   },
   "dependencies": {
+    "better-auth": "^1.7.12",
     "hono": "^4.6.0",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",

@@ -5,12 +5,26 @@ import { Screen } from '../components/Screen';
 import { zoneLabel } from '../lib';
 import { setPrefs, usePrefs } from '../store';
 import { useUi } from '../ui';
+import { refreshAccount, signOut, useAccount } from '../practice/account';
+import { deleteAccount, exportUrl, resetDemo } from '../practice/api';
 
 export const APP_VERSION = '0.1.0';
 
 export function SettingsScreen() {
   const { zone, adminToken } = usePrefs();
   const ui = useUi();
+  const account = useAccount();
+
+  const onDelete = async () => {
+    if (!window.confirm('Supprimer votre compte et toutes vos parties ? Cette action est définitive.')) return;
+    try {
+      await deleteAccount();
+      await refreshAccount();
+      ui.toast('Compte supprimé');
+    } catch (e) {
+      ui.toast((e as Error).message);
+    }
+  };
 
   return (
     <Screen title="Réglages" eyebrow>
@@ -30,6 +44,51 @@ export function SettingsScreen() {
           chevron
           onClick={() => ui.openZone()}
         />
+      </Group>
+
+      <Group
+        title="Compte"
+        footer={
+          account.status === 'in'
+            ? account.me.demo
+              ? 'Compte de démo partagé : il est remis à zéro chaque nuit.'
+              : 'Votre compte sert uniquement à enregistrer vos parties et vos stats.'
+            : 'Un compte n’est utile que pour l’onglet Mes parties. Le reste de l’app fonctionne sans compte.'
+        }
+      >
+        {account.status === 'in' ? (
+          <>
+            <Row
+              icon={<Icon name="person" size={16} />}
+              iconColor="var(--blue)"
+              label={account.me.user.name || account.me.user.email}
+              sub={account.me.demo ? 'Compte de démo' : account.me.user.email}
+              chevron
+              onClick={() => ui.push({ type: 'profile' })}
+            />
+            {!account.me.demo && <Row label="Exporter mes données" href={exportUrl} chevron />}
+            {account.me.demo && (
+              <Row
+                label="Remettre la démo à zéro"
+                onClick={async () => {
+                  await resetDemo();
+                  await refreshAccount();
+                  ui.toast('Démo remise à zéro');
+                }}
+              />
+            )}
+            <Row label="Se déconnecter" onClick={() => void signOut().then(() => ui.toast('Déconnecté'))} />
+            {!account.me.demo && <Row label="Supprimer mon compte" destructive onClick={() => void onDelete()} />}
+          </>
+        ) : (
+          <Row
+            icon={<Icon name="person" size={16} />}
+            iconColor="var(--blue)"
+            label="Se connecter ou créer un compte"
+            chevron
+            onClick={() => ui.openLogin()}
+          />
+        )}
       </Group>
 
       <Group title="À propos">

@@ -1,0 +1,143 @@
+import { girOf, type HoleEntry, type RangeStats, type RoundStats, type DrillCategory } from '../../shared/practice';
+
+export interface RoundRow {
+  id: string;
+  played_at: string;
+  golf_name: string | null;
+  holes: HoleEntry[];
+}
+export interface RangeRow {
+  id: string;
+  played_at: string;
+  duration_min: number | null;
+  balls: number | null;
+  drills: Array<{ label: string; category: DrillCategory; distance_m: number | null; attempts: number | null; successes: number | null }>;
+}
+
+const r1 = (x: number) => Math.round(x * 10) / 10;
+const pct = (a: number, n: number) => (n ? Math.round((100 * a) / n) : null);
+
+export function roundStats(rounds: RoundRow[]): RoundStats {
+  const dist = { eagle: 0, birdie: 0, par: 0, bogey: 0, double: 0, triple: 0 };
+  const byPar: Record<number, { sum: number; n: number }> = { 3: { sum: 0, n: 0 }, 4: { sum: 0, n: 0 }, 5: { sum: 0, n: 0 } };
+  const fw = { n: 0, hit: 0, left: 0, right: 0, short: 0 };
+  const gir = { n: 0, hit: 0 };
+  const putts = { sum: 0, holes: 0, three: 0, onGir: 0, girHoles: 0 };
+  const ud = { n: 0, made: 0 };
+  let pen = 0;
+  let holesPlayed = 0;
+  let relSum = 0;
+  const series: RoundStats['series'] = [];
+  let best: RoundStats['best'] = null;
+
+  for (const r of [...rounds].sort((a, b) => a.played_at.localeCompare(b.played_at))) {
+    const played = r.holes.filter((h) => h.strokes != null);
+    if (!played.length) continue;
+    let rel = 0;
+    let strokes = 0;
+    for (const h of played) {
+      const d = h.strokes! - h.par;
+      rel += d;
+      strokes += h.strokes!;
+      if (d <= -2) dist.eagle++;
+      else if (d === -1) dist.birdie++;
+      else if (d === 0) dist.par++;
+      else if (d === 1) dist.bogey++;
+      else if (d === 2) dist.double++;
+      else dist.triple++;
+      const bp = byPar[Math.min(Math.max(h.par, 3), 5)];
+      bp.sum += d;
+      bp.n++;
+      pen += h.penalties ?? 0;
+      if (h.par >= 4 && h.fairway) {
+        fw.n++;
+        fw[h.fairway]++;
+      }
+      const g = girOf(h);
+      if (g != null) {
+        gir.n++;
+        gir.hit += g;
+      }
+      if (h.putts != null) {
+        putts.sum += h.putts;
+        putts.holes++;
+        if (h.putts >= 3) putts.three++;
+        if (g === 1) {
+          putts.onGir += h.putts;
+          putts.girHoles++;
+        }
+      }
+      if (g === 0 && h.up_down != null) {
+        ud.n++;
+        ud.made += h.up_down;
+      }
+    }
+    holesPlayed += played.length;
+    relSum += rel;
+    const rel18 = r1((rel * 18) / played.length);
+    const date = r.played_at.slice(0, 10);
+    series.push({ id: r.id, date, rel18, strokes, holes: played.length });
+    if (played.length >= 9 && (!best || rel18 < (best.rel * 18) / best.holes)) {
+      best = { id: r.id, rel, strokes, holes: played.length, date, golf: r.golf_name };
+    }
+  }
+
+  const avg = (b: { sum: number; n: number }) => (b.n ? Math.round((100 * b.sum) / b.n) / 100 : null);
+  return {
+    count: series.length,
+    holesPlayed,
+    rel18: holesPlayed ? r1((relSum * 18) / holesPlayed) : null,
+    best,
+    series,
+    dist,
+    byPar: { 3: avg(byPar[3]), 4: avg(byPar[4]), 5: avg(byPar[5]) },
+    fairways: { ...fw, pct: pct(fw.hit, fw.n) },
+    gir: { ...gir, pct: pct(gir.hit, gir.n) },
+    putts: {
+      n: putts.holes,
+      per18: putts.holes ? r1((putts.sum * 18) / putts.holes) : null,
+      threePuttPct: pct(putts.three, putts.holes),
+      perGir: putts.girHoles ? Math.round((100 * putts.onGir) / putts.girHoles) / 100 : null,
+    },
+    upDown: { ...ud, pct: pct(ud.made, ud.n) },
+    penalties: { per18: holesPlayed ? r1((pen * 18) / holesPlayed) : null },
+  };
+}
+
+/** Lundi de la semaine (YYYY-MM-DD) */
+function weekOf(date: string): string {
+  const d = new Date(`${date.slice(0, 10)}T12:00:00Z`);
+  const day = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - day);
+  return d.toISOString().slice(0, 10);
+}
+
+export function rangeStats(rows: RangeRow[]): RangeStats {
+  const weeks = new Map<string, { minutes: number; balls: number }>();
+  const drills = new Map<string, RangeStats['drills'][number]>();
+  let minutes = 0;
+  let balls = 0;
+  for (const r of [...rows].sort((a, b) => a.played_at.localeCompare(b.played_at))) {
+    minutes += r.duration_min ?? 0;
+    balls += r.balls ?? 0;
+    const w = weekOf(r.played_at);
+    const cur = weeks.get(w) ?? { minutes: 0, balls: 0 };
+    cur.minutes += r.duration_min ?? 0;
+    cur.balls += r.balls ?? 0;
+    weeks.set(w, cur);
+    for (const d of r.drills) {
+      if (!d.attempts || d.successes == null) continue;
+      const key = `${d.category}|${d.label}`;
+      const entry = drills.get(key) ?? { label: d.label, category: d.category, distance_m: d.distance_m, points: [] };
+      entry.points.push({ date: r.played_at.slice(0, 10), rate: Math.round((100 * d.successes) / d.attempts), attempts: d.attempts });
+      drills.set(key, entry);
+    }
+  }
+  return {
+    count: rows.length,
+    minutes,
+    balls,
+    weekly: [...weeks.entries()].sort().map(([week, v]) => ({ week, ...v })),
+    drills: [...drills.values()].sort((a, b) => b.points.length - a.points.length),
+  };
+}

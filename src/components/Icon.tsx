@@ -20,6 +20,34 @@ const paths: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="3" />
     </>
   ),
+  chart: (
+    <>
+      <path d="M4.5 20.5h15" />
+      <path d="M7 17v-5.5" />
+      <path d="M12 17V6" />
+      <path d="M17 17v-8" />
+    </>
+  ),
+  person: (
+    <>
+      <circle cx="12" cy="8.2" r="3.8" />
+      <path d="M4.8 20.2c.9-3.6 3.7-5.7 7.2-5.7s6.3 2.1 7.2 5.7" />
+    </>
+  ),
+  camera: (
+    <>
+      <path d="M4 8.5h3.2L8.8 6h6.4l1.6 2.5H20v11H4z" />
+      <circle cx="12" cy="13.5" r="3.4" />
+    </>
+  ),
+  trash: (
+    <>
+      <path d="M4.5 6.5h15" />
+      <path d="M9.5 6.5V4.5h5v2" />
+      <path d="M6.5 6.5l1 13.5h9l1-13.5" />
+    </>
+  ),
+  edit: <path d="M4.5 19.5l1-4.5L16 4.5l3.5 3.5L9 18.5zM14 6.5l3.5 3.5" />,
   chevron: <path d="M9 5l7 7-7 7" />,
   'chevron-left': <path d="M15 5l-7 7 7 7" />,
   'chevron-down': <path d="M5 9l7 7 7-7" />,

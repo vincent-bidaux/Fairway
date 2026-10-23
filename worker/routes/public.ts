@@ -198,3 +198,13 @@ publicApi.get('/communes', async (c) => {
     }));
   return c.json(items, 200, { 'Cache-Control': 'public, max-age=86400' });
 });
+
+/** Pars connus d'un golf (trou par trou, toutes boucles). */
+publicApi.get('/golfs/:id{[0-9]+}/holes', async (c) => {
+  const rows = await c.env.DB.prepare(
+    `SELECT course, hole, par, stroke_index, source, votes FROM golf_holes WHERE golf_id = ? ORDER BY course, hole`,
+  )
+    .bind(Number(c.req.param('id')))
+    .all();
+  return c.json(rows.results);
+});
