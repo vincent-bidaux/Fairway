@@ -1,4 +1,5 @@
 import type { DepartmentCode, EventType, Golf, GolfEvent } from '../../shared/types';
+import type { PlanLevel } from '../../shared/plan';
 
 export interface GolfRowDb {
   id: number;
@@ -16,6 +17,7 @@ export interface GolfRowDb {
   address?: string | null;
   photo_url?: string | null;
   upcoming_count?: number;
+  plan_level?: string | null;
 }
 
 export interface EventRowDb {
@@ -58,6 +60,7 @@ export function toGolf(r: GolfRowDb): Golf {
     address: r.address ?? null,
     photoUrl: r.photo_url ?? null,
     ...(r.upcoming_count !== undefined ? { upcomingCount: r.upcoming_count } : {}),
+    ...(r.plan_level !== undefined ? { planLevel: r.plan_level && r.plan_level !== 'none' ? (r.plan_level as PlanLevel) : null } : {}),
   };
 }
 

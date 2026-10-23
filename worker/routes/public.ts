@@ -141,6 +141,7 @@ publicApi.get('/golfs', async (c) => {
   const limit = Math.min(Number(q.limit ?? 500) || 500, 1000);
   const { results } = await c.env.DB.prepare(
     `SELECT g.id, g.slug, g.name, g.department, g.city, g.postcode, g.lat, g.lng, g.holes, g.website, g.phone, g.email, g.address, g.photo_url,
+            (SELECT p.level FROM course_plans p WHERE p.golf_id = g.id) AS plan_level,
             (SELECT COUNT(*) FROM events e WHERE e.golf_id = g.id AND e.status != 'removed' AND e.start_date >= ?) AS upcoming_count
      FROM golfs g WHERE ${where.join(' AND ')} ORDER BY g.department, g.name COLLATE NOCASE LIMIT ${limit}`,
   )
@@ -154,7 +155,9 @@ publicApi.get('/golfs', async (c) => {
 publicApi.get('/golfs/:id{[0-9]+}', async (c) => {
   const id = Number(c.req.param('id'));
   const golf = await c.env.DB.prepare(
-    `SELECT id, slug, name, department, city, postcode, lat, lng, holes, website, phone, email, address, photo_url FROM golfs WHERE id = ? AND active = 1`,
+    `SELECT g.id, g.slug, g.name, g.department, g.city, g.postcode, g.lat, g.lng, g.holes, g.website, g.phone, g.email, g.address, g.photo_url,
+            (SELECT p.level FROM course_plans p WHERE p.golf_id = g.id) AS plan_level
+     FROM golfs g WHERE g.id = ? AND g.active = 1`,
   )
     .bind(id)
     .first<GolfRowDb>();
@@ -165,6 +168,17 @@ publicApi.get('/golfs/:id{[0-9]+}', async (c) => {
     .bind(id, todayParis())
     .all<EventRowDb>();
   return c.json({ ...toGolf({ ...golf, upcoming_count: results.length }), events: results.map(toEvent) });
+});
+
+/** Plan du parcours (OpenStreetMap), stocké en JSON par le cron. */
+publicApi.get('/plans/:slug', async (c) => {
+  const row = await c.env.DB.prepare(
+    `SELECT p.plan FROM course_plans p JOIN golfs g ON g.id = p.golf_id WHERE g.slug = ? AND p.plan IS NOT NULL`,
+  )
+    .bind(c.req.param('slug'))
+    .first<{ plan: string }>();
+  if (!row) return c.json({ error: 'Pas de plan pour ce golf' }, 404);
+  return c.body(row.plan, 200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
 });
 
 /** City autocomplete, proxied from the French government geo API (free, no key). */

@@ -5,6 +5,7 @@ import { runCrawl } from '../crawl/runner';
 import { discoverSources } from '../crawl/discover';
 import { applySeed } from '../seed';
 import { todayParis } from '../lib/dates';
+import { ensurePlansTable, refreshPlans } from '../plans/osm';
 
 export const adminApi = new Hono<{ Bindings: Env }>();
 
@@ -142,3 +143,32 @@ async function safeEqual(a: string, b: string) {
   for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
   return diff === 0;
 }
+
+// ---------------------------------------------------------------- Plans de parcours (OpenStreetMap)
+
+/** État des plans : nombre de golfs par niveau, erreurs récentes. */
+adminApi.get('/plans', async (c) => {
+  await ensurePlansTable(c.env);
+  const db = c.env.DB;
+  const [levels, pending, errors] = await db.batch([
+    db.prepare(`SELECT level, COUNT(*) AS n FROM course_plans GROUP BY level`),
+    db.prepare(`SELECT COUNT(*) AS n FROM golfs g WHERE g.active = 1 AND NOT EXISTS (SELECT 1 FROM course_plans p WHERE p.golf_id = g.id)`),
+    db.prepare(`SELECT g.slug, p.error, p.checked_at FROM course_plans p JOIN golfs g ON g.id = p.golf_id WHERE p.error IS NOT NULL ORDER BY p.checked_at DESC LIMIT 20`),
+  ]);
+  return c.json({
+    levels: Object.fromEntries((levels.results as Array<{ level: string; n: number }>).map((r) => [r.level, r.n])),
+    pending: (pending.results[0] as { n: number }).n,
+    errors: errors.results,
+  });
+});
+
+/** Lance l'extraction tout de suite : ?limit=3 (golfs dus), ou ?slug=a,b pour des golfs précis, &force=1 pour tout revérifier. */
+adminApi.post('/plans/refresh', async (c) => {
+  const slug = c.req.query('slug');
+  const results = await refreshPlans(c.env, {
+    limit: Math.min(Number(c.req.query('limit') ?? 3) || 3, 10),
+    slugs: slug ? slug.split(',') : undefined,
+    force: c.req.query('force') === '1',
+  });
+  return c.json({ results });
+});

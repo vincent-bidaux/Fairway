@@ -59,6 +59,20 @@ D1 « fairway-db » : departments · golfs · sources · events · crawl_runs
 - [x] Badge « croix » des golfs : ▲ département · ▶ trous · ▼ compétitions à venir · ◀ km
 - [x] Golfs enrichis depuis l'annuaire ffgolf (adresse, e-mail, photo) ; ré-import automatique quand le fichier de référence change (version)
 
+## Plans de parcours OpenStreetMap (24/10)
+
+- [x] Extraction côté Worker (`worker/plans/osm.ts`) : tracés `leisure=golf_course`, trous `golf=hole` (numéro, par, index),
+      surfaces (fairways, greens, départs, bunkers, eau, bois). Géométrie en mètres, simplifiée, stockée en JSON dans
+      `course_plans` (migration 0004). Séparation des boucles (18 + 9, pitch & putt) en enchaînant green → départ suivant.
+- [x] Cron `*/5 * * * *` : 3 golfs par passage, puis chaque golf revérifié tous les 30 jours. Plusieurs serveurs Overpass, avec relances.
+- [x] Pars de la boucle principale versés dans `golf_holes` (source `osm`), sans écraser les pars des clubs ni des joueurs.
+- [x] Qualité : complet (vert), partiel (orange), trous non tracés (rouge), avec une fiche d'explication.
+- [x] Widget `CourseWidget` en tête de la fiche golf : plan cliquable, règle « Parcours · 1 · 2… », vue par trou tournée
+      (départ en bas, repères 100/150/200 m), onglets de boucles, zoom (pincement, double-tap, boutons), hauteur limitée à l'écran.
+      La carte de situation passe juste avant la photo. Sans plan, la fiche est inchangée.
+- [x] API : `GET /api/plans/:slug`, champ `planLevel` sur les golfs ; admin : `GET /api/admin/plans`, `POST /api/admin/plans/refresh?limit=&slug=&force=1`.
+- [ ] Après le premier passage complet : relire les golfs « inexistant » (mauvais tracé rattaché ?) et ceux sans tracé.
+
 ## Sprint 1 — mise en production (à faire)
 
 - [x] Secrets Cloudflare : `ANTHROPIC_API_KEY`, `ADMIN_TOKEN`

@@ -1,3 +1,4 @@
+import type { PlanLevel } from './plan';
 // Contract shared by the Worker API (worker/) and the React app (src/).
 
 export type DepartmentCode =
@@ -31,6 +32,8 @@ export interface Golf {
   distanceKm?: number;
   /** Number of upcoming visible events. */
   upcomingCount?: number;
+  /** Quality of the OpenStreetMap course plan, null when there is none (GET /api/plans/:slug). */
+  planLevel?: PlanLevel | null;
 }
 
 export type EventType =
