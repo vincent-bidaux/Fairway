@@ -17,6 +17,7 @@ import { GolfDetail } from './screens/GolfDetail';
 import { GolfsScreen } from './screens/GolfsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { LoginSheet } from './practice/LoginSheet';
+import { flushDrafts } from './practice/drafts';
 import { PracticeScreen } from './practice/PracticeScreen';
 import { ProfileEdit } from './practice/screens/ProfileEdit';
 import { SessionDetail } from './practice/screens/SessionDetail';
@@ -36,6 +37,11 @@ export function App() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [login, setLogin] = useState<{ open: boolean; demo?: boolean }>({ open: false });
   const toastTimer = useRef<number | undefined>(undefined);
+
+  // Parties saisies hors ligne : renvoyées au démarrage (puis au retour du réseau).
+  useEffect(() => {
+    void flushDrafts();
+  }, []);
 
   useEffect(() => {
     let alive = true;

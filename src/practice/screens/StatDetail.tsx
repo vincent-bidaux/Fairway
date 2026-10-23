@@ -1,16 +1,16 @@
 // Détail plein écran d'une stat : grand graphe, choix de la période, explication.
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import type { PlaySession, StatsPeriod, StatsResponse } from '../../../shared/practice';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import type { StatsPeriod, StatsResponse } from '../../../shared/practice';
 import { Group, Row, Segmented, Spinner } from '../../components/Controls';
 import { BackButton, Screen } from '../../components/Screen';
 import { ErrorState } from '../../components/States';
 import type { StatMetric } from '../../ui';
 import { useUi } from '../../ui';
 import { useDataVersion } from '../account';
-import { getProfile, getStats, listSessions, type Profile } from '../api';
+import { getProfile, getStats, type Profile } from '../api';
 import { BarChart, DotRange, Legend, LineChart, Ring, StackedBar, type LinePoint } from '../charts';
 import { Delta, MIN_ROUNDS, distSegments, fairwaySegments, lastWeeks } from '../Dashboard';
-import { PERIODS, duration, fmtDateFull, fmtDateShort, fmtDateShortYear, nf, parseLocal, pctText, readPeriod, rel, writePeriod } from '../statsFormat';
+import { PERIODS, duration, fmtDateShort, fmtDateShortYear, nf, parseLocal, pctText, readPeriod, rel, writePeriod } from '../statsFormat';
 import '../practice.css';
 
 interface Meta {
@@ -109,7 +109,6 @@ function useStatsData(period: StatsPeriod) {
   const version = useDataVersion();
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [sessions, setSessions] = useState<PlaySession[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(true);
   const [tick, setTick] = useState(0);
@@ -118,19 +117,18 @@ function useStatsData(period: StatsPeriod) {
   useEffect(() => {
     const n = ++seq.current;
     setBusy(true);
-    Promise.all([getStats(period), getProfile().catch(() => null), listSessions('round').catch(() => [] as PlaySession[])])
-      .then(([s, p, l]) => {
+    Promise.all([getStats(period), getProfile().catch(() => null)])
+      .then(([s, p]) => {
         if (n !== seq.current) return;
         setStats(s);
         setProfile(p);
-        setSessions(l);
         setError(null);
       })
       .catch((e: Error) => n === seq.current && setError(e.message))
       .finally(() => n === seq.current && setBusy(false));
   }, [period, version, tick]);
 
-  return { stats, profile, sessions, error, busy, retry: () => setTick((t) => t + 1) };
+  return { stats, profile, error, busy, retry: () => setTick((t) => t + 1) };
 }
 
 const ts = (iso: string) => parseLocal(iso).getTime();
@@ -139,7 +137,7 @@ export function StatDetail({ metric }: { metric: StatMetric }) {
   const ui = useUi();
   const meta = META[metric];
   const [period, setPeriod] = useState<StatsPeriod>(readPeriod);
-  const { stats, profile, sessions, error, busy, retry } = useStatsData(period);
+  const { stats, profile, error, busy, retry } = useStatsData(period);
   const back = <BackButton onClick={ui.back} />;
   const onPeriod = (p: StatsPeriod) => {
     setPeriod(p);
@@ -166,7 +164,7 @@ export function StatDetail({ metric }: { metric: StatMetric }) {
         <Segmented value={period} options={[...PERIODS]} onChange={onPeriod} label="Période" />
       </div>
       <div className={busy ? 'pr-busy' : undefined} aria-busy={busy}>
-        <Body metric={metric} stats={stats} profile={profile} sessions={sessions} period={period} />
+        <Body metric={metric} stats={stats} profile={profile} period={period} />
       </div>
       <div className="sd-explain">
         <h3>À propos</h3>
@@ -195,7 +193,7 @@ function Notice({ children }: { children: ReactNode }) {
   return <p className="sd-empty">{children}</p>;
 }
 
-function Body({ metric, stats, profile, sessions, period }: { metric: StatMetric; stats: StatsResponse; profile: Profile | null; sessions: PlaySession[]; period: StatsPeriod }) {
+function Body({ metric, stats, profile, period }: { metric: StatMetric; stats: StatsResponse; profile: Profile | null; period: StatsPeriod }) {
   const r = stats.rounds;
   const p = stats.prevRounds;
   const color = META[metric].color;
