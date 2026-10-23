@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { playPoc } from './poc';
+import { playPoc, primeAudio } from './poc';
 
 /** First launch: the splash closes on its own after this delay (or earlier on tap). */
 const AUTO_CLOSE_MS = 3600;
@@ -65,7 +65,10 @@ function ballPath(): { samples: Sample[]; flagHitAt: number; total: number } {
 const BACK_OUT = 'cubic-bezier(0.34, 1.56, 0.64, 1)'; // overshoot ("back")
 const CUBIC_OUT = 'cubic-bezier(0.33, 1, 0.68, 1)';
 
-function SplashArt({ size, onFlagHit }: { size: number; onFlagHit: () => void }) {
+/** Delay before a replay starts, so the finger has left the icon. */
+const REPLAY_DELAY_MS = 330;
+
+function SplashArt({ size, onFlagHit, replay }: { size: number; onFlagHit: () => void; replay: number }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const pole = useRef<SVGGElement>(null);
   const stick = useRef<SVGGElement>(null);
@@ -73,9 +76,69 @@ function SplashArt({ size, onFlagHit }: { size: number; onFlagHit: () => void })
   const ball = useRef<SVGGElement>(null);
   const shadow = useRef<SVGEllipseElement>(null);
   const spin = useRef<SVGGElement>(null);
+  const ballAnims = useRef<{ anims: Animation[]; timers: number[] }>({ anims: [], timers: [] });
+  const reduce = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  /** Ball sequence only (flag stays put): incoming shot, lip, flag hit + shake + sound, arc, roll out. */
+  const playBall = (delay: number) => {
+    ballAnims.current.anims.forEach((a) => a.cancel());
+    ballAnims.current.timers.forEach((t) => window.clearTimeout(t));
+    const anims: Animation[] = [];
+    const timers: number[] = [];
+    const { samples, flagHitAt, total } = ballPath();
+    anims.push(
+      ball.current!.animate(
+        samples.map((p) => ({ transform: `translate(${p.x}px, ${p.y}px)`, offset: p.t / total })),
+        { duration: total, delay, easing: 'linear', fill: 'both' },
+      ),
+    );
+    // Ball spins as it travels.
+    anims.push(
+      spin.current!.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(900deg)' }], {
+        duration: total,
+        delay,
+        easing: 'cubic-bezier(0.2, 0.6, 0.4, 1)',
+        fill: 'both',
+      }),
+    );
+    // Ground shadow follows the ball horizontally and fades with height.
+    anims.push(
+      shadow.current!.animate(
+        samples.map((p) => ({
+          transform: `translateX(${p.x}px)`,
+          opacity: Math.max(0, 1 - Math.max(0, -p.y) / 70),
+          offset: p.t / total,
+        })),
+        { duration: total, delay, easing: 'linear', fill: 'both' },
+      ),
+    );
+    // Impact on the flag: shake the whole flagstick around the hole, plus a "ploc".
+    const hitTime = delay + flagHitAt;
+    anims.push(
+      stick.current!.animate(
+        [
+          { transform: 'rotate(0deg)' },
+          { transform: 'rotate(-6deg)', offset: 0.12 },
+          { transform: 'rotate(4deg)', offset: 0.3 },
+          { transform: 'rotate(-2.5deg)', offset: 0.48 },
+          { transform: 'rotate(1.4deg)', offset: 0.66 },
+          { transform: 'rotate(-0.6deg)', offset: 0.84 },
+          { transform: 'rotate(0deg)' },
+        ],
+        { duration: 650, delay: hitTime, easing: 'ease-out' },
+      ),
+    );
+    timers.push(window.setTimeout(onFlagHit, hitTime));
+    ballAnims.current = { anims, timers };
+  };
+
+  // Replay requested (tap on the icon).
+  useEffect(() => {
+    if (replay > 0 && !reduce && ball.current?.animate) playBall(REPLAY_DELAY_MS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [replay]);
 
   useEffect(() => {
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (reduce || !pole.current?.animate) return;
     const anims: Animation[] = [];
     const timers: number[] = [];
@@ -106,56 +169,13 @@ function SplashArt({ size, onFlagHit }: { size: number; onFlagHit: () => void })
       ),
     );
 
-    // Ball flight, sampled for a natural trajectory.
-    const { samples, flagHitAt, total } = ballPath();
-    anims.push(
-      ball.current!.animate(
-        samples.map((p) => ({ transform: `translate(${p.x}px, ${p.y}px)`, offset: p.t / total })),
-        { duration: total, delay: BALL_START, easing: 'linear', fill: 'both' },
-      ),
-    );
-    // Ball spins as it travels.
-    anims.push(
-      spin.current!.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(900deg)' }], {
-        duration: total,
-        delay: BALL_START,
-        easing: 'cubic-bezier(0.2, 0.6, 0.4, 1)',
-        fill: 'both',
-      }),
-    );
-    // Ground shadow follows the ball horizontally and fades with height.
-    anims.push(
-      shadow.current!.animate(
-        samples.map((p) => ({
-          transform: `translateX(${p.x}px)`,
-          opacity: Math.max(0, 1 - Math.max(0, -p.y) / 70),
-          offset: p.t / total,
-        })),
-        { duration: total, delay: BALL_START, easing: 'linear', fill: 'both' },
-      ),
-    );
-
-    // Impact on the flag: shake the whole flagstick around the hole, plus a "poc".
-    const hitTime = BALL_START + flagHitAt;
-    anims.push(
-      stick.current!.animate(
-        [
-          { transform: 'rotate(0deg)' },
-          { transform: 'rotate(-6deg)', offset: 0.12 },
-          { transform: 'rotate(4deg)', offset: 0.3 },
-          { transform: 'rotate(-2.5deg)', offset: 0.48 },
-          { transform: 'rotate(1.4deg)', offset: 0.66 },
-          { transform: 'rotate(-0.6deg)', offset: 0.84 },
-          { transform: 'rotate(0deg)' },
-        ],
-        { duration: 650, delay: hitTime, easing: 'ease-out' },
-      ),
-    );
-    timers.push(window.setTimeout(onFlagHit, hitTime));
+    playBall(BALL_START);
 
     return () => {
       anims.forEach((a) => a.cancel());
       timers.forEach((t) => window.clearTimeout(t));
+      ballAnims.current.anims.forEach((a) => a.cancel());
+      ballAnims.current.timers.forEach((t) => window.clearTimeout(t));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -230,7 +250,9 @@ function SplashArt({ size, onFlagHit }: { size: number; onFlagHit: () => void })
 export function Splash({ runId, onDone }: { runId: number; onDone: () => void }) {
   const [out, setOut] = useState(false);
   const [hint, setHint] = useState(false);
-  const persistent = runId > 0;
+  const [replay, setReplay] = useState(0);
+  const [stay, setStay] = useState(runId > 0);
+  const autoClose = useRef<number[]>([]);
 
   const close = () => {
     if (out) return;
@@ -241,9 +263,15 @@ export function Splash({ runId, onDone }: { runId: number; onDone: () => void })
   useEffect(() => {
     setOut(false);
     setHint(false);
-    const timers = [window.setTimeout(() => setHint(true), 2600)];
-    if (!persistent) timers.push(window.setTimeout(() => setOut(true), AUTO_CLOSE_MS), window.setTimeout(onDone, AUTO_CLOSE_MS + FADE_MS));
-    return () => timers.forEach((t) => window.clearTimeout(t));
+    setReplay(0);
+    setStay(runId > 0);
+    const hintTimer = window.setTimeout(() => setHint(true), 2600);
+    autoClose.current =
+      runId > 0 ? [] : [window.setTimeout(() => setOut(true), AUTO_CLOSE_MS), window.setTimeout(onDone, AUTO_CLOSE_MS + FADE_MS)];
+    return () => {
+      window.clearTimeout(hintTimer);
+      autoClose.current.forEach((t) => window.clearTimeout(t));
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runId]);
 
@@ -257,10 +285,27 @@ export function Splash({ runId, onDone }: { runId: number; onDone: () => void })
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && close()}
     >
       <div className="splash-inner" key={runId}>
-        <SplashArt size={168} onFlagHit={() => playPoc()} />
+        {/* Tap on the icon replays the ball shot (flag stays); tap anywhere else closes. */}
+        <button
+          type="button"
+          className="splash-art-btn"
+          aria-label="Rejouer l'animation"
+          onClick={(e) => {
+            e.stopPropagation();
+            primeAudio();
+            // Playing with the icon on first launch: keep the splash open until the user taps elsewhere.
+            autoClose.current.forEach((t) => window.clearTimeout(t));
+            autoClose.current = [];
+            setStay(true);
+            setReplay((n) => n + 1);
+          }}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          <SplashArt size={168} replay={replay} onFlagHit={() => playPoc()} />
+        </button>
         <h1 className="splash-title">FAIRWAY</h1>
         <p className="splash-tag">Trouvez les prochaines compétitions de golf autour de vous.</p>
-        {persistent && <p className={`splash-hint${hint ? ' is-on' : ''}`}>Touchez pour continuer</p>}
+        {stay && <p className={`splash-hint${hint ? ' is-on' : ''}`}>Touchez l'écran pour continuer · l'icône pour rejouer</p>}
       </div>
     </div>
   );

@@ -2048,3 +2048,17 @@ input[type='range']::-moz-range-thumb {
 .golf-photo-section {
   margin: 8px var(--gutter) 24px;
 }
+
+.splash-art-btn {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 38px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.splash-art-btn:active {
+  opacity: 0.85;
+}
