@@ -1269,7 +1269,7 @@ input[type='range']::-moz-range-thumb {
   padding-left: var(--safe-l);
   padding-right: var(--safe-r);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background: var(--bar-bg);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
