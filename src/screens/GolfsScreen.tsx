@@ -102,7 +102,7 @@ export function GolfsScreen({ active }: { active: boolean }) {
                 ))}
               </div>
               {gi === 0 && (
-                <p className="group-footer cross-legend">▲ département · ▶ trous · ▼ compétitions à venir · ◀ km</p>
+                <p className="group-footer cross-legend">En haut : département et nombre de trous (en vert). En bas : compétitions à venir.</p>
               )}
             </section>
           ))}
