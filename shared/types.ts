@@ -22,6 +22,11 @@ export interface Golf {
   holes: number | null;
   website: string | null;
   phone: string | null;
+  email: string | null;
+  /** Street address line (without postcode/city). */
+  address: string | null;
+  /** ffgolf directory photo. May fail to load (hotlink protection): always provide a fallback. */
+  photoUrl: string | null;
   /** Distance in km from the search centre, only when a centre was given. */
   distanceKm?: number;
   /** Number of upcoming visible events. */

@@ -4,7 +4,7 @@ import { adminApi } from './routes/admin';
 import { publicApi } from './routes/public';
 import { runCrawl } from './crawl/runner';
 import { discoverSources } from './crawl/discover';
-import { seedIfEmpty } from './seed';
+import { seedIfOutdated } from './seed';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -26,8 +26,8 @@ export default {
   async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext) {
     ctx.waitUntil(
       (async () => {
-        // First run on a fresh database: load the bundled golf list and sources.
-        const seeded = await seedIfEmpty(env);
+        // Fresh database or updated seed file: (re)load the bundled golf list and sources.
+        const seeded = await seedIfOutdated(env);
         if (seeded) console.log('seeded', JSON.stringify(seeded));
         const run = await runCrawl(env, { trigger: 'cron' });
         console.log(`crawl #${run.id}: ok=${run.sourcesOk} unchanged=${run.sourcesUnchanged} failed=${run.sourcesFailed} new=${run.eventsNew} remaining=${run.remaining}`);

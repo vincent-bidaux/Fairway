@@ -12,6 +12,9 @@ export interface GolfRowDb {
   holes: number | null;
   website: string | null;
   phone: string | null;
+  email?: string | null;
+  address?: string | null;
+  photo_url?: string | null;
   upcoming_count?: number;
 }
 
@@ -51,6 +54,9 @@ export function toGolf(r: GolfRowDb): Golf {
     holes: r.holes,
     website: r.website,
     phone: r.phone,
+    email: r.email ?? null,
+    address: r.address ?? null,
+    photoUrl: r.photo_url ?? null,
     ...(r.upcoming_count !== undefined ? { upcomingCount: r.upcoming_count } : {}),
   };
 }

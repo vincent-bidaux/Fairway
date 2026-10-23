@@ -15,7 +15,13 @@ interface SeedGolf {
   ffgolf_id: string | null;
   competitions_url: string | null;
   notes: string | null;
+  email?: string | null;
+  address?: string | null;
+  photo_url?: string | null;
 }
+
+/** Bump when db/seed/*.json changes: the next cron re-applies the seed (upsert, nothing is deleted). */
+export const SEED_VERSION = '2026-10-23.2';
 
 interface SeedSource {
   label: string;
@@ -42,13 +48,17 @@ export async function applySeed(env: Env) {
     stmts.push(
       db
         .prepare(
-          `INSERT INTO golfs (slug, name, department, city, postcode, lat, lng, holes, website, phone, ffgolf_id, notes)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+          `INSERT INTO golfs (slug, name, department, city, postcode, lat, lng, holes, website, phone, ffgolf_id, notes, email, address, photo_url)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
            ON CONFLICT(slug) DO UPDATE SET name=excluded.name, department=excluded.department, city=excluded.city,
              postcode=excluded.postcode, lat=excluded.lat, lng=excluded.lng, holes=excluded.holes, website=excluded.website,
-             phone=excluded.phone, ffgolf_id=COALESCE(excluded.ffgolf_id, golfs.ffgolf_id), updated_at=datetime('now')`,
+             phone=excluded.phone, ffgolf_id=COALESCE(excluded.ffgolf_id, golfs.ffgolf_id), email=excluded.email,
+             address=excluded.address, photo_url=excluded.photo_url, updated_at=datetime('now')`,
         )
-        .bind(slug, g.name, g.department, g.city, g.postcode, g.lat, g.lng, g.holes, g.website, g.phone, g.ffgolf_id, g.notes),
+        .bind(
+          slug, g.name, g.department, g.city, g.postcode, g.lat, g.lng, g.holes, g.website, g.phone, g.ffgolf_id, g.notes,
+          g.email ?? null, g.address ?? null, g.photo_url ?? null,
+        ),
     );
     if (g.competitions_url) {
       stmts.push(
@@ -76,8 +86,13 @@ export async function applySeed(env: Env) {
   return count;
 }
 
-export async function seedIfEmpty(env: Env) {
-  const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM golfs`).first<{ n: number }>();
-  if ((row?.n ?? 0) > 0) return null;
-  return applySeed(env);
+/** Applies the bundled seed on a fresh database, or when SEED_VERSION changed since the last application. */
+export async function seedIfOutdated(env: Env) {
+  const row = await env.DB.prepare(`SELECT value FROM meta WHERE key = 'seed_version'`).first<{ value: string }>();
+  if (row?.value === SEED_VERSION) return null;
+  const result = await applySeed(env);
+  await env.DB.prepare(`INSERT INTO meta (key, value) VALUES ('seed_version', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`)
+    .bind(SEED_VERSION)
+    .run();
+  return result;
 }

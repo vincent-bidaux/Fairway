@@ -17,9 +17,9 @@ for (const g of golfs) {
   seen.add(slug);
   g.slug = slug;
   lines.push(
-    `INSERT INTO golfs (slug, name, department, city, postcode, lat, lng, holes, website, phone, ffgolf_id, notes) VALUES (${[
-      slug, g.name, g.department, g.city, g.postcode, g.lat, g.lng, g.holes, g.website, g.phone, g.ffgolf_id, g.notes,
-    ].map(q).join(', ')}) ON CONFLICT(slug) DO UPDATE SET name=excluded.name, department=excluded.department, city=excluded.city, postcode=excluded.postcode, lat=excluded.lat, lng=excluded.lng, holes=excluded.holes, website=excluded.website, phone=excluded.phone, ffgolf_id=excluded.ffgolf_id, notes=excluded.notes, updated_at=datetime('now');`,
+    `INSERT INTO golfs (slug, name, department, city, postcode, lat, lng, holes, website, phone, ffgolf_id, notes, email, address, photo_url) VALUES (${[
+      slug, g.name, g.department, g.city, g.postcode, g.lat, g.lng, g.holes, g.website, g.phone, g.ffgolf_id, g.notes, g.email, g.address, g.photo_url,
+    ].map(q).join(', ')}) ON CONFLICT(slug) DO UPDATE SET name=excluded.name, department=excluded.department, city=excluded.city, postcode=excluded.postcode, lat=excluded.lat, lng=excluded.lng, holes=excluded.holes, website=excluded.website, phone=excluded.phone, ffgolf_id=excluded.ffgolf_id, notes=excluded.notes, email=excluded.email, address=excluded.address, photo_url=excluded.photo_url, updated_at=datetime('now');`,
   );
 }
 

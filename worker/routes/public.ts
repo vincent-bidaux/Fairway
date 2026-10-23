@@ -140,7 +140,7 @@ publicApi.get('/golfs', async (c) => {
   areaWhere(area, where, params);
   const limit = Math.min(Number(q.limit ?? 500) || 500, 1000);
   const { results } = await c.env.DB.prepare(
-    `SELECT g.id, g.slug, g.name, g.department, g.city, g.postcode, g.lat, g.lng, g.holes, g.website, g.phone,
+    `SELECT g.id, g.slug, g.name, g.department, g.city, g.postcode, g.lat, g.lng, g.holes, g.website, g.phone, g.email, g.address, g.photo_url,
             (SELECT COUNT(*) FROM events e WHERE e.golf_id = g.id AND e.status != 'removed' AND e.start_date >= ?) AS upcoming_count
      FROM golfs g WHERE ${where.join(' AND ')} ORDER BY g.department, g.name COLLATE NOCASE LIMIT ${limit}`,
   )
@@ -154,7 +154,7 @@ publicApi.get('/golfs', async (c) => {
 publicApi.get('/golfs/:id{[0-9]+}', async (c) => {
   const id = Number(c.req.param('id'));
   const golf = await c.env.DB.prepare(
-    `SELECT id, slug, name, department, city, postcode, lat, lng, holes, website, phone FROM golfs WHERE id = ? AND active = 1`,
+    `SELECT id, slug, name, department, city, postcode, lat, lng, holes, website, phone, email, address, photo_url FROM golfs WHERE id = ? AND active = 1`,
   )
     .bind(id)
     .first<GolfRowDb>();
