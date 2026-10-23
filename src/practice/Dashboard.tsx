@@ -13,15 +13,15 @@ const MINUS = '−';
 
 /** Écart avec la période précédente. better = sens qui est une amélioration. */
 export function Delta({ cur, prev, better, digits = 1, unit = '', label = 'vs période précédente' }: { cur: number | null; prev: number | null | undefined; better: 'up' | 'down'; digits?: number; unit?: string; label?: string }) {
-  if (cur == null || prev == null) return <span className="delta delta--none">{label === '' ? '' : 'Pas de période précédente'}</span>;
+  if (cur == null || prev == null) return <span className="pdelta pdelta--none">{label === '' ? '' : 'Pas de période précédente'}</span>;
   const d = Math.round((cur - prev) * 10 ** digits) / 10 ** digits;
-  if (d === 0) return <span className="delta delta--flat">Stable {label}</span>;
+  if (d === 0) return <span className="pdelta pdelta--flat">Stable {label}</span>;
   const good = (d > 0) === (better === 'up');
   return (
-    <span className={`delta ${good ? 'delta--good' : 'delta--bad'}`}>
+    <span className={`pdelta ${good ? 'pdelta--good' : 'pdelta--bad'}`}>
       <span aria-hidden="true">{d > 0 ? '↑' : '↓'}</span> {d > 0 ? '+' : MINUS}
       {nf(Math.abs(d), digits)}
-      {unit} <span className="delta-label">{label}</span>
+      {unit} <span className="pdelta-label">{label}</span>
     </span>
   );
 }
@@ -136,7 +136,7 @@ export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; pr
             <>
               <span className="tile-sub">{total ? `${total} trous joués` : 'Aucun trou saisi'}</span>
               <StackedBar segments={segs} height={16} />
-              <Legend segments={segs} columns={5} />
+              <Legend segments={segs} columns={3} />
             </>
           );
         })()}
@@ -177,11 +177,11 @@ export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; pr
         ) : null}
       </Tile>
 
-      <Tile title="Greens en régulation" color="var(--tint)" metric="gir" onOpen={onOpen} hint={hint}>
+      <Tile title="Greens (GIR)" color="var(--tint)" metric="gir" onOpen={onOpen} hint={hint}>
         <span className="tile-row tile-row--center">
           <span className="tile-col">
             <Value dim={!enough || r.gir.pct == null}>{enough ? pctText(r.gir.pct) : '—'}</Value>
-            {enough && <span className="tile-sub">{r.gir.hit} sur {r.gir.n} trous</span>}
+            {enough && <span className="tile-sub">{r.gir.hit} sur {r.gir.n}</span>}
           </span>
           {enough && r.gir.pct != null && <Ring pct={r.gir.pct} size={46} stroke={7} color="var(--tint)" />}
         </span>
@@ -217,7 +217,7 @@ export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; pr
         </Value>
         {enough && (
           <>
-            <span className="tile-sub">Balles perdues, OB, eau</span>
+            <span className="tile-sub">Coups de pénalité</span>
             <Delta cur={r.penalties.per18} prev={p?.penalties.per18} better="down" label="" />
           </>
         )}
@@ -247,6 +247,7 @@ export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; pr
         <BarChart
           bars={weeks.map((w, i) => ({ key: w.week, value: w.minutes, axis: i % 4 === 0 ? fmtDateShort(w.week) : '' }))}
           height={112}
+          minMax={60}
           color="var(--blue)"
           yFormat={(n) => `${n}`}
           ariaLabel={`Minutes de practice par semaine, ${weeks.length} dernières semaines : ${stats.range.minutes} minutes au total`}

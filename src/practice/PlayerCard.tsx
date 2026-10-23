@@ -98,7 +98,7 @@ export function PlayerCard({
         </button>
         {history.length > 1 && (
           <div className="pcard-spark">
-            <Sparkline values={history.map((h) => h.hcp_index)} width={124} height={52} color="#fff" strokeWidth={2.4} />
+            <Sparkline values={history.map((h) => h.hcp_index)} width={124} height={52} color="#fff" strokeWidth={2.4} fill={false} />
           </div>
         )}
       </div>

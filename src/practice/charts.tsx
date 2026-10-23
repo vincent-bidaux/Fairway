@@ -308,6 +308,7 @@ export function BarChart({
   describe,
   placeholder,
   labelEvery = 1,
+  minMax = 1,
 }: {
   bars: BarDatum[];
   height?: number;
@@ -317,6 +318,8 @@ export function BarChart({
   describe?: (b: BarDatum) => ReactNode;
   placeholder?: ReactNode;
   labelEvery?: number;
+  /** Valeur maximale minimale de l'axe (évite un axe 0–1 sans données). */
+  minMax?: number;
 }) {
   const [ref, w] = useWidth<HTMLDivElement>();
   const [sel, setSel] = useState<number | null>(null);
@@ -326,7 +329,7 @@ export function BarChart({
   const B = 22;
   const innerW = Math.max(40, w - L - R);
   const innerH = height - T - B;
-  const max = Math.max(1, ...bars.map((b) => b.value));
+  const max = Math.max(minMax, ...bars.map((b) => b.value));
   const ticks = niceTicks(0, max, 3);
   const top = Math.max(max, ticks[ticks.length - 1] ?? max);
   const slot = innerW / Math.max(1, bars.length);
