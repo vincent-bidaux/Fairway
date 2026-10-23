@@ -6,16 +6,11 @@ import { Icon } from './Icon';
 
 const TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-/** Bandeau carte zoomable ; la photo du golf, si elle se charge, s'affiche à part sous la carte. */
+/** Bandeau carte zoomable, cadré assez près pour voir le tracé du parcours. */
 export function GolfBanner({ golf }: { golf: Golf }) {
   const el = useRef<HTMLDivElement>(null);
-  const [photoFailed, setPhotoFailed] = useState(false);
   const { lat, lng } = golf;
   const hasCoords = lat !== null && lng !== null;
-
-  useEffect(() => {
-    setPhotoFailed(false);
-  }, [golf.photoUrl]);
 
   useEffect(() => {
     if (!el.current || lat === null || lng === null) return;
@@ -28,7 +23,7 @@ export function GolfBanner({ golf }: { golf: Golf }) {
       touchZoom: true,
       boxZoom: false,
       keyboard: false,
-    }).setView([lat, lng], 14);
+    }).setView([lat, lng], 16); // close enough to see the course layout (fairways, greens)
     L.control.zoom({ position: 'topright' }).addTo(map);
     L.tileLayer(TILES, {
       maxZoom: 19,
@@ -48,7 +43,6 @@ export function GolfBanner({ golf }: { golf: Golf }) {
     };
   }, [lat, lng]);
 
-  const showPhoto = !!golf.photoUrl && !photoFailed;
 
   return (
     <>
@@ -61,17 +55,24 @@ export function GolfBanner({ golf }: { golf: Golf }) {
           </div>
         )}
       </div>
-      {showPhoto && (
-        <div className="golf-photo">
-          <img
-            src={golf.photoUrl!}
-            alt={`Photo : ${golf.name}`}
-            referrerPolicy="no-referrer"
-            loading="lazy"
-            onError={() => setPhotoFailed(true)}
-          />
-        </div>
-      )}
     </>
+  );
+}
+
+/** Large photo of the course (bottom of the golf page). Renders nothing if missing or blocked. */
+export function GolfPhoto({ golf }: { golf: Golf }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [golf.photoUrl]);
+  if (!golf.photoUrl || failed) return null;
+  return (
+    <div className="golf-photo golf-photo-section">
+      <img
+        src={golf.photoUrl}
+        alt={`Photo : ${golf.name}`}
+        referrerPolicy="no-referrer"
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    </div>
   );
 }

@@ -19,7 +19,11 @@ export function GolfCell({ golf, onOpen, favorite, onToggleFav, editing }: Props
         <GolfCross golf={golf} />
         <span className="cell-text">
           <span className="cell-title">{golf.name}</span>
-          <span className="cell-sub">{golf.city}</span>
+          <span className="cell-sub">
+            {[golf.city, golf.holes ? `${golf.holes} trous` : null, golf.distanceKm !== undefined ? `${Math.round(golf.distanceKm)} km` : null]
+              .filter(Boolean)
+              .join(' · ')}
+          </span>
           {!!golf.upcomingCount && (
             <span className="cell-meta">
               <Badge tone="green">{golf.upcomingCount} compét.</Badge>

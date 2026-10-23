@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Golf } from '../../shared/types';
 import { getGolf, type GolfDetailData } from '../api';
-import { GolfBanner } from '../components/GolfBanner';
+import { GolfBanner, GolfPhoto } from '../components/GolfBanner';
 import { GolfCross } from '../components/GolfCross';
 import { EventCell } from '../components/EventCell';
 import { Group, Row } from '../components/Controls';
@@ -136,6 +136,8 @@ export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
           />
         ))}
       </Group>
+
+      <GolfPhoto golf={golf} />
     </Screen>
   );
 }
