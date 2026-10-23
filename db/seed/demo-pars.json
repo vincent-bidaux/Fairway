@@ -1,29 +1,49 @@
 {
  "golf-de-la-pree-la-rochelle-marsilly": {
-  "source": "placeholder",
+  "source": "carte de score publiée (GolfPass), à confirmer",
   "pars": [
    4,
+   5,
+   3,
+   4,
+   3,
+   4,
+   4,
+   4,
+   5,
+   5,
+   3,
+   4,
    4,
    3,
    5,
    4,
    4,
+   4
+  ],
+  "stroke_index": [
+   7,
+   11,
+   13,
+   9,
+   15,
+   1,
    3,
-   4,
    5,
+   17,
+   2,
+   10,
+   6,
    4,
-   4,
-   3,
-   5,
-   4,
-   4,
-   3,
-   4,
-   5
+   18,
+   16,
+   14,
+   8,
+   12
   ]
  },
  "golf-la-rochelle-sud-la-jarne": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    3,
@@ -37,7 +57,7 @@
   ]
  },
  "golf-bluegreen-rochefort-ocean-saint-laurent-de-la-pree": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    4,
@@ -60,7 +80,7 @@
   ]
  },
  "golf-club-d-oleron-saint-pierre-d-oleron": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    3,
@@ -74,7 +94,7 @@
   ]
  },
  "golf-de-trousse-chemise-les-portes-en-re": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    3,
@@ -88,7 +108,7 @@
   ]
  },
  "la-palmyre-golf-resort-la-palmyre": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    3,
@@ -102,7 +122,7 @@
   ]
  },
  "golf-de-royan-saint-palais-sur-mer": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    4,
@@ -125,30 +145,50 @@
   ]
  },
  "golf-de-saintes-fontcouverte": {
-  "source": "placeholder",
+  "source": "carte de score publiée (GolfPass), à confirmer",
   "pars": [
    4,
-   4,
    3,
    5,
    4,
    4,
    3,
    4,
-   5,
-   4,
-   4,
    3,
    5,
    4,
+   3,
    4,
    3,
    4,
-   5
+   4,
+   4,
+   4,
+   3
+  ],
+  "stroke_index": [
+   6,
+   12,
+   10,
+   5,
+   15,
+   16,
+   1,
+   7,
+   2,
+   11,
+   9,
+   14,
+   8,
+   3,
+   17,
+   18,
+   4,
+   13
   ]
  },
  "golf-du-cognac-saint-brice": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    4,
@@ -171,7 +211,7 @@
   ]
  },
  "golf-du-chateau-de-la-vallade-saint-porchaire": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    3,
@@ -185,7 +225,7 @@
   ]
  },
  "golf-bluegreen-niort-romagne-niort": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    4,
@@ -208,7 +248,7 @@
   ]
  },
  "golf-bluegreen-mazieres-en-gatine-mazieres-en-gatine": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    4,
@@ -231,7 +271,7 @@
   ]
  },
  "golf-de-margaux-margaux": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    4,
@@ -254,7 +294,7 @@
   ]
  },
  "angouleme-golf-l-hirondelle-angouleme": {
-  "source": "placeholder",
+  "source": "estimé (parcours type) — à remplacer par la vraie carte",
   "pars": [
    4,
    4,

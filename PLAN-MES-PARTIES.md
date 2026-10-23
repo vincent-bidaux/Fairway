@@ -37,7 +37,7 @@ Le code passe par une petite interface `sendMail()`, ce qui permet de changer de
 
 ## 3. Pars des trous
 
-> Section complétée après la recherche de sources (voir § 3 bis en fin de document).
+> Sources possibles : voir § 3 bis en fin de document.
 
 **Principe** : la base Fairway connaît les pars trou par trou. Elle est pré-remplie automatiquement quand une source existe, puis corrigée et complétée par les joueurs.
 
@@ -211,3 +211,17 @@ Chaque sprint se termine par un déploiement et une vérification sur l'app en l
 
 - Fournisseur des e-mails : Cloudflare Email Service (5 $/mois) ou Resend (compte gratuit à créer).
 - Le nom définitif de l'onglet.
+
+## 3 bis. Sources des pars trou par trou (recherche du 23/10)
+
+| Source | Par par trou | Licence | Verdict |
+|---|---|---|---|
+| **OpenStreetMap** (trous `golf=hole` avec `par`, `ref`, `handicap`) | Oui quand le golf est cartographié, couverture partielle en France | ODbL, gratuite (citer « © OpenStreetMap ») | **Meilleure piste automatique.** À tester sur nos 91 golfs avec l'API Overpass |
+| **OpenGolfAPI** (opengolfapi.org, construite sur OSM) | Annonce des cartes de score, couverture France inconnue | ODbL, gratuite, sans clé | À tester |
+| **ffgolf** | Pas d'API publique trouvée. SSS et slope par repère sont des données fédérales | — | À demander avec l'autorisation déjà prévue au Sprint 1 |
+| **GolfPass / Hole19** | GolfPass : par et index par trou (La Prée, Saintes OK ; Rochefort faux, 9 trous dupliqués). Hole19 : rien sans l'app | CGU interdisant l'extraction | Vérification manuelle seulement |
+| **Sites des clubs** (cartes de score PDF) | Oui, au cas par cas | Faits publics | Complément manuel, comme pour les 23 pages de compétitions |
+
+Conclusion : import OSM / OpenGolfAPI au Sprint P2 (statut « à vérifier »), puis correction par les joueurs via la flèche du par. La base devient la plus fiable à mesure que les parties s'accumulent.
+
+Les séances de démo utilisent les vraies cartes de La Prée et de Saintes ; les 12 autres golfs ont des pars types, à remplacer dès l'import (`db/seed/demo-pars.json`).

@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const root = new URL('..', import.meta.url);
-const PARS = JSON.parse(readFileSync(new URL('db/seed/golf-holes.json', root), 'utf8'));
+const PARS = JSON.parse(readFileSync(new URL('db/seed/demo-pars.json', root), 'utf8'));
 
 // ---------------------------------------------------------------- aléatoire reproductible
 let seed = 20261023;
