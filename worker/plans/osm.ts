@@ -4,12 +4,15 @@ import type { CoursePlan, PlanHole, PlanLayer, PlanLevel, PlanLoop, PlanQuality,
 import type { Env } from '../env';
 
 const ENDPOINTS = [
-  'https://overpass-api.de/api/interpreter',
   'https://overpass.private.coffee/api/interpreter',
+  'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
 ];
 const UA = 'Fairway/1.0 (+https://fairway.abpq.cc)';
 const REFRESH_DAYS = 30;
+/** checked_at values that make a golf due again after 1 hour (error) or 20 minutes (claimed by a run). */
+const RETRY_AT = `datetime('now', '-${REFRESH_DAYS} days', '+1 hour')`;
+const CLAIM_UNTIL = `datetime('now', '-${REFRESH_DAYS} days', '+20 minutes')`;
 /** An OSM golf course belongs to the nearest Fairway golf, if it is within this distance (km). */
 const MATCH_KM = 1.2;
 
@@ -24,7 +27,7 @@ interface OsmElement {
 }
 
 async function overpass(query: string, start = 0): Promise<OsmElement[]> {
-  let last = '';
+  const tries: string[] = [];
   for (let i = 0; i < ENDPOINTS.length * 2; i++) {
     const url = ENDPOINTS[(start + i) % ENDPOINTS.length];
     try {
@@ -32,17 +35,17 @@ async function overpass(query: string, start = 0): Promise<OsmElement[]> {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': UA },
         body: 'data=' + encodeURIComponent(query),
-        signal: AbortSignal.timeout(60_000),
+        signal: AbortSignal.timeout(45_000),
       });
       const text = await res.text();
       if (res.ok && text.trimStart().startsWith('{')) return (JSON.parse(text) as { elements: OsmElement[] }).elements;
-      last = `${new URL(url).host} ${res.status} ${text.slice(0, 80)}`;
+      tries.push(`${new URL(url).host} ${res.status}`);
     } catch (e) {
-      last = `${new URL(url).host} ${(e as Error).message}`;
+      tries.push(`${new URL(url).host} ${(e as Error).name === 'TimeoutError' ? 'délai dépassé' : (e as Error).message}`);
     }
     await new Promise((r) => setTimeout(r, 1500));
   }
-  throw new Error(`Overpass indisponible (${last})`);
+  throw new Error(`Overpass indisponible : ${tries.join(', ')}`);
 }
 
 // ---------------------------------------------------------------- géométrie
@@ -181,6 +184,17 @@ function buildPlan(golf: GolfRow, courses: OsmElement[], elements: OsmElement[])
   const near = (rs: LatLon[][]) =>
     rs.every((r) => r.every((p) => p.lat >= minLat - padLat && p.lat <= maxLat + padLat && p.lon >= minLon - padLon && p.lon <= maxLon + padLon));
 
+  // With a bounding box query, a neighbouring golf can show up: keep golf features that touch our outlines.
+  const outlineRings = outlines.flatMap(geomOf);
+  const inRing = (p: LatLon, r: LatLon[]) => {
+    let inside = false;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      if ((r[i].lat > p.lat) !== (r[j].lat > p.lat) && p.lon < ((r[j].lon - r[i].lon) * (p.lat - r[i].lat)) / (r[j].lat - r[i].lat) + r[i].lon) inside = !inside;
+    }
+    return inside;
+  };
+  const touches = (pts: LatLon[]) => pts.some((p) => outlineRings.some((r) => inRing(p, r)));
+
   const layers: CoursePlan['layers'] = {};
   const holes: PlanHole[] = [];
   const seen = new Set<string>();
@@ -191,6 +205,7 @@ function buildPlan(golf: GolfRow, courses: OsmElement[], elements: OsmElement[])
     if (!c) continue;
     if (c === 'hole') {
       if (e.type !== 'way' || !e.geometry || e.geometry.length < 2) continue;
+      if (!touches([e.geometry[0], e.geometry[e.geometry.length - 1]])) continue;
       const line = e.geometry.map(P);
       let len = 0;
       for (let i = 1; i < line.length; i++) len += Math.hypot(line[i][0] - line[i - 1][0], line[i][1] - line[i - 1][1]);
@@ -204,6 +219,7 @@ function buildPlan(golf: GolfRow, courses: OsmElement[], elements: OsmElement[])
     const rings = geomOf(e);
     if (!rings.length) continue;
     if ((c === 'water' || c === 'wood' || c === 'scrub') && !e.tags.golf && !near(rings)) continue;
+    if (e.tags.golf && !touches(rings.flat())) continue;
     const shape: Shape = rings.map((r) => enc(r)).filter((r) => r.length >= 6);
     if (shape.length) (layers[c] ??= []).push(shape);
   }
@@ -276,6 +292,20 @@ export async function refreshPlans(env: Env, opts: { limit?: number; slugs?: str
     due = all.filter((g) => ids.has(g.id));
   }
 
+  // Claim the golfs for 20 minutes so that an overlapping cron run does not take them too.
+  if (due.length) {
+    await db.batch(
+      due.map((g) =>
+        db
+          .prepare(
+            `INSERT INTO course_plans (golf_id, level, error, checked_at) VALUES (?, 'none', 'en cours', ${CLAIM_UNTIL})
+             ON CONFLICT(golf_id) DO UPDATE SET checked_at = ${CLAIM_UNTIL}`,
+          )
+          .bind(g.id),
+      ),
+    );
+  }
+
   const out: PlanResult[] = [];
   for (const [i, golf] of due.entries()) {
     try {
@@ -284,8 +314,8 @@ export async function refreshPlans(env: Env, opts: { limit?: number; slugs?: str
       const msg = (e as Error).message.slice(0, 300);
       await db
         .prepare(
-          `INSERT INTO course_plans (golf_id, level, error, checked_at) VALUES (?, 'none', ?, datetime('now', '-${REFRESH_DAYS - 1} days'))
-           ON CONFLICT(golf_id) DO UPDATE SET error = excluded.error, checked_at = datetime('now', '-${REFRESH_DAYS - 1} days')`,
+          `INSERT INTO course_plans (golf_id, level, error, checked_at) VALUES (?, 'none', ?, ${RETRY_AT})
+           ON CONFLICT(golf_id) DO UPDATE SET error = excluded.error, checked_at = ${RETRY_AT}`,
         )
         .bind(golf.id, msg)
         .run();
@@ -317,8 +347,17 @@ async function refreshOne(env: Env, golf: GolfRow, all: GolfRow[], i: number): P
   }
 
   const sel = mine.map((c) => `${c.type === 'relation' ? 'rel' : 'way'}(${c.id});`).join('');
+  // A bounding box query is much lighter for Overpass than map_to_area. Natural areas are fetched as ways only
+  // (large forest or lake relations would swamp the response); buildPlan drops the ones bigger than the course.
+  let s = 90, w = 180, n = -90, e = -180;
+  for (const c of mine) {
+    s = Math.min(s, c.bounds!.minlat); w = Math.min(w, c.bounds!.minlon);
+    n = Math.max(n, c.bounds!.maxlat); e = Math.max(e, c.bounds!.maxlon);
+  }
+  const padLat = (n - s) * 0.08, padLon = (e - w) * 0.08;
+  const bbox = [s - padLat, w - padLon, n + padLat, e + padLon].map((v) => v.toFixed(6)).join(',');
   const elements = await overpass(
-    `[out:json][timeout:90];(${sel})->.c;.c out geom;.c map_to_area->.a;(nwr(area.a)["golf"];nwr(area.a)["natural"~"^(water|wood|scrub)$"];nwr(area.a)["landuse"="forest"];);out geom;`,
+    `[out:json][timeout:60];(${sel})->.c;.c out geom;(nwr["golf"](${bbox});way["natural"~"^(water|wood|scrub)$"](${bbox});way["landuse"="forest"](${bbox}););out geom;`,
     i,
   );
   const plan = buildPlan(golf, mine, elements);
