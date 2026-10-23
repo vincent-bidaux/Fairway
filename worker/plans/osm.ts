@@ -3,10 +3,12 @@
 import type { CoursePlan, PlanHole, PlanLayer, PlanLevel, PlanLoop, PlanQuality, Ring, Shape } from '../../shared/plan';
 import type { Env } from '../env';
 
+// Public Overpass servers, tried in turn (each one is often overloaded or down for a while).
 const ENDPOINTS = [
   'https://overpass.private.coffee/api/interpreter',
-  'https://overpass-api.de/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass-api.de/api/interpreter',
 ];
 const UA = 'Fairway/1.0 (+https://fairway.abpq.cc)';
 const REFRESH_DAYS = 30;
@@ -28,14 +30,14 @@ interface OsmElement {
 
 async function overpass(query: string, start = 0): Promise<OsmElement[]> {
   const tries: string[] = [];
-  for (let i = 0; i < ENDPOINTS.length * 2; i++) {
+  for (let i = 0; i < ENDPOINTS.length + 1; i++) {
     const url = ENDPOINTS[(start + i) % ENDPOINTS.length];
     try {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': UA },
         body: 'data=' + encodeURIComponent(query),
-        signal: AbortSignal.timeout(45_000),
+        signal: AbortSignal.timeout(40_000),
       });
       const text = await res.text();
       if (res.ok && text.trimStart().startsWith('{')) return (JSON.parse(text) as { elements: OsmElement[] }).elements;
