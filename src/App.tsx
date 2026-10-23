@@ -1,3 +1,4 @@
+import { primeAudio } from './components/poc';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Department } from '../shared/types';
 import { getDepartments } from './api';
@@ -64,7 +65,10 @@ export function App() {
       back: () => history.back(),
       openZone: (mode, locate) => setZoneSheet({ open: true, mode, locate }),
       toast,
-      showSplash: () => setSplash((s) => ({ run: (s?.run ?? 0) + 1 })),
+      showSplash: () => {
+        primeAudio(); // tap = user gesture: unlocks the « poc » sound
+        setSplash((s) => ({ run: (s?.run ?? 0) + 1 }));
+      },
       departments,
     }),
     [push, toast, departments],

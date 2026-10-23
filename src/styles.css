@@ -1682,6 +1682,37 @@ input[type='range']::-moz-range-thumb {
   transition: opacity 0.3s ease-out;
 }
 
+.splash {
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.splash .sp-origin-view {
+  transform-box: view-box;
+}
+
+.splash-hint {
+  margin: 28px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.55);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.splash-hint.is-on {
+  opacity: 1;
+  animation: hint-pulse 2.2s 0.5s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
 .splash.is-out {
   opacity: 0;
   pointer-events: none;
@@ -1697,6 +1728,7 @@ input[type='range']::-moz-range-thumb {
 
 .splash-art {
   border-radius: 38px;
+  animation: art-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
