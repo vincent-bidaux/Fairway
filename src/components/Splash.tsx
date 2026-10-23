@@ -305,8 +305,9 @@ export function Splash({ runId, onDone }: { runId: number; onDone: () => void })
         </button>
         <h1 className="splash-title">FAIRWAY</h1>
         <p className="splash-tag">Trouvez les prochaines compétitions de golf autour de vous.</p>
-        {stay && <p className={`splash-hint${hint ? ' is-on' : ''}`}>Touchez l'écran pour continuer · l'icône pour rejouer</p>}
       </div>
+      {/* Pinned to the bottom (absolute) so the icon and title never move when it appears. */}
+      {stay && <p className={`splash-hint${hint ? ' is-on' : ''}`}>Touchez l'écran pour continuer</p>}
     </div>
   );
 }
