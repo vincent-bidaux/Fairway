@@ -1933,7 +1933,7 @@ input[type='range']::-moz-range-thumb {
 
 .golf-banner {
   position: relative;
-  height: 220px;
+  aspect-ratio: 6 / 5; /* almost square */
   margin: 0 var(--gutter) 16px;
   border-radius: 16px;
   overflow: hidden;
@@ -2023,7 +2023,6 @@ input[type='range']::-moz-range-thumb {
   box-sizing: border-box;
   border-radius: 50%;
   background: linear-gradient(145deg, #4ade80, #1e8e3e);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .golf-avatar-inner {
@@ -2034,8 +2033,6 @@ input[type='range']::-moz-range-thumb {
   height: 100%;
   border-radius: 50%;
   overflow: hidden;
-  /* thin dark gap between the ring and the photo */
-  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.35);
   background: #1c3a26;
   color: #9ee6b4;
 }

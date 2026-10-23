@@ -11,7 +11,7 @@ export function GolfCross({ golf, size = 56 }: { golf: Golf; size?: number }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [golf.photoUrl]);
   const showPhoto = !!golf.photoUrl && !failed;
-  const ring = Math.max(2.5, Math.round(size * 0.055));
+  const ring = Math.max(5, Math.round(size * 0.11));
   return (
     <span
       className="golf-avatar"
