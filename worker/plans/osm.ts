@@ -331,11 +331,29 @@ export async function refreshPlans(env: Env, opts: { limit?: number; slugs?: str
 
 async function refreshOne(env: Env, golf: GolfRow, all: GolfRow[], i: number): Promise<PlanResult> {
   const db = env.DB;
-  const around = await overpass(`[out:json][timeout:50];nwr["leisure"="golf_course"](around:1600,${golf.lat},${golf.lng});out tags bb;`, i);
+  // One request per golf (public Overpass servers limit requests per IP, and Workers share their IPs):
+  // the golf courses near the golf, then every golf feature and natural area around it.
+  const { lat, lng } = golf;
+  const elements = await overpass(
+    `[out:json][timeout:60];nwr["leisure"="golf_course"](around:1600,${lat},${lng})->.c;.c out geom;` +
+      `(nwr["golf"](around:2600,${lat},${lng});way["natural"~"^(water|wood|scrub)$"](around:2600,${lat},${lng});way["landuse"="forest"](around:2600,${lat},${lng}););out geom;`,
+    i,
+  );
+  const boundsOf = (c: OsmElement): OsmElement['bounds'] => {
+    if (c.bounds) return c.bounds;
+    const pts = geomOf(c).flat();
+    if (!pts.length) return undefined;
+    return {
+      minlat: Math.min(...pts.map((p) => p.lat)), minlon: Math.min(...pts.map((p) => p.lon)),
+      maxlat: Math.max(...pts.map((p) => p.lat)), maxlon: Math.max(...pts.map((p) => p.lon)),
+    };
+  };
+  const courses = elements.filter((e) => e.tags?.leisure === 'golf_course' && e.type !== 'node');
+  for (const c of courses) c.bounds = boundsOf(c);
   // keep the OSM courses whose nearest Fairway golf is this one
-  const mine = around.filter((c) => {
+  const mine = courses.filter((c) => {
     if (!c.bounds) return false;
-    const d = distToBox(golf.lat, golf.lng, c.bounds);
+    const d = distToBox(lat, lng, c.bounds);
     if (d > MATCH_KM) return false;
     return all.every((o) => o.id === golf.id || distToBox(o.lat, o.lng, c.bounds!) >= d);
   });
@@ -349,21 +367,12 @@ async function refreshOne(env: Env, golf: GolfRow, all: GolfRow[], i: number): P
       .run();
     return { slug: golf.slug, level: 'none', detail: 'aucun tracé de golf dans OSM' };
   }
-
-  const sel = mine.map((c) => `${c.type === 'relation' ? 'rel' : 'way'}(${c.id});`).join('');
-  // A bounding box query is much lighter for Overpass than map_to_area. Natural areas are fetched as ways only
-  // (large forest or lake relations would swamp the response); buildPlan drops the ones bigger than the course.
-  let s = 90, w = 180, n = -90, e = -180;
-  for (const c of mine) {
-    s = Math.min(s, c.bounds!.minlat); w = Math.min(w, c.bounds!.minlon);
-    n = Math.max(n, c.bounds!.maxlat); e = Math.max(e, c.bounds!.maxlon);
+  // courses of a neighbouring golf are dropped; buildPlan keeps only features touching our outlines
+  const mineIds = new Set(mine.map(ref));
+  for (let k = elements.length - 1; k >= 0; k--) {
+    const e = elements[k];
+    if (e.tags?.leisure === 'golf_course' && !mineIds.has(ref(e))) elements.splice(k, 1);
   }
-  const padLat = (n - s) * 0.08, padLon = (e - w) * 0.08;
-  const bbox = [s - padLat, w - padLon, n + padLat, e + padLon].map((v) => v.toFixed(6)).join(',');
-  const elements = await overpass(
-    `[out:json][timeout:60];(${sel})->.c;.c out geom;(nwr["golf"](${bbox});way["natural"~"^(water|wood|scrub)$"](${bbox});way["landuse"="forest"](${bbox}););out geom;`,
-    i,
-  );
   const plan = buildPlan(golf, mine, elements);
   if (!plan) throw new Error('contour OSM vide');
   const level = plan.quality.level;
