@@ -134,6 +134,23 @@ export interface RangeStats {
   drills: Array<{ label: string; category: DrillCategory; distance_m: number | null; points: Array<{ date: string; rate: number; attempts: number }> }>;
 }
 
+/** Humeur, forme ou météo elles-mêmes (et non leur effet sur le score), sur toutes les séances de la période. */
+export interface WellbeingDim {
+  /** Nombre de séances où le niveau est renseigné. */
+  n: number;
+  /** Niveau moyen (1–5), arrondi à 1 décimale. */
+  avg: number | null;
+  /** Nombre de séances par niveau (index 0 = niveau 1). */
+  dist: [number, number, number, number, number];
+  /** Niveau de chaque séance renseignée, ordre chronologique. */
+  series: Array<{ date: string; level: number; kind: 'round' | 'range' }>;
+}
+export interface WellbeingStats {
+  mood: WellbeingDim;
+  body: WellbeingDim;
+  weather: WellbeingDim;
+}
+
 export interface StatsResponse {
   period: StatsPeriod;
   from: string | null;
@@ -142,6 +159,9 @@ export interface StatsResponse {
   prevRounds: RoundStats | null;
   range: RangeStats;
   prevRange: RangeStats | null;
+  /** Humeur, forme, météo sur toutes les séances (parties et practice). */
+  wellbeing: WellbeingStats;
+  prevWellbeing: WellbeingStats | null;
 }
 
 /** GIR saisi, sinon déduit : balle sur le green en (par − 2) coups ou moins. */

@@ -1,9 +1,10 @@
 // Cartes de statistiques façon Apple Santé. Utilisé avec de vraies données ou avec l'aperçu fictif grisé.
 import type { ReactNode } from 'react';
-import type { RangeStats, RoundStats, StatsResponse } from '../../shared/practice';
+import type { RangeStats, RoundStats, StatsResponse, WellbeingStats } from '../../shared/practice';
 import { Icon } from '../components/Icon';
 import type { StatMetric } from '../ui';
-import { ContextBars, contextInsight, hasContext } from './ContextCard';
+import { ContextBars, contextInsight, hasContext, hasWellbeing, roundLevel } from './ContextCard';
+import { CONTEXT_LABELS, CONTEXT_TITLES, ContextBadge, contextColor, type ContextKind } from './contextIcons';
 import type { Profile } from './api';
 import { BarChart, DotRange, Legend, Ring, Sparkline, StackedBar, type Segment } from './charts';
 import { birdieCaption, duration, fmtDateShort, nf, pctText, plural, practiceBuckets, rel } from './statsFormat';
@@ -11,6 +12,7 @@ import './practice.css';
 
 export const MIN_ROUNDS = 3;
 const MINUS = '−';
+const WB_KINDS: ContextKind[] = ['mood', 'body', 'weather'];
 export type DashMetric = StatMetric | 'context';
 
 /** Écart avec la période précédente. better = sens qui est une amélioration. */
@@ -95,6 +97,40 @@ export function lastWeeks(range: RangeStats, n = 12): Array<{ week: string; minu
     out.push(map.get(key) ?? { week: key, minutes: 0, balls: 0 });
   }
   return out;
+}
+
+/** Trois colonnes (humeur, forme, météo) : niveau moyen en pictogramme noir, libellé, moyenne, écart et répartition. */
+function WellbeingSummary({ cur, prev }: { cur: WellbeingStats; prev: WellbeingStats | null }) {
+  return (
+    <div className="wb-cols">
+      {WB_KINDS.map((k) => {
+        const d = cur[k];
+        const has = !!d && d.n > 0 && d.avg != null;
+        const level = has ? roundLevel(d.avg!) : 0;
+        const segs: Segment[] = has
+          ? d.dist.map((v, i) => ({ key: String(i + 1), label: CONTEXT_LABELS[k][i], value: v, color: contextColor(k, i + 1) }))
+          : [];
+        return (
+          <div key={k} className={`wb-col${has ? '' : ' is-empty'}`} role="group" aria-label={CONTEXT_TITLES[k]}>
+            <span className="ctxb-title">{k === 'body' ? 'Forme' : CONTEXT_TITLES[k]}</span>
+            {has ? (
+              <>
+                <ContextBadge kind={k} level={level} size={26} mono />
+                <span className="wb-label">{CONTEXT_LABELS[k][level - 1]}</span>
+                <span className="wb-avg">moy. {nf(d.avg!)}</span>
+                <Delta cur={d.avg} prev={prev?.[k]?.avg} better="up" digits={1} label="" />
+                <StackedBar segments={segs} height={5} gap={1.5} ariaLabel={`${CONTEXT_TITLES[k]} : ${segs.map((s) => `${s.label} ${s.value}`).join(', ')}`} />
+              </>
+            ) : (
+              <span className="wb-none" aria-label={`${CONTEXT_TITLES[k]} : non renseignée`}>
+                —
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export function Dashboard({ stats, profile, onOpen, totalRanges = 0 }: { stats: StatsResponse; profile: Profile | null; onOpen: (m: DashMetric) => void; totalRanges?: number }) {
@@ -268,10 +304,15 @@ export function Dashboard({ stats, profile, onOpen, totalRanges = 0 }: { stats: 
         )}
       </Tile>
 
-      {hasContext(r.context) && (
+      {(hasContext(r.context) || hasWellbeing(stats.wellbeing)) && (
         <Tile title="Humeur, forme et météo" color="var(--pink)" metric="context" wide onOpen={onOpen}>
-          <span className="tile-sub">Score moyen selon vos conditions de jeu</span>
-          <ContextBars ctx={r.context} size={26} />
+          <span className="tile-sub">{hasContext(r.context) ? 'Vos conditions de jeu et leur effet sur le score' : 'Vos conditions de jeu sur la période'}</span>
+          {hasWellbeing(stats.wellbeing) && <WellbeingSummary cur={stats.wellbeing} prev={stats.prevWellbeing} />}
+          {hasContext(r.context) && (
+            <div className={hasWellbeing(stats.wellbeing) ? 'wb-score' : undefined}>
+              <ContextBars ctx={r.context} size={26} mono />
+            </div>
+          )}
           {contextInsight(r.context) && <span className="ctx-insight">{contextInsight(r.context)}</span>}
         </Tile>
       )}

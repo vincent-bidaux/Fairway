@@ -113,14 +113,14 @@ export function ContextGlyph({ kind, level, size = 24 }: { kind: ContextKind; le
   );
 }
 
-/** Pastille de couleur + pictogramme blanc. */
-export function ContextBadge({ kind, level, size = 36, label }: { kind: ContextKind; level: number; size?: number; label?: boolean }) {
+/** Pastille de couleur + pictogramme blanc. `mono` : pas de pastille, pictogramme couleur du texte (noir en clair, blanc en sombre). */
+export function ContextBadge({ kind, level, size = 36, label, mono = false }: { kind: ContextKind; level: number; size?: number; label?: boolean; mono?: boolean }) {
   const text = CONTEXT_LABELS[kind][Math.min(Math.max(level, 1), 5) - 1];
   return (
     <span className="ctx-badge-wrap">
       <span
-        className="ctx-badge"
-        style={{ width: size, height: size, background: contextColor(kind, level) }}
+        className={`ctx-badge${mono ? ' ctx-badge--mono' : ''}`}
+        style={mono ? { width: size, height: size } : { width: size, height: size, background: contextColor(kind, level) }}
         role="img"
         aria-label={`${CONTEXT_TITLES[kind]} : ${text}`}
       >

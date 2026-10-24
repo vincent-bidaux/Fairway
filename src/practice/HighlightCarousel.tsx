@@ -39,6 +39,15 @@ export function HighlightCarousel({
     const i = Math.min(items.length - 1, Math.max(0, Math.round(el.scrollLeft / step)));
     setIdx((p) => (p === i ? p : i));
   };
+  /** Flèches (souris) et touches ← → : une carte à la fois. */
+  const go = (d: 1 | -1) => {
+    const el = ref.current;
+    if (!el) return;
+    const slide = el.children[0] as HTMLElement | undefined;
+    const step = slide ? slide.offsetWidth + 12 : el.clientWidth;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    el.scrollTo({ left: Math.max(0, Math.min(items.length - 1, idx + d)) * step, behavior: reduce ? 'auto' : 'smooth' });
+  };
   const dots = Math.min(items.length, 7);
   const active = items.length <= 7 ? idx : Math.min(dots - 1, Math.floor((idx * dots) / items.length));
   return (
@@ -47,12 +56,34 @@ export function HighlightCarousel({
         <h3>Coups de maître</h3>
         <span>{highlightSummary(items)}</span>
       </div>
-      <div className="hl-carousel" ref={ref} onScroll={onScroll} tabIndex={interactive ? 0 : -1}>
-        {items.map((h) => (
-          <div className="hl-slide" key={`${h.session_id}-${h.hole}`}>
-            <HighlightCard h={h} player={player} interactive={interactive} onOpen={() => onOpen(h.session_id)} />
-          </div>
-        ))}
+      <div className="hl-viewport">
+        <div
+          className="hl-carousel"
+          ref={ref}
+          onScroll={onScroll}
+          tabIndex={interactive ? 0 : -1}
+          aria-label="Coups de maître, faites défiler avec les flèches"
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+          }}
+        >
+          {items.map((h) => (
+            <div className="hl-slide" key={`${h.session_id}-${h.hole}`}>
+              <HighlightCard h={h} player={player} interactive={interactive} onOpen={() => onOpen(h.session_id)} />
+            </div>
+          ))}
+        </div>
+        {interactive && items.length > 1 && (
+          <>
+            <button type="button" className="hl-arrow hl-arrow--prev" aria-label="Coup de maître précédent" onClick={() => go(-1)} disabled={idx === 0}>
+              <Icon name="chevron" size={18} strokeWidth={2.6} />
+            </button>
+            <button type="button" className="hl-arrow hl-arrow--next" aria-label="Coup de maître suivant" onClick={() => go(1)} disabled={idx >= items.length - 1}>
+              <Icon name="chevron" size={18} strokeWidth={2.6} />
+            </button>
+          </>
+        )}
       </div>
       {dots > 1 && (
         <div className="hl-dots" aria-hidden="true">

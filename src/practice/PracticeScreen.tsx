@@ -15,8 +15,11 @@ import { getHighlights } from './highlightsApi';
 import { PlayerCard } from './PlayerCard';
 import { sampleHighlights, sampleProfile, sampleSessions, sampleStats } from './sample';
 import { SessionCell } from './SessionCell';
-import { PERIODS, readPeriod, writePeriod } from './statsFormat';
+import { MIN_ROUNDS } from './Dashboard';
+import { PERIODS, plural, readPeriod, roundsByPeriod, writePeriod } from './statsFormat';
 import './practice.css';
+
+const PERIOD_WORDS: Record<StatsPeriod, string> = { '1m': 'le dernier mois', '3m': '3 mois', '6m': '6 mois', '1y': '1 an', all: 'toute la période' };
 
 interface Loaded {
   profile: Profile | null;
@@ -36,6 +39,12 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
   const [tick, setTick] = useState(0);
   const statsSeq = useRef(0);
   const signedIn = account.status === 'in';
+  const accountId = account.status === 'in' ? account.me.user.id : undefined;
+
+  // chaque compte garde sa propre période (par défaut 6 mois)
+  useEffect(() => {
+    if (accountId) setPeriod(readPeriod(accountId));
+  }, [accountId]);
 
   // profil + séances : à chaque changement de données
   useEffect(() => {
@@ -74,7 +83,7 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
 
   const onPeriod = (p: StatsPeriod) => {
     setPeriod(p);
-    writePeriod(p);
+    writePeriod(p, accountId);
   };
 
   // ------------------------------------------------------------ non connecté
@@ -96,10 +105,10 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
           <div className="pr-preview" aria-hidden="true" ref={(el) => el?.setAttribute('inert', '')}>
             <div className="pr-preview-inner">
               <PlayerCard profile={sampleProfile} counts={{ rounds: 23, ranges: 7 }} best={{ strokes: 87, rel: 15, holes: 18 }} onOpenProfile={() => {}} onOpenIndex={() => {}} interactive={false} />
+              <HighlightCarousel items={sampleHighlights} player={{ name: sampleProfile.display_name ?? '', photo: null }} onOpen={() => {}} onAll={() => {}} interactive={false} />
               <div className="pr-period">
                 <Segmented value="6m" options={[...PERIODS]} onChange={() => {}} label="Période" />
               </div>
-              <HighlightCarousel items={sampleHighlights} player={{ name: sampleProfile.display_name ?? '', photo: null }} onOpen={() => {}} onAll={() => {}} interactive={false} />
               <Dashboard stats={sampleStats} profile={sampleProfile} onOpen={() => {}} />
               <Group title="Dernières séances">
                 {sampleSessions.map((s) => (
@@ -154,6 +163,10 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
   const me = account.me;
   const total = me.rounds + me.ranges;
   const recent = data.sessions.slice(0, 5);
+  // Peu de parties sur la période choisie : proposer la plus courte période qui en a assez.
+  const counts = roundsByPeriod(data.sessions);
+  const periodRounds = counts[period] ?? 0;
+  const fewRounds = periodRounds < MIN_ROUNDS ? PERIODS.map((p) => p.value).find((v) => v !== period && (counts[v] ?? 0) >= MIN_ROUNDS && (counts[v] ?? 0) > periodRounds) : undefined;
 
   return (
     <Screen title={PARTIES_LABEL} eyebrow right={plus}>
@@ -174,9 +187,6 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
         </EmptyState>
       ) : (
         <>
-          <div className="pr-period">
-            <Segmented value={period} options={[...PERIODS]} onChange={onPeriod} label="Période" />
-          </div>
           {data.highlights.length > 0 && (
             <HighlightCarousel
               items={data.highlights}
@@ -184,6 +194,19 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
               onOpen={(id) => ui.push({ type: 'session', id })}
               onAll={() => ui.push({ type: 'highlights' })}
             />
+          )}
+          <div className="pr-period">
+            <Segmented value={period} options={[...PERIODS]} onChange={onPeriod} label="Période" />
+          </div>
+          {fewRounds && (
+            <div className="pr-few" role="status">
+              <span>
+                {periodRounds === 0 ? 'Aucune partie' : plural(periodRounds, 'partie')} sur {PERIOD_WORDS[period]}. Les statistiques s’affichent à partir de {MIN_ROUNDS} parties.
+              </span>
+              <button type="button" className="text-btn" onClick={() => onPeriod(fewRounds)}>
+                Voir {PERIOD_WORDS[fewRounds]}
+              </button>
+            </div>
           )}
           <div className={statsBusy ? 'pr-busy' : undefined} aria-busy={statsBusy}>
             <Dashboard stats={stats} profile={data.profile} totalRanges={me.ranges} onOpen={(metric: DashMetric) => ui.push({ type: 'stat', metric })} />

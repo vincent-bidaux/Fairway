@@ -5,9 +5,10 @@ import './highlights.css';
 
 export const KIND_LABEL: Record<HighlightKind, string> = { birdie: 'Birdie', eagle: 'Eagle', ace: 'Trou en un', albatross: 'Albatros' };
 
+// ink = chiffre gravé (sombre, bien contrasté sur la face) ; lit = reflet clair sous la gravure (effet de relief).
 const PALETTE = {
-  silver: { rim: ['#f4f6f9', '#9aa3ae', '#e7ebf0', '#7d8691'], face: ['#e9edf2', '#b5bdc7', '#8f98a4'], ink: ['#ffffff', '#5b6470'], glow: '#c7d0dc' },
-  gold: { rim: ['#fff2b8', '#c8901a', '#ffe58a', '#a8700e'], face: ['#ffe9a0', '#f1b93c', '#c98a14'], ink: ['#fffbe6', '#7a4d06'], glow: '#ffd25a' },
+  silver: { rim: ['#f4f6f9', '#9aa3ae', '#e7ebf0', '#7d8691'], face: ['#f3f5f8', '#c9d0d8', '#a7b0bb'], ink: ['#3f4752', '#1f252d'], lit: '#ffffff', glow: '#c7d0dc' },
+  gold: { rim: ['#fff2b8', '#c8901a', '#ffe58a', '#a8700e'], face: ['#fff0b8', '#f4c451', '#d99b1c'], ink: ['#6e4304', '#3f2602'], lit: '#fff6d6', glow: '#ffd25a' },
 } as const;
 
 export function AwardBadge({ kind, size = 92 }: { kind: HighlightKind; size?: number }) {
@@ -30,7 +31,7 @@ export function AwardBadge({ kind, size = 92 }: { kind: HighlightKind; size?: nu
         </linearGradient>
         <linearGradient id={`${uid}ink`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor={tone.ink[0]} />
-          <stop offset="1" stopColor={tone.ink[1]} stopOpacity="0.85" />
+          <stop offset="1" stopColor={tone.ink[1]} />
         </linearGradient>
         <radialGradient id={`${uid}hi`} cx="0.3" cy="0.2" r="0.7">
           <stop offset="0" stopColor="#fff" stopOpacity="0.75" />
@@ -67,16 +68,16 @@ export function AwardBadge({ kind, size = 92 }: { kind: HighlightKind; size?: nu
         {/* emblème en relief */}
         {kind === 'albatross' ? (
           <g>
-            <path d="M16 56 Q30 36 50 52 Q70 36 84 56 Q70 50 50 62 Q30 50 16 56Z" fill="#000" fillOpacity="0.25" transform="translate(0 1.6)" />
+            <path d="M16 56 Q30 36 50 52 Q70 36 84 56 Q70 50 50 62 Q30 50 16 56Z" fill={tone.lit} fillOpacity="0.85" transform="translate(0 1.6)" />
             <path d="M16 56 Q30 36 50 52 Q70 36 84 56 Q70 50 50 62 Q30 50 16 56Z" fill={`url(#${uid}ink)`} />
             <path d="M44 62 Q50 72 56 62" fill="none" stroke={`url(#${uid}ink)`} strokeWidth="3" strokeLinecap="round" />
           </g>
         ) : (
           <g fontFamily="-apple-system, 'SF Pro Rounded', system-ui, sans-serif" fontWeight="800" textAnchor="middle">
-            <text x="50" y={kind === 'ace' ? 69 : 64} fontSize={kind === 'ace' ? 58 : 34} fill="#000" fillOpacity="0.28" transform="translate(0 1.8)">
+            <text x="50" y={kind === 'ace' ? 69 : 64} fontSize={kind === 'ace' ? 60 : 38} fill={tone.lit} fillOpacity="0.85" transform="translate(0 1.6)">
               {text}
             </text>
-            <text x="50" y={kind === 'ace' ? 69 : 64} fontSize={kind === 'ace' ? 58 : 34} fill={`url(#${uid}ink)`} stroke="#000" strokeOpacity="0.12" strokeWidth="0.6">
+            <text x="50" y={kind === 'ace' ? 69 : 64} fontSize={kind === 'ace' ? 60 : 38} fill={`url(#${uid}ink)`}>
               {text}
             </text>
           </g>

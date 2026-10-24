@@ -1,5 +1,5 @@
 // Données fictives pour l'aperçu grisé (utilisateur non connecté). Aucune n'est réelle.
-import type { Highlight, PlaySession, RoundStats, StatsResponse } from '../../shared/practice';
+import type { Highlight, PlaySession, RoundStats, StatsResponse, WellbeingDim, WellbeingStats } from '../../shared/practice';
 import type { Profile } from './api';
 
 const iso = (daysAgo: number) => {
@@ -41,6 +41,27 @@ const weekly = Array.from({ length: 12 }, (_, i) => {
   };
 });
 
+const wbDim = (levels: number[]): WellbeingDim => {
+  const dist: [number, number, number, number, number] = [0, 0, 0, 0, 0];
+  levels.forEach((l) => dist[l - 1]++);
+  return {
+    n: levels.length,
+    avg: levels.length ? Math.round((10 * levels.reduce((a, b) => a + b, 0)) / levels.length) / 10 : null,
+    dist,
+    series: levels.map((level, i) => ({ date: iso((levels.length - i) * 11), level, kind: i % 4 === 3 ? ('range' as const) : ('round' as const) })),
+  };
+};
+const wellbeing: WellbeingStats = {
+  mood: wbDim([3, 3, 4, 2, 3, 4, 4, 3, 5, 4, 3, 4, 4, 5]),
+  body: wbDim([3, 2, 3, 3, 4, 3, 4, 4, 3, 4, 5, 4, 3, 4]),
+  weather: wbDim([4, 3, 2, 4, 5, 3, 4, 4, 5, 3, 4, 5, 4, 4]),
+};
+const prevWellbeing: WellbeingStats = {
+  mood: wbDim([3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 3, 2]),
+  body: wbDim([2, 3, 3, 3, 2, 3, 4, 3, 3, 2, 3, 3]),
+  weather: wbDim([3, 4, 3, 4, 2, 3, 4, 5, 3, 4, 3, 4]),
+};
+
 export const sampleStats: StatsResponse = {
   period: '6m',
   from: iso(180),
@@ -59,6 +80,8 @@ export const sampleStats: StatsResponse = {
     ],
   },
   prevRange: null,
+  wellbeing,
+  prevWellbeing,
 };
 
 export const sampleProfile: Profile = {

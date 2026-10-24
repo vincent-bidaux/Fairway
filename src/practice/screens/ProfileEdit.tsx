@@ -1,14 +1,12 @@
 // Modifier la carte joueur : photo, nom, golf d'attache, ville, naissance, main, licence, index.
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { Golf } from '../../../shared/types';
-import { getGolfs } from '../../api';
-import { Field, Group, Row, SearchField, Segmented, Spinner } from '../../components/Controls';
-import { Icon } from '../../components/Icon';
+import { useEffect, useRef, useState } from 'react';
+import { Field, Group, Row, Segmented, Spinner } from '../../components/Controls';
 import { BackButton, Screen } from '../../components/Screen';
 import { ErrorState } from '../../components/States';
 import { Sheet } from '../../components/Sheet';
 import { useUi } from '../../ui';
 import { touchData, useAccount } from '../account';
+import { GolfPicker } from '../GolfPicker';
 import { deleteIndex, getProfile, putIndex, saveProfile, type Profile } from '../api';
 import { fmtDateShortYear, golfLabel, initials, nf } from '../statsFormat';
 import '../practice.css';
@@ -19,8 +17,6 @@ const today = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
-
-const plain = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 /** Recadre au centre en 256×256 et encode en JPEG (qualité 0,82). */
 export async function resizeToDataUrl(file: File, size = 256, quality = 0.82): Promise<string> {
@@ -255,15 +251,23 @@ export function ProfileEdit() {
         </Group>
       )}
 
-      <GolfSheet
+      <GolfPicker
         open={golfSheet}
         onClose={() => setGolfSheet(false)}
-        selected={golfId}
+        title="Golf d’attache"
+        selectedId={golfId}
         onPick={(g) => {
-          setGolfId(g?.id ?? null);
-          setGolfName(g ? golfLabel(g.name) : null);
-          if (g && !city.trim()) setCity(g.city);
-          setGolfSheet(false);
+          setGolfId(g.id);
+          setGolfName(golfLabel(g.name));
+          if (!city.trim()) setCity(g.city);
+        }}
+        allowOther={golfId != null}
+        otherSelected={false}
+        otherLabel="Aucun golf d’attache"
+        otherSub=""
+        onOther={() => {
+          setGolfId(null);
+          setGolfName(null);
         }}
       />
       <IndexSheet
@@ -278,56 +282,6 @@ export function ProfileEdit() {
         }}
       />
     </Screen>
-  );
-}
-
-function GolfSheet({ open, onClose, selected, onPick }: { open: boolean; onClose: () => void; selected: number | null; onPick: (g: Golf | null) => void }) {
-  const [golfs, setGolfs] = useState<Golf[] | null>(null);
-  const [q, setQ] = useState('');
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!open || golfs) return;
-    getGolfs({ limit: 200 })
-      .then((r) => setGolfs(r.items))
-      .catch((e: Error) => setError(e.message));
-  }, [open, golfs]);
-
-  const list = useMemo(() => {
-    const n = plain(q.trim());
-    const all = golfs ?? [];
-    return n ? all.filter((g) => plain(`${g.name} ${g.city}`).includes(n)) : all;
-  }, [golfs, q]);
-
-  return (
-    <Sheet open={open} onClose={onClose} title="Golf d’attache">
-      <div className="sheet-pad">
-        <SearchField value={q} onChange={setQ} placeholder="Rechercher un golf" />
-      </div>
-      {error ? (
-        <p className="list-footnote">{error}</p>
-      ) : !golfs ? (
-        <div className="pr-center" style={{ padding: 30 }}>
-          <Spinner />
-        </div>
-      ) : (
-        <div className="group-wrap">
-          <div className="group">
-            {!q && selected != null && <Row label="Aucun golf d’attache" onClick={() => onPick(null)} />}
-            {list.map((g) => (
-              <Row
-                key={g.id}
-                label={golfLabel(g.name)}
-                sub={g.city}
-                value={g.id === selected ? <Icon name="check" size={18} strokeWidth={2.6} className="pe-check" /> : undefined}
-                onClick={() => onPick(g)}
-              />
-            ))}
-            {list.length === 0 && <Row label="Aucun résultat" />}
-          </div>
-        </div>
-      )}
-    </Sheet>
   );
 }
 

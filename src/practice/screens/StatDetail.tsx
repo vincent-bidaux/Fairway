@@ -1,6 +1,6 @@
 // Détail plein écran d'une stat : grand graphe, choix de la période, explication.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import type { StatsPeriod, StatsResponse } from '../../../shared/practice';
+import type { StatsPeriod, StatsResponse, WellbeingDim } from '../../../shared/practice';
 import { Group, Row, Segmented, Spinner } from '../../components/Controls';
 import { BackButton, Screen } from '../../components/Screen';
 import { ErrorState } from '../../components/States';
@@ -8,7 +8,8 @@ import type { StatMetric } from '../../ui';
 import { useUi } from '../../ui';
 import { useAccount, useDataVersion } from '../account';
 import { getProfile, getStats, type Profile } from '../api';
-import { ContextBars, contextInsight, hasContext } from '../ContextCard';
+import { ContextBars, contextInsight, hasContext, hasWellbeing, roundLevel } from '../ContextCard';
+import { CONTEXT_LABELS, CONTEXT_TITLES, ContextBadge, contextColor, type ContextKind } from '../contextIcons';
 import { BarChart, DotRange, Legend, LineChart, Ring, StackedBar, type LinePoint } from '../charts';
 import { Delta, MIN_ROUNDS, distSegments, fairwaySegments } from '../Dashboard';
 import { PERIODS, birdieCaption, duration, plural, practiceBuckets, fmtDateShort, fmtDateShortYear, nf, parseLocal, pctText, readPeriod, rel, writePeriod } from '../statsFormat';
@@ -101,8 +102,9 @@ const META: Record<StatMetric, Meta> = {
     title: 'Humeur, forme et météo',
     color: 'var(--pink)',
     explain: [
-      'Score moyen (relatif au par, ramené à 18 trous) de vos parties selon l’humeur, la forme physique et la météo que vous avez notées. Plus la barre est basse, mieux vous avez joué.',
-      'Les niveaux sans partie sont grisés. Renseignez ces trois notes à chaque partie pour affiner la comparaison.',
+      'Les trois premières cartes décrivent vos conditions elles-mêmes : niveau moyen, évolution et répartition sur toutes vos séances de la période, parties et practice.',
+      'La dernière carte donne le score moyen (relatif au par, ramené à 18 trous) de vos parties selon l’humeur, la forme physique et la météo notées. Plus la barre est basse, mieux vous avez joué. Les niveaux sans partie sont grisés.',
+      'Renseignez ces trois notes à chaque séance pour affiner les statistiques.',
     ],
   },
   drills: {
@@ -298,13 +300,25 @@ function Body({ metric, stats, profile, period }: { metric: StatMetric; stats: S
     }
 
     case 'context': {
-      if (!hasContext(r.context)) return <Card><Notice>Renseignez l’humeur, la forme et la météo sur au moins deux niveaux différents pour voir la comparaison.</Notice></Card>;
+      const withScore = hasContext(r.context);
+      const withWb = hasWellbeing(stats.wellbeing);
       const insight = contextInsight(r.context);
       return (
-        <Card>
-          {insight && <p className="ctx-insight" style={{ marginTop: 0, marginBottom: 14, fontSize: 16, fontWeight: 600 }}>{insight}</p>}
-          <ContextBars ctx={r.context} size={34} />
-        </Card>
+        <>
+          {withWb &&
+            (['mood', 'body', 'weather'] as const).map((k) => <WellbeingCard key={k} kind={k} cur={stats.wellbeing[k]} prev={stats.prevWellbeing?.[k] ?? null} />)}
+          <Card>
+            {withWb && <h3 className="sd-card-title">Score selon vos conditions</h3>}
+            {withScore ? (
+              <>
+                {insight && <p className="ctx-insight" style={{ marginTop: 0, marginBottom: 14, fontSize: 16, fontWeight: 600 }}>{insight}</p>}
+                <ContextBars ctx={r.context} size={34} />
+              </>
+            ) : (
+              <Notice>Renseignez l’humeur, la forme et la météo sur au moins deux niveaux différents pour voir la comparaison.</Notice>
+            )}
+          </Card>
+        </>
       );
     }
 
@@ -487,6 +501,73 @@ function Body({ metric, stats, profile, period }: { metric: StatMetric; stats: S
   }
 }
 
+
+/** Humeur, forme ou météo elles-mêmes : niveau moyen, écart, évolution et répartition. */
+function WellbeingCard({ kind, cur, prev }: { kind: ContextKind; cur: WellbeingDim; prev: WellbeingDim | null }) {
+  const title = CONTEXT_TITLES[kind];
+  const labels = CONTEXT_LABELS[kind];
+  if (!cur || cur.n === 0 || cur.avg == null) {
+    return (
+      <Card>
+        <h3 className="sd-card-title">{title}</h3>
+        <Notice>Aucune note de {title.toLowerCase()} sur cette période. Renseignez-la dans vos séances (parties et practice).</Notice>
+      </Card>
+    );
+  }
+  const level = roundLevel(cur.avg);
+  const data: LinePoint[] = cur.series.map((s) => ({ t: ts(s.date), y: s.level, label: `${labels[s.level - 1]} · ${s.kind === 'round' ? 'partie' : 'practice'}` }));
+  const max = Math.max(1, ...cur.dist);
+  return (
+    <Card>
+      <h3 className="sd-card-title">{title}</h3>
+      <div className="wbd-head">
+        <ContextBadge kind={kind} level={level} size={56} />
+        <div className="wbd-head-main">
+          <span className="wbd-level">{labels[level - 1]}</span>
+          <span className="wbd-sub">
+            moyenne {nf(cur.avg)} sur {plural(cur.n, 'séance')}
+          </span>
+          <Delta cur={cur.avg} prev={prev?.avg} better="up" digits={1} />
+        </div>
+      </div>
+      {data.length >= 2 && (
+        <LineChart
+          pointLabel="Chaque séance"
+          data={data}
+          height={180}
+          color={META.context.color}
+          domain={[1, 5]}
+          rolling={data.length >= 5 ? 5 : undefined}
+          rollingLabel="Moyenne sur 5 séances"
+          yFormat={(n) => `${n}`}
+          ariaLabel={`${title} sur ${data.length} séances, de ${labels[data[0].y - 1]} à ${labels[data[data.length - 1].y - 1]}`}
+          placeholder="Touchez le graphe pour voir une séance"
+          describe={(pt, avg) => (
+            <>
+              <span>{fmtDateShortYear(toIsoLocal(pt.t))}</span>
+              <span>
+                <b>{labels[pt.y - 1]}</b> · {pt.label?.split(' · ')[1]}
+                {avg != null && <> · moy. {nf(avg)}</>}
+              </span>
+            </>
+          )}
+        />
+      )}
+      <ul className="wbd-dist" aria-label={`Répartition : ${title}`}>
+        {cur.dist.map((count, i) => (
+          <li key={i} className={`wbd-dist-row${count === 0 ? ' is-zero' : ''}`}>
+            <ContextBadge kind={kind} level={i + 1} size={28} />
+            <span className="wbd-dist-name">{labels[i]}</span>
+            <span className="wbd-dist-track" role="img" aria-label={`${labels[i]} : ${plural(count, 'séance')}`}>
+              <span className="wbd-dist-fill" style={{ width: `${(count / max) * 100}%`, background: contextColor(kind, i + 1) }} />
+            </span>
+            <span className="wbd-dist-n">{count}</span>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
 
 function Curve({ data, color, unit, fmt, name }: { data: LinePoint[]; color: string; unit: string; fmt: (n: number) => string; name: string }) {
   if (data.length < 2) return null;

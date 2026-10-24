@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { highlightKind, type Drill, type Highlight, type HoleEntry, type PlaySession, type StatsPeriod, type StatsResponse } from '../../shared/practice';
 import { createAuth } from '../auth';
 import type { Env } from '../env';
-import { rangeStats, roundStats, type RangeRow, type RoundRow } from '../lib/stats';
+import { rangeStats, roundStats, wellbeingStats, type RangeRow, type RoundRow } from '../lib/stats';
 import { ensureDemo, isDemo } from '../demo';
 
 type Vars = { userId: string; userName: string };
@@ -262,11 +262,14 @@ async function loadForStats(env: Env, uid: string, from: string | null, to: stri
   }
   const rounds: RoundRow[] = [];
   const ranges: RangeRow[] = [];
+  // Humeur, forme et météo de toutes les séances (parties et practice), saisies ou non.
+  const wellbeing: Array<{ played_at: string; kind: 'round' | 'range'; mood: number | null; body: number | null; weather: number | null }> = [];
   for (const s of sessions.results) {
+    wellbeing.push({ played_at: s.played_at, kind: s.kind === 'round' ? 'round' : 'range', mood: s.mood, body: s.body, weather: s.weather });
     if (s.kind === 'round') rounds.push({ id: s.id, played_at: s.played_at, golf_name: s.golf_name, mood: s.mood, body: s.body, weather: s.weather, holes: holes.get(s.id) ?? [] });
     else ranges.push({ id: s.id, played_at: s.played_at, duration_min: s.duration_min, balls: s.balls, drills: drills.get(s.id) ?? [] });
   }
-  return { rounds, ranges };
+  return { rounds, ranges, wellbeing };
 }
 
 meApi.get('/stats', async (c) => {
@@ -291,6 +294,8 @@ meApi.get('/stats', async (c) => {
     prevRounds: prev ? roundStats(prev.rounds) : null,
     range: rangeStats(cur.ranges),
     prevRange: prev ? rangeStats(prev.ranges) : null,
+    wellbeing: wellbeingStats(cur.wellbeing),
+    prevWellbeing: prev ? wellbeingStats(prev.wellbeing) : null,
   };
   return c.json(body);
 });

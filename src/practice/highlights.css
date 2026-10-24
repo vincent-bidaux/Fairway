@@ -29,11 +29,11 @@ button.hl:active {
 }
 .hl--gold {
   --hl-a: color-mix(in srgb, #ffcc33 38%, transparent);
-  --hl-ink: #b8860b;
+  --hl-ink: #8f6200;
 }
 .hl--silver {
   --hl-a: color-mix(in srgb, #9fb0c4 38%, transparent);
-  --hl-ink: #6b7685;
+  --hl-ink: #4c5562;
 }
 @media (prefers-color-scheme: dark) {
   .hl--gold {
@@ -59,8 +59,8 @@ button.hl:active {
   width: 80px;
 }
 .hl-kind {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   color: var(--hl-ink);
@@ -212,6 +212,47 @@ button.hl:active {
 .hl-section-head span {
   font-size: 14px;
   color: var(--label2);
+}
+.hl-viewport {
+  position: relative;
+}
+/* Flèches : seulement avec une souris ou un trackpad (au doigt, on fait glisser). */
+.hl-arrow {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hl-arrow {
+    position: absolute;
+    top: calc(50% - 26px);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--label);
+    background: var(--blur-bg);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18), inset 0 0 0 0.5px var(--sep);
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .hl-arrow--prev {
+    left: max(6px, env(safe-area-inset-left, 0px));
+  }
+  .hl-arrow--prev svg {
+    transform: scaleX(-1);
+  }
+  .hl-arrow--next {
+    right: max(6px, env(safe-area-inset-right, 0px));
+  }
+  .hl-arrow:hover {
+    transform: scale(1.06);
+  }
+  .hl-arrow:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 .hl-carousel {
   display: flex;

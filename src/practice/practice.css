@@ -8,6 +8,25 @@
 .pr-period {
   margin: 0 var(--gutter) 14px;
 }
+.pr-few {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: -4px var(--gutter) 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--orange) 12%, var(--bg2));
+  font-size: 14px;
+  line-height: 1.35;
+}
+.pr-few span {
+  flex: 1 1 200px;
+}
+.pr-few .text-btn {
+  font-weight: 600;
+}
 .pr-busy {
   opacity: 0.55;
   transition: opacity 0.2s;
@@ -873,3 +892,148 @@
 .sess-sub { display: flex; }
 .sess-sub-golf { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .sess-sub-date { flex: none; white-space: pre; }
+
+/* --- Humeur, forme et météo : statistiques des niveaux eux-mêmes ----------- */
+.wb-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+.wb-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  text-align: center;
+}
+.wb-col .ctxb-title {
+  margin-bottom: 2px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wb-col .stacked {
+  width: 100%;
+  margin-top: 4px;
+}
+.wb-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.wb-avg {
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--label2);
+  font-variant-numeric: tabular-nums;
+}
+.wb-col .pdelta {
+  font-size: 12px;
+  min-height: 15px;
+  white-space: nowrap;
+}
+.wb-none {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--label3);
+}
+.wb-score {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--sep);
+}
+.wb-score .ctxb {
+  margin-top: 0;
+}
+
+/* Détail : une carte par dimension */
+.wbd-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 4px;
+}
+.wbd-head-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.wbd-kind {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--label2);
+}
+.wbd-level {
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.wbd-sub {
+  font-size: 14px;
+  color: var(--label2);
+  font-variant-numeric: tabular-nums;
+}
+.wbd-dist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 12px 0 0;
+  border-top: 0.5px solid var(--sep);
+  list-style: none;
+}
+.wbd-dist-row {
+  display: grid;
+  grid-template-columns: 28px 92px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.wbd-dist-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wbd-dist-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--fill);
+  overflow: hidden;
+}
+.wbd-dist-fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+}
+.wbd-dist-n {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.wbd-dist-row.is-zero .wbd-dist-name,
+.wbd-dist-row.is-zero .wbd-dist-n {
+  color: var(--label3);
+  font-weight: 400;
+}
+.wbd-dist-row.is-zero .ctx-badge {
+  opacity: 0.4;
+}
+.sd-card-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--label2);
+}

@@ -1,5 +1,5 @@
 // Humeur, forme et météo : score moyen par niveau (5 barres par dimension) et phrase de synthèse.
-import type { RoundStats } from '../../shared/practice';
+import type { RoundStats, WellbeingStats } from '../../shared/practice';
 import { CONTEXT_TITLES, ContextBadge, contextColor, type ContextKind } from './contextIcons';
 import { rel } from './statsFormat';
 import './highlights.css';
@@ -18,6 +18,12 @@ const withData = (ctx: Ctx, k: ContextKind) => (ctx?.[k] ?? []).filter((l) => l.
 /** Nombre de dimensions à au moins 2 niveaux renseignés. */
 export const hasContext = (ctx: Ctx | undefined) => !!ctx && KINDS.some((k) => withData(ctx, k).length >= 2);
 
+/** Au moins un niveau d'humeur, de forme ou de météo renseigné sur la période (toutes séances). */
+export const hasWellbeing = (w: WellbeingStats | null | undefined) => !!w && KINDS.some((k) => (w[k]?.n ?? 0) > 0);
+
+/** Niveau 1–5 le plus proche d'une moyenne. */
+export const roundLevel = (avg: number) => Math.min(5, Math.max(1, Math.round(avg)));
+
 export function contextInsight(ctx: Ctx | undefined): string | null {
   if (!ctx) return null;
   let best: { gap: number; kind: ContextKind; good: number; bad: number } | null = null;
@@ -34,7 +40,7 @@ export function contextInsight(ctx: Ctx | undefined): string | null {
   return `Vous jouez ${n} coup${n > 1 ? 's' : ''} de moins quand ${PHRASE[best.kind][best.good - 1]} que quand ${PHRASE[best.kind][best.bad - 1]}.`;
 }
 
-export function ContextBars({ ctx, size = 28, titles = true }: { ctx: Ctx; size?: number; titles?: boolean }) {
+export function ContextBars({ ctx, size = 28, titles = true, mono = false }: { ctx: Ctx; size?: number; titles?: boolean; mono?: boolean }) {
   const all = KINDS.flatMap((k) => ctx[k] ?? []).filter((l) => l.rel18 != null).map((l) => l.rel18!);
   const max = Math.max(1, ...all);
   return (
@@ -51,7 +57,7 @@ export function ContextBars({ ctx, size = 28, titles = true }: { ctx: Ctx; size?
                 <div key={level} className={`ctxb-col${has ? '' : ' is-empty'}`}>
                   <span className="ctxb-val">{has ? rel(e!.rel18!) : '—'}</span>
                   <span className="ctxb-bar" style={{ height: h, background: contextColor(k, level) }} />
-                  <ContextBadge kind={k} level={level} size={size} />
+                  <ContextBadge kind={k} level={level} size={size} mono={mono} />
                   <span className="ctxb-n">{has ? `${e!.rounds} p.` : ' '}</span>
                 </div>
               );

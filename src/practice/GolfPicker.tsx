@@ -1,19 +1,25 @@
-// Feuille de choix du golf : récents, distance, A–Z, département, recherche, favoris.
+// Feuille de choix du golf : favoris (golfs et compétitions), récents, distance, A–Z, département, recherche.
 import { useEffect, useMemo, useState } from 'react';
-import type { Golf } from '../../shared/types';
-import { getGolfs } from '../api';
+import type { Golf, GolfEvent } from '../../shared/types';
+import { getEvent, getGolfs } from '../api';
 import { Group, SearchField, Segmented, Spinner } from '../components/Controls';
 import { Icon } from '../components/Icon';
 import { Sheet } from '../components/Sheet';
 import { deptName, formatKm, getPosition } from '../lib';
-import { useGolfFavorites } from '../store';
+import { useGolfFavorites, usePrefs } from '../store';
 import { useUi } from '../ui';
 import { recentGolfs } from './api';
 import './session.css';
 
-type Sort = 'distance' | 'az' | 'dept';
+type Sort = 'fav' | 'distance' | 'az' | 'dept';
 
 let golfCache: Golf[] | null = null;
+const eventCache = new Map<number, GolfEvent | null>();
+const dShort = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+const fmtDay = (iso: string) => {
+  const m = /^(\d{4})-(\d\d)-(\d\d)/.exec(iso);
+  return m ? dShort.format(new Date(+m[1], +m[2] - 1, +m[3], 12)) : iso;
+};
 
 function haversine(a: { lat: number; lng: number }, lat: number, lng: number): number {
   const R = 6371;
@@ -31,15 +37,24 @@ interface Props {
   onClose: () => void;
   selectedId: number | null;
   onPick: (g: Golf) => void;
-  /** Practice : ligne « Autre lieu ». */
+  /** Practice : ligne « Autre lieu » (libellés modifiables, ex. « Aucun golf d'attache »). */
   allowOther?: boolean;
   otherSelected?: boolean;
   onOther?: () => void;
+  otherLabel?: string;
+  otherSub?: string;
+  title?: string;
+  /** Saisie d'une partie : l'onglet Favoris propose aussi les compétitions favorites. */
+  onPickEvent?: (e: GolfEvent, golf: Golf | null) => void;
+  selectedEventId?: number | null;
 }
 
-export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, otherSelected, onOther }: Props) {
+export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, otherSelected, onOther, otherLabel, otherSub, title, onPickEvent, selectedEventId }: Props) {
   const ui = useUi();
   const favs = useGolfFavorites();
+  const { favorites: favEventIds } = usePrefs();
+  const [favEvents, setFavEvents] = useState<GolfEvent[]>([]);
+  const hasFavs = favs.length > 0 || (!!onPickEvent && favEventIds.length > 0);
   const [golfs, setGolfs] = useState<Golf[]>(golfCache ?? []);
   const [loading, setLoading] = useState(!golfCache);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +67,8 @@ export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, othe
   useEffect(() => {
     if (!open) return;
     setQ('');
+    if (hasFavs) setSort('fav');
+    else setSort((v) => (v === 'fav' ? 'distance' : v));
     let alive = true;
     if (!golfCache) {
       setLoading(true);
@@ -81,6 +98,31 @@ export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, othe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  // Compétitions favorites (saisie d'une partie) : chargées une fois, gardées en mémoire.
+  useEffect(() => {
+    if (!open || !onPickEvent || !favEventIds.length) {
+      setFavEvents([]);
+      return;
+    }
+    let alive = true;
+    const ids = favEventIds.slice(-40);
+    Promise.all(
+      ids.map((id) =>
+        eventCache.has(id)
+          ? Promise.resolve(eventCache.get(id) ?? null)
+          : getEvent(id)
+              .then((e) => (eventCache.set(id, e), e))
+              .catch(() => (eventCache.set(id, null), null)),
+      ),
+    ).then((list) => {
+      if (!alive) return;
+      setFavEvents(list.filter((e): e is GolfEvent => !!e).sort((a, b) => b.startDate.localeCompare(a.startDate)));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [open, onPickEvent, favEventIds]);
+
   const withDist = useMemo(
     () =>
       golfs.map((g) => ({
@@ -105,7 +147,16 @@ export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, othe
       if (rec.length) out.push({ title: 'Récents', items: rec });
     }
     const rest = filtered;
-    if (sort === 'distance' && pos) {
+    if (sort === 'fav') {
+      const fav = rest.filter((x) => favs.includes(x.g.id));
+      out.length = 0; // pas de « Récents » dans l'onglet Favoris
+      if (fav.length) {
+        out.push({
+          title: 'Golfs favoris',
+          items: [...fav].sort((a, b) => (pos ? (a.km ?? 1e9) - (b.km ?? 1e9) : a.g.name.localeCompare(b.g.name, 'fr'))),
+        });
+      }
+    } else if (sort === 'distance' && pos) {
       out.push({
         title: query ? 'Résultats' : 'Par distance',
         items: [...rest].sort((a, b) => (a.km ?? 1e9) - (b.km ?? 1e9)),
@@ -125,7 +176,7 @@ export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, othe
       out.push({ title: query ? 'Résultats' : 'A–Z', items: [...rest].sort((a, b) => a.g.name.localeCompare(b.g.name, 'fr')) });
     }
     return out;
-  }, [filtered, recent, withDist, sort, pos, query, ui.departments]);
+  }, [filtered, recent, withDist, sort, pos, query, ui.departments, favs]);
 
   const row = ({ g, km }: { g: Golf; km: number | null }, key: string) => (
     <button
@@ -151,8 +202,33 @@ export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, othe
     </button>
   );
 
+  const shownEvents = sort === 'fav' && onPickEvent ? favEvents.filter((e) => !query || norm(`${e.title} ${e.golfName} ${e.golfCity}`).includes(query)) : [];
+  const eventRow = (e: GolfEvent) => (
+    <button
+      key={`ev-${e.id}`}
+      type="button"
+      className="row row--tap gp-row"
+      onClick={() => {
+        onPickEvent?.(e, golfs.find((g) => g.id === e.golfId) ?? null);
+        onClose();
+      }}
+    >
+      <span className="row-main">
+        <span className="row-label gp-name">
+          <Icon name="star" size={13} fill className="gp-star" />
+          {e.title}
+        </span>
+        <span className="row-sub">{[e.golfName, fmtDay(e.startDate)].filter(Boolean).join(' · ')}</span>
+      </span>
+      <span className={`check${selectedEventId === e.id ? ' is-on' : ''}`}>
+        <Icon name="check" size={18} strokeWidth={2.6} />
+      </span>
+    </button>
+  );
+  const favEmpty = sort === 'fav' && sections.every((x) => !x.items.length) && !shownEvents.length;
+
   return (
-    <Sheet open={open} onClose={onClose} title="Choisir un golf">
+    <Sheet open={open} onClose={onClose} title={title ?? 'Choisir un golf'}>
       <div className="gp-controls">
         <SearchField value={q} onChange={setQ} placeholder="Rechercher un golf ou une ville" label="Rechercher un golf" />
         <Segmented<Sort>
@@ -160,9 +236,10 @@ export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, othe
           value={sort}
           onChange={setSort}
           options={[
+            { value: 'fav', label: 'Favoris' },
             { value: 'distance', label: 'Distance' },
             { value: 'az', label: 'A–Z' },
-            { value: 'dept', label: 'Département' },
+            { value: 'dept', label: 'Dép.' },
           ]}
         />
         {sort === 'distance' && !pos && posTried && (
@@ -183,8 +260,8 @@ export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, othe
               <Icon name="pin" size={16} />
             </span>
             <span className="row-main">
-              <span className="row-label">Autre lieu</span>
-              <span className="row-sub">Practice hors golf, terrain d’entraînement…</span>
+              <span className="row-label">{otherLabel ?? 'Autre lieu'}</span>
+              {(otherSub ?? 'Practice hors golf, terrain d’entraînement…') && <span className="row-sub">{otherSub ?? 'Practice hors golf, terrain d’entraînement…'}</span>}
             </span>
             <span className={`check${otherSelected ? ' is-on' : ''}`}>
               <Icon name="check" size={18} strokeWidth={2.6} />
@@ -198,14 +275,23 @@ export function GolfPicker({ open, onClose, selectedId, onPick, allowOther, othe
         </div>
       ) : error && !golfs.length ? (
         <p className="gp-note gp-note--error">{error}</p>
-      ) : sections.every((s) => !s.items.length) ? (
+      ) : favEmpty ? (
+        <p className="gp-note">
+          {query
+            ? `Aucun favori ne correspond à « ${q} ».`
+            : `Aucun favori pour l’instant. Touchez l’étoile sur la fiche d’un golf${onPickEvent ? ' ou d’une compétition' : ''} pour le retrouver ici.`}
+        </p>
+      ) : sort !== 'fav' && sections.every((s) => !s.items.length) ? (
         <p className="gp-note">Aucun golf ne correspond à « {q} ».</p>
       ) : (
-        sections.map((s) => (
-          <Group key={s.title} title={s.title}>
-            {s.items.map((x) => row(x, `${s.title}-${x.g.id}`))}
-          </Group>
-        ))
+        <>
+          {sections.map((s) => (
+            <Group key={s.title} title={s.title}>
+              {s.items.map((x) => row(x, `${s.title}-${x.g.id}`))}
+            </Group>
+          ))}
+          {shownEvents.length > 0 && <Group title="Compétitions favorites">{shownEvents.map(eventRow)}</Group>}
+        </>
       )}
     </Sheet>
   );

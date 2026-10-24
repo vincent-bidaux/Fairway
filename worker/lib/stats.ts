@@ -1,4 +1,4 @@
-import { girOf, type HoleEntry, type RangeStats, type RoundStats, type DrillCategory } from '../../shared/practice';
+import { girOf, type HoleEntry, type RangeStats, type RoundStats, type DrillCategory, type WellbeingDim, type WellbeingStats } from '../../shared/practice';
 
 export interface RoundRow {
   id: string;
@@ -146,6 +146,25 @@ export function roundStats(rounds: RoundRow[]): RoundStats {
       weather: ctx.weather.map((b, i) => ({ level: i + 1, rounds: b.n, rel18: b.holes ? r1((b.rel * 18) / b.holes) : null })),
     },
   };
+}
+
+/** Humeur, forme et météo elles-mêmes, sur toutes les séances (parties et practice) où elles sont renseignées. */
+export function wellbeingStats(rows: Array<{ played_at: string; kind: 'round' | 'range'; mood: number | null; body: number | null; weather: number | null }>): WellbeingStats {
+  const sorted = [...rows].sort((a, b) => a.played_at.localeCompare(b.played_at));
+  const dim = (k: 'mood' | 'body' | 'weather'): WellbeingDim => {
+    const dist: [number, number, number, number, number] = [0, 0, 0, 0, 0];
+    const series: WellbeingDim['series'] = [];
+    let sum = 0;
+    for (const r of sorted) {
+      const lvl = r[k];
+      if (lvl == null || !Number.isInteger(lvl) || lvl < 1 || lvl > 5) continue;
+      dist[lvl - 1]++;
+      sum += lvl;
+      series.push({ date: r.played_at, level: lvl, kind: r.kind });
+    }
+    return { n: series.length, avg: series.length ? r1(sum / series.length) : null, dist, series };
+  };
+  return { mood: dim('mood'), body: dim('body'), weather: dim('weather') };
 }
 
 /** Lundi de la semaine (YYYY-MM-DD) */

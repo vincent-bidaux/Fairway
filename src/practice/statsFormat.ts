@@ -89,9 +89,12 @@ export const PERIODS = [
 
 export const PERIOD_KEY = 'fairway:practice:period';
 
-export function readPeriod(): (typeof PERIODS)[number]['value'] {
+/** Période mémorisée par compte : passer d'un compte à l'autre (ex. compte de démo) ne garde pas un filtre trop étroit. */
+const periodKey = (account?: string) => (account ? `${PERIOD_KEY}:${account}` : PERIOD_KEY);
+
+export function readPeriod(account?: string): (typeof PERIODS)[number]['value'] {
   try {
-    const v = localStorage.getItem(PERIOD_KEY);
+    const v = localStorage.getItem(periodKey(account));
     if (PERIODS.some((p) => p.value === v)) return v as (typeof PERIODS)[number]['value'];
   } catch {
     /* stockage indisponible */
@@ -99,9 +102,27 @@ export function readPeriod(): (typeof PERIODS)[number]['value'] {
   return '6m';
 }
 
-export function writePeriod(v: string) {
+const PERIOD_MONTHS: Record<string, number | null> = { '1m': 1, '3m': 3, '6m': 6, '1y': 12, all: null };
+
+/** Nombre de parties (séances « round ») dans chaque période, à partir de la liste des séances. */
+export function roundsByPeriod(sessions: Array<{ kind: string; played_at: string }>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const p of PERIODS) {
+    const m = PERIOD_MONTHS[p.value];
+    let from = '';
+    if (m) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - m);
+      from = d.toLocaleDateString('sv-SE');
+    }
+    out[p.value] = sessions.filter((s) => s.kind === 'round' && s.played_at.slice(0, 10) >= from).length;
+  }
+  return out;
+}
+
+export function writePeriod(v: string, account?: string) {
   try {
-    localStorage.setItem(PERIOD_KEY, v);
+    localStorage.setItem(periodKey(account), v);
   } catch {
     /* ignoré */
   }

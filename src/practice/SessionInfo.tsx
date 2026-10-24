@@ -102,6 +102,25 @@ export function PlaceDate({ s, onChange }: PlaceDateProps) {
         otherSelected={other}
         onOther={() => onChange({ golf_id: null, golf_name: null, golf_city: null, place: s.place ?? '' }, null)}
         onPick={(g) => onChange(g.id === s.golf_id ? {} : { golf_id: g.id, golf_name: g.name, golf_city: g.city, place: null, event_id: null, event_title: null }, g)}
+        selectedEventId={s.event_id}
+        onPickEvent={
+          isRange
+            ? undefined
+            : (e, g) =>
+                // Compétition favorite : golf, compétition et date en une fois (l'heure saisie est gardée).
+                onChange(
+                  {
+                    golf_id: e.golfId,
+                    golf_name: e.golfName,
+                    golf_city: e.golfCity,
+                    place: null,
+                    event_id: e.id,
+                    event_title: e.title,
+                    played_at: `${e.startDate}T${e.startTime ?? s.played_at.slice(11, 16) ?? '09:00'}`,
+                  },
+                  g ?? undefined,
+                )
+        }
       />
     </>
   );

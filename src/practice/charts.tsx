@@ -136,7 +136,10 @@ export function LineChart({
   describe,
   zeroLine,
   dots = true,
+  pointLabel = 'Chaque partie',
 }: {
+  /** Légende des points (« Chaque partie », « Chaque séance »…). */
+  pointLabel?: string;
   data: LinePoint[];
   height?: number;
   color?: string;
@@ -281,7 +284,7 @@ export function LineChart({
         <div className="chart-legend">
           <span className="legend-item">
             <i className="legend-dot" style={{ background: color, opacity: 0.7 }} />
-            Chaque partie
+            {pointLabel}
           </span>
           <span className="legend-item">
             <i className="legend-line" style={{ background: color }} />
