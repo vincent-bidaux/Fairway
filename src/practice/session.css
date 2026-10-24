@@ -300,3 +300,10 @@
 .hs--many { padding: 0 6px; }
 .hs--many .hs-dot { font-size: 9.5px; }
 .hs--many .hs-btn.is-cur .hs-dot { box-shadow: 0 0 0 1.5px var(--bg), 0 0 0 3px var(--label); transform: none; }
+
+.ctx-row { padding-top: 12px; padding-bottom: 12px; }
+.mood-q { font-size: 20px; font-weight: 700; text-align: center; padding: 4px 0 16px; }
+.mood-card { background: var(--bg2); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+.ctx-strip { display: flex; justify-content: space-around; margin: 0 var(--gutter) 22px; padding: 14px 8px 12px; border-radius: 14px; background: var(--bg2); }
+.ctx-strip .ctx-badge-label { font-size: 12px; }
+.detail-sub2 { padding: 0 var(--gutter) 2px; margin-top: -4px; color: var(--label2); font-size: 16px; font-weight: 500; }

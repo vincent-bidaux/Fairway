@@ -10,7 +10,9 @@ import { ConfirmSheet } from '../ConfirmSheet';
 import { clearDraft, readDraft, writeDraft } from '../drafts';
 import { PracticeForm } from '../PracticeForm';
 import { RoundEntry } from '../RoundEntry';
-import { buildEntries, PlaceDate, RoundOptions } from '../SessionInfo';
+import { BeforeGroup, buildEntries, CompetitionGroup, PlaceDate, RoundOptions } from '../SessionInfo';
+import { ContextPicker } from '../contextIcons';
+import { Sheet } from '../../components/Sheet';
 import '../session.css';
 
 function blank(kind: SessionKind, id = newId()): PlaySession {
@@ -44,7 +46,7 @@ function blank(kind: SessionKind, id = newId()): PlaySession {
 /** Ce qui part au serveur : seuls les trous réellement joués comptent (et votent pour le par). */
 function toPayload(s: PlaySession): PlaySession {
   if (s.kind === 'round') return { ...s, hole_entries: (s.hole_entries ?? []).filter((e) => e.strokes != null) };
-  return { ...s, hole_entries: undefined };
+  return { ...s, hole_entries: undefined, feeling: s.mood ?? s.feeling };
 }
 
 type Step = 'setup' | 'entry';
@@ -56,6 +58,7 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
   const [s, setS] = useState<PlaySession>(() => {
     if (!session) return blank(kindProp ?? 'round');
     const base: PlaySession = { ...session };
+    if (base.mood == null && base.kind === 'range' && base.feeling) base.mood = base.feeling;
     if (base.kind === 'round') {
       const holes = base.holes === 9 ? 9 : 18;
       base.holes = holes;
@@ -70,6 +73,7 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
   const [sync, setSync] = useState<Sync>('ok');
   const [busy, setBusy] = useState(false);
   const [confirmEmpty, setConfirmEmpty] = useState(false);
+  const [moodOpen, setMoodOpen] = useState(false);
   const [rev, setRev] = useState(0);
 
   const latest = useRef(s);
@@ -207,6 +211,7 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
   };
   const finish = () => {
     if (latest.current.kind === 'round' && !hasScore(latest.current)) setConfirmEmpty(true);
+    else if (latest.current.kind === 'round') setMoodOpen(true);
     else void doFinish();
   };
 
@@ -245,7 +250,9 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
             });
           }}
         />
+        {kind === 'round' && <CompetitionGroup s={s} onChange={(p) => setS((x) => ({ ...x, ...p }))} />}
         {kind === 'round' && <RoundOptions s={s} golfHoles={golfN} onChange={(p) => setS((x) => ({ ...x, ...p }))} />}
+        {kind === 'round' && <BeforeGroup s={s} onChange={(p) => setS((x) => ({ ...x, ...p }))} />}
         <div className="setup-cta">
           <button type="button" className="btn btn--block" disabled={!canStart} onClick={start}>
             {kind === 'round' ? 'Commencer' : 'Continuer'}
@@ -277,6 +284,58 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
       ) : (
         <PracticeForm s={s} update={update} setGolfN={setGolfN} busy={busy} onSave={finish} onBack={leave} isNew={isNew} />
       )}
+      <Sheet
+        open={moodOpen}
+        onClose={() => setMoodOpen(false)}
+        title="Fin de partie"
+        right={
+          <button type="button" className="text-btn" onClick={() => setMoodOpen(false)}>
+            Retour
+          </button>
+        }
+      >
+        <div className="sheet-pad">
+          <h3 className="mood-q">Comment s’est passée la partie ?</h3>
+          <div className="mood-card">
+            <ContextPicker kind="mood" value={s.mood} onChange={(v) => update((x) => ({ ...x, mood: v }))} />
+          </div>
+          <div className="mood-card">
+            <textarea
+              className="notes-input"
+              rows={3}
+              maxLength={2000}
+              placeholder="Une note ? (facultatif)"
+              aria-label="Note de la partie"
+              value={s.notes ?? ''}
+              onChange={(e) => update((x) => ({ ...x, notes: e.target.value || null }))}
+            />
+          </div>
+          <div className="confirm-actions">
+            <button
+              type="button"
+              className="btn btn--block"
+              disabled={busy}
+              onClick={() => {
+                setMoodOpen(false);
+                void doFinish();
+              }}
+            >
+              {busy ? 'Enregistrement…' : 'Enregistrer la partie'}
+            </button>
+            <button
+              type="button"
+              className="btn btn--block btn--secondary"
+              disabled={busy}
+              onClick={() => {
+                setMoodOpen(false);
+                void doFinish();
+              }}
+            >
+              Passer
+            </button>
+          </div>
+        </div>
+      </Sheet>
       <ConfirmSheet
         open={confirmEmpty}
         title="Aucun score saisi"

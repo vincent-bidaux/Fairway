@@ -6,6 +6,7 @@ import { Icon } from '../components/Icon';
 import { BackButton, Screen } from '../components/Screen';
 import { Sheet } from '../components/Sheet';
 import { PlaceDate } from './SessionInfo';
+import { ContextPicker } from './contextIcons';
 import './session.css';
 
 const buzz = (ms = 8) => {
@@ -258,29 +259,15 @@ export function PracticeForm({ s, update, setGolfN, busy, onSave, onBack, isNew 
         </button>
       </Group>
 
-      <Group title="Ressenti">
-        <div className="row row--block feel">
-          <div className="feel-stars" role="radiogroup" aria-label="Ressenti sur 5">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                role="radio"
-                aria-checked={s.feeling === n}
-                aria-label={`${n} sur 5, ${FEELING[n - 1].toLowerCase()}`}
-                className={`feel-star${(s.feeling ?? 0) >= n ? ' is-on' : ''}`}
-                onClick={() => {
-                  buzz(6);
-                  update((x) => ({ ...x, feeling: x.feeling === n ? null : n }));
-                }}
-              >
-                <Icon name="star" size={32} fill={(s.feeling ?? 0) >= n} />
-              </button>
-            ))}
-          </div>
-          <div className="feel-cap" aria-live="polite">
-            {s.feeling ? FEELING[s.feeling - 1] : 'Touchez pour noter la séance'}
-          </div>
+      <Group title="Conditions" footer="Facultatif.">
+        <div className="row row--block ctx-row">
+          <ContextPicker kind="weather" value={s.weather} onChange={(v) => update((x) => ({ ...x, weather: v }))} />
+        </div>
+        <div className="row row--block ctx-row">
+          <ContextPicker kind="body" value={s.body} onChange={(v) => update((x) => ({ ...x, body: v }))} />
+        </div>
+        <div className="row row--block ctx-row">
+          <ContextPicker kind="mood" value={s.mood} onChange={(v) => update((x) => ({ ...x, mood: v, feeling: v }))} />
         </div>
       </Group>
 

@@ -9,7 +9,8 @@ import { BackButton, Screen } from '../components/Screen';
 import { Sheet } from '../components/Sheet';
 import { useUi } from '../ui';
 import { golfHoles } from './api';
-import { PlaceDate, RoundOptions } from './SessionInfo';
+import { BeforeGroup, CompetitionGroup, PlaceDate, RoundOptions, sessionTitle } from './SessionInfo';
+import { ContextPicker } from './contextIcons';
 import { ScoreRuler } from './ScoreRuler';
 import { ariaScore, fmtRel, resKey, Scorecard, summarize } from './scorecard';
 import './session.css';
@@ -327,7 +328,7 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
 
   return (
     <Screen
-      title={s.golf_name ?? 'Partie'}
+      title={sessionTitle(s)}
       large={false}
       fill
       left={<BackButton onClick={onBack} label="Quitter" />}
@@ -343,7 +344,7 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
           <div className="re-sub">
             <button type="button" className="re-info" onClick={() => setCard(true)} aria-label="Modifier le golf, la date et la carte">
               <span>
-                {s.golf_name ?? 'Partie'} · {dateLabel}
+                {sessionTitle(s)} · {dateLabel}
               </span>
               <Icon name="chevron" size={11} strokeWidth={3} />
             </button>
@@ -444,6 +445,13 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
             update((x) => ({ ...x, ...p }));
           }}
         />
+        <CompetitionGroup s={s} onChange={(p) => update((x) => ({ ...x, ...p }))} />
+        <BeforeGroup s={s} onChange={(p) => update((x) => ({ ...x, ...p }))} />
+        <Group title="Humeur">
+          <div className="row row--block ctx-row">
+            <ContextPicker kind="mood" value={s.mood} onChange={(v) => update((x) => ({ ...x, mood: v }))} />
+          </div>
+        </Group>
         <RoundOptions
           s={s}
           golfHoles={golfN}

@@ -106,3 +106,90 @@ export function writePeriod(v: string) {
     /* ignoré */
   }
 }
+
+export const plural = (n: number, one: string, many = `${one}s`) => `${n.toLocaleString('fr-FR')} ${n > 1 ? many : one}`;
+
+/** Détail de « Birdie+ » : eagles seuls (hors albatros et trous en un), albatros, trous en un. */
+export function birdieExtras(d: { eagle: number; albatross: number; ace: number }): { eagles: number; albatross: number; ace: number } {
+  const albatross = d.albatross ?? 0;
+  const ace = d.ace ?? 0;
+  return { eagles: Math.max(0, d.eagle - Math.max(albatross, ace)), albatross, ace };
+}
+
+/** « dont 2 eagles, 1 trou en un » (vide s'il n'y en a pas). */
+export function birdieCaption(d: { eagle: number; albatross: number; ace: number }): string {
+  const x = birdieExtras(d);
+  const parts: string[] = [];
+  if (x.eagles) parts.push(plural(x.eagles, 'eagle'));
+  if (x.albatross) parts.push(plural(x.albatross, 'albatros', 'albatros'));
+  if (x.ace) parts.push(plural(x.ace, 'trou en un', 'trous en un'));
+  return parts.length ? `dont ${parts.join(', ')}` : '';
+}
+
+/** Barres de practice adaptées à la période : semaines (1 M, 3 M) ou mois (6 M, 1 A, Tout). */
+export interface PracticeBucket {
+  key: string;
+  start: string;
+  minutes: number;
+  balls: number;
+  label: string;
+  long: string;
+}
+
+const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const monShort = new Intl.DateTimeFormat('fr-FR', { month: 'short' });
+const monLong = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' });
+
+export function practiceBuckets(
+  weekly: Array<{ week: string; minutes: number; balls: number }>,
+  period: string,
+  from: string | null,
+  to: string,
+): { buckets: PracticeBucket[]; unit: 'week' | 'month' } {
+  const end = parseLocal(to);
+  if (period === '1m' || period === '3m') {
+    const n = period === '1m' ? 5 : 13;
+    const mon = new Date(end);
+    mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+    const map = new Map(weekly.map((w) => [w.week, w]));
+    const buckets: PracticeBucket[] = [];
+    for (let i = n - 1; i >= 0; i--) {
+      const d = new Date(mon);
+      d.setDate(mon.getDate() - i * 7);
+      const k = iso(d);
+      const w = map.get(k);
+      buckets.push({ key: k, start: k, minutes: w?.minutes ?? 0, balls: w?.balls ?? 0, label: i % (n > 6 ? 4 : 1) === 0 || i === n - 1 ? dShort.format(d) : '', long: `Semaine du ${dShort.format(d)}` });
+    }
+    return { buckets, unit: 'week' };
+  }
+  let start = from ? parseLocal(from) : null;
+  if (!start) {
+    const first = weekly[0]?.week;
+    start = first ? parseLocal(first) : new Date(end.getFullYear(), end.getMonth() - 5, 1);
+    const minStart = new Date(end.getFullYear(), end.getMonth() - 5, 1);
+    if (start > minStart) start = minStart;
+  }
+  const cur = new Date(start.getFullYear(), start.getMonth(), 1);
+  const buckets: PracticeBucket[] = [];
+  const map = new Map<string, { minutes: number; balls: number }>();
+  for (const w of weekly) {
+    const d = parseLocal(w.week);
+    const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const e = map.get(k) ?? { minutes: 0, balls: 0 };
+    e.minutes += w.minutes;
+    e.balls += w.balls;
+    map.set(k, e);
+  }
+  const last = new Date(end.getFullYear(), end.getMonth(), 1);
+  const spanMonths = (last.getFullYear() - cur.getFullYear()) * 12 + last.getMonth() - cur.getMonth() + 1;
+  const every = spanMonths > 14 ? 3 : spanMonths > 8 ? 2 : 1;
+  let i = 0;
+  while (cur <= last) {
+    const k = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}`;
+    const v = map.get(k);
+    buckets.push({ key: k, start: iso(cur), minutes: v?.minutes ?? 0, balls: v?.balls ?? 0, label: i % every === 0 ? monShort.format(cur).replace('.', '') : '', long: monLong.format(cur) });
+    cur.setMonth(cur.getMonth() + 1);
+    i++;
+  }
+  return { buckets, unit: 'month' };
+}

@@ -1,8 +1,12 @@
 // Lieu, date, trous et repère : partagés par « Nouvelle séance », la feuille Infos et le formulaire de practice.
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Golf } from '../../shared/types';
 import type { HoleEntry, PlaySession } from '../../shared/practice';
+import { EVENT_TYPE_LABELS, type GolfEvent } from '../../shared/types';
+import { getEvents } from '../api';
+import { addDaysISO, formatLongDate } from '../lib';
 import { Field, Group, Row, Segmented } from '../components/Controls';
+import { ContextPicker } from './contextIcons';
 import { Icon } from '../components/Icon';
 import { GolfPicker } from './GolfPicker';
 import './session.css';
@@ -97,7 +101,7 @@ export function PlaceDate({ s, onChange }: PlaceDateProps) {
         allowOther={isRange}
         otherSelected={other}
         onOther={() => onChange({ golf_id: null, golf_name: null, golf_city: null, place: s.place ?? '' }, null)}
-        onPick={(g) => onChange({ golf_id: g.id, golf_name: g.name, golf_city: g.city, place: null }, g)}
+        onPick={(g) => onChange(g.id === s.golf_id ? {} : { golf_id: g.id, golf_name: g.name, golf_city: g.city, place: null, event_id: null, event_title: null }, g)}
       />
     </>
   );
@@ -161,5 +165,116 @@ export function RoundOptions({ s, golfHoles, onChange, showStart = true }: Round
         </div>
       </Group>
     </>
+  );
+}
+
+/** Titre affiché d'une séance : la compétition si elle existe, sinon le golf. */
+export function sessionTitle(s: Pick<PlaySession, 'event_title' | 'golf_name' | 'place' | 'kind'>): string {
+  return s.event_title || s.golf_name || s.place || (s.kind === 'round' ? 'Partie' : 'Practice');
+}
+
+const fmtEventDate = (e: GolfEvent) => {
+  const d = formatLongDate(e.startDate).split(' ').slice(0, 3).join(' ');
+  return `${d}${e.startTime ? ` · ${e.startTime.replace(':', 'h')}` : ''}`;
+};
+
+/** Lie la partie à une compétition de l'agenda (golf + date ±1 jour), ou à une compétition libre. */
+export function CompetitionGroup({ s, onChange }: { s: PlaySession; onChange: (p: Partial<PlaySession>) => void }) {
+  const [events, setEvents] = useState<GolfEvent[]>([]);
+  const [custom, setCustom] = useState(false);
+  const day = s.played_at.slice(0, 10);
+  const golfId = s.golf_id;
+  useEffect(() => {
+    if (golfId == null || !day) {
+      setEvents([]);
+      return;
+    }
+    let alive = true;
+    getEvents({ golfId, from: addDaysISO(day, -1), to: addDaysISO(day, 1), limit: 20 })
+      .then((r) => alive && setEvents(r.items.filter((e) => e.status !== 'cancelled')))
+      .catch(() => alive && setEvents([]));
+    return () => {
+      alive = false;
+    };
+  }, [golfId, day]);
+
+  const linked = s.event_id != null;
+  const freeTitle = !linked && !!s.event_title;
+  const isCustom = custom || freeTitle;
+  const known = linked && !events.some((e) => e.id === s.event_id);
+  if (golfId == null || (!events.length && !linked && !isCustom && !custom)) {
+    // Rien à proposer : pas de groupe, sauf si une compétition libre est déjà saisie.
+    return null;
+  }
+  const none = !linked && !isCustom;
+  const radio = (on: boolean) => (
+    <span className={`check${on ? ' is-on' : ''}`}>
+      <Icon name="check" size={18} strokeWidth={2.6} />
+    </span>
+  );
+  return (
+    <Group title="Compétition" footer="Rattachez la partie à une compétition de l’agenda, ou jouez librement.">
+      <button type="button" className="row row--tap" role="radio" aria-checked={none} onClick={() => { setCustom(false); onChange({ event_id: null, event_title: null }); }}>
+        <span className="row-main"><span className="row-label">Partie libre</span></span>
+        {radio(none)}
+      </button>
+      {known && (
+        <button type="button" className="row row--tap" role="radio" aria-checked onClick={() => undefined}>
+          <span className="row-main">
+            <span className="row-label">{s.event_title}</span>
+            <span className="row-sub">Compétition de l’agenda</span>
+          </span>
+          {radio(true)}
+        </button>
+      )}
+      {events.map((e) => (
+        <button
+          key={e.id}
+          type="button"
+          className="row row--tap"
+          role="radio"
+          aria-checked={s.event_id === e.id}
+          onClick={() => { setCustom(false); onChange({ event_id: e.id, event_title: e.title }); }}
+        >
+          <span className="row-main">
+            <span className="row-label">{e.title}</span>
+            <span className="row-sub">{[EVENT_TYPE_LABELS[e.type], e.format, fmtEventDate(e)].filter(Boolean).join(' · ')}</span>
+          </span>
+          {radio(s.event_id === e.id)}
+        </button>
+      ))}
+      <button type="button" className="row row--tap" role="radio" aria-checked={isCustom} onClick={() => { setCustom(true); onChange({ event_id: null }); }}>
+        <span className="row-main"><span className="row-label">Autre compétition…</span></span>
+        {radio(isCustom)}
+      </button>
+      {isCustom && (
+        <Field label="Titre">
+          <input
+            type="text"
+            value={s.event_title ?? ''}
+            placeholder="Nom de la compétition"
+            maxLength={120}
+            autoComplete="off"
+            enterKeyHint="done"
+            autoFocus={custom && !freeTitle}
+            onChange={(e) => onChange({ event_id: null, event_title: e.target.value || null })}
+          />
+        </Field>
+      )}
+    </Group>
+  );
+}
+
+/** Météo + forme physique (connues avant le départ). */
+export function BeforeGroup({ s, onChange }: { s: PlaySession; onChange: (p: Partial<PlaySession>) => void }) {
+  return (
+    <Group title="Conditions" footer="Facultatif. Sert à comparer vos scores selon la météo et votre forme.">
+      <div className="row row--block ctx-row">
+        <ContextPicker kind="weather" value={s.weather} onChange={(v) => onChange({ weather: v })} />
+      </div>
+      <div className="row row--block ctx-row">
+        <ContextPicker kind="body" value={s.body} onChange={(v) => onChange({ body: v })} />
+      </div>
+    </Group>
   );
 }

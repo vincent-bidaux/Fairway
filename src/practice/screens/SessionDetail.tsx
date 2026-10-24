@@ -10,9 +10,10 @@ import { useUi } from '../../ui';
 import { useDataVersion, touchData } from '../account';
 import { deleteSession, getSession, getStats } from '../api';
 import { ConfirmSheet } from '../ConfirmSheet';
-import { FEELING, fmtDuration, focusLabel } from '../PracticeForm';
+import { fmtDuration, focusLabel } from '../PracticeForm';
 import { fmtRel, Scorecard, summarize } from '../scorecard';
-import { teeLabel } from '../SessionInfo';
+import { sessionTitle, teeLabel } from '../SessionInfo';
+import { ContextBadge } from '../contextIcons';
 import '../session.css';
 
 const nf = (n: number, d = 1) => n.toFixed(d).replace('.', ',');
@@ -150,12 +151,13 @@ export function SessionDetail({ id }: { id: string }) {
 
   const isRound = s.kind === 'round';
   const place = s.golf_name ?? s.place ?? 'Autre lieu';
-  const title = place;
+  const title = sessionTitle(s);
+  const golfLine = s.event_title && (s.golf_name ?? s.place) ? [s.golf_name ?? s.place, s.golf_city].filter(Boolean).join(' · ') : null;
 
   const share = async () => {
     const lines: string[] = [];
     if (isRound) {
-      lines.push(`Partie à ${place} · ${fmtDate(s.played_at).split(' · ')[0]}`);
+      lines.push(`${s.event_title ? `${s.event_title} (${place})` : `Partie à ${place}`} · ${fmtDate(s.played_at).split(' · ')[0]}`);
       lines.push(`${tot.strokes} (${fmtRel(tot.rel)}) · ${s.holes ?? entries.length} trous${tot.putts != null ? ` · ${tot.putts} putts` : ''}`);
       if (nums.fw) lines.push(`Fairways ${nums.fw.hit}/${nums.fw.n}`);
       if (nums.gir) lines.push(`Greens en régulation ${nums.gir.hit}/${nums.gir.n}`);
@@ -212,6 +214,7 @@ export function SessionDetail({ id }: { id: string }) {
 
   return (
     <Screen title={title} left={back} right={right}>
+      {golfLine && <p className="detail-sub2">{golfLine}</p>}
       <p className="detail-when">
         {isRound ? '' : 'Practice · '}
         {fmtDate(s.played_at)}
@@ -234,6 +237,15 @@ export function SessionDetail({ id }: { id: string }) {
               {tot.putts != null ? ` · ${tot.putts} putts` : ''}
             </div>
           </div>
+
+
+      {(s.weather || s.body || s.mood) && (
+        <div className="ctx-strip">
+          {s.weather && <ContextBadge kind="weather" level={s.weather} size={40} label />}
+          {s.body && <ContextBadge kind="body" level={s.body} size={40} label />}
+          {s.mood && <ContextBadge kind="mood" level={s.mood} size={40} label />}
+        </div>
+      )}
 
           <Group title="Carte de score">
             <div className="row row--block sc-wrap">
@@ -307,11 +319,19 @@ export function SessionDetail({ id }: { id: string }) {
                 <span className="hero-lab">Balles</span>
               </div>
               <div>
-                <span className="hero-num hero-num--sm">{s.feeling ? `${s.feeling}/5` : '–'}</span>
-                <span className="hero-lab">{s.feeling ? FEELING[s.feeling - 1] : 'Ressenti'}</span>
+                <span className="hero-num hero-num--sm">{s.drills?.length ?? 0}</span>
+                <span className="hero-lab">Exercices</span>
               </div>
             </div>
           </div>
+
+      {(s.weather || s.body || s.mood) && (
+        <div className="ctx-strip">
+          {s.weather && <ContextBadge kind="weather" level={s.weather} size={40} label />}
+          {s.body && <ContextBadge kind="body" level={s.body} size={40} label />}
+          {s.mood && <ContextBadge kind="mood" level={s.mood} size={40} label />}
+        </div>
+      )}
           {!!s.focus && (
             <Group title="Travail">
               <div className="row row--block">

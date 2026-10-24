@@ -1,0 +1,326 @@
+/* Coups de maître */
+.hl {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 16px 16px 14px;
+  border-radius: 24px;
+  background: var(--bg2);
+  color: var(--label);
+  text-align: left;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: 0 10px 28px -12px rgba(0, 0, 0, 0.28), inset 0 0 0 0.5px var(--sep);
+  transition: transform 0.15s;
+}
+button.hl:active {
+  transform: scale(0.985);
+}
+.hl::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 150px;
+  z-index: -1;
+  background: radial-gradient(90% 120% at 0% 0%, var(--hl-a), transparent 70%);
+}
+.hl--gold {
+  --hl-a: color-mix(in srgb, #ffcc33 38%, transparent);
+  --hl-ink: #b8860b;
+}
+.hl--silver {
+  --hl-a: color-mix(in srgb, #9fb0c4 38%, transparent);
+  --hl-ink: #6b7685;
+}
+@media (prefers-color-scheme: dark) {
+  .hl--gold {
+    --hl-a: color-mix(in srgb, #ffb800 26%, transparent);
+    --hl-ink: #f1c34a;
+  }
+  .hl--silver {
+    --hl-a: color-mix(in srgb, #9fb0c4 22%, transparent);
+    --hl-ink: #b9c3d0;
+  }
+}
+.hl-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.hl-badge {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 88px;
+}
+.hl-kind {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--hl-ink);
+}
+.hl-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.hl-title {
+  font-size: 22px;
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+.hl-date {
+  font-size: 14px;
+  color: var(--label2);
+  text-transform: capitalize;
+}
+.hl-golf {
+  font-size: 14px;
+  font-weight: 600;
+}
+.hl-golf span {
+  font-weight: 400;
+  color: var(--label2);
+}
+.hl-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.hl-event {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--orange) 16%, transparent);
+  color: var(--orange);
+  font-size: 13px;
+  font-weight: 700;
+}
+.hl-event span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hl-event svg {
+  flex: none;
+}
+.hl-recap {
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+.hl-round {
+  margin-top: -4px;
+  font-size: 13px;
+  color: var(--label2);
+}
+.hl-diagram {
+  display: block;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+}
+.hole {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hl-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.hl-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--fill);
+  font-size: 13px;
+}
+.hl-chip small {
+  font-size: 11.5px;
+  color: var(--label2);
+}
+.hl-chip b {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.hl-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 0.5px solid var(--sep);
+}
+.hl-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(150deg, #0c5f2d, #3fae5f);
+}
+.hl-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hl-player {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--label2);
+}
+
+/* Carrousel */
+.hl-section {
+  margin: 0 0 22px;
+}
+.hl-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 calc(var(--gutter) + 4px) 8px;
+}
+.hl-section-head h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.hl-section-head span {
+  font-size: 14px;
+  color: var(--label2);
+}
+.hl-carousel {
+  display: flex;
+  gap: 12px;
+  padding: 4px var(--gutter) 14px;
+  margin-top: -4px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 var(--gutter);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.hl-carousel::-webkit-scrollbar {
+  display: none;
+}
+.hl-slide {
+  flex: 0 0 88%;
+  display: flex;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+.hl-slide:first-child {
+  scroll-snap-align: start;
+}
+.hl-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: -2px;
+}
+.hl-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--label3);
+  transition: background-color 0.2s, transform 0.2s;
+}
+.hl-dot.is-active {
+  background: var(--label);
+  transform: scale(1.15);
+}
+.hl-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 4px;
+  color: var(--tint);
+  font-size: 16px;
+  font-weight: 500;
+}
+.hl-all:active {
+  opacity: 0.5;
+}
+
+/* Liste */
+.hl-summary {
+  margin: 0 var(--gutter) 16px;
+  padding: 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--label2);
+  line-height: 1.4;
+}
+.hl-summary b {
+  color: var(--label);
+}
+.hl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 var(--gutter) 20px;
+}
+.hl-year {
+  margin: 8px calc(var(--gutter) + 4px) 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--label2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .award-sweep {
+    animation: award-sweep 4.5s ease-in-out 0.8s infinite;
+  }
+  .hole-trail path {
+    animation: hole-fade 0.7s ease-out backwards;
+  }
+  .hole-burst {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: burst 1.6s ease-in-out infinite;
+  }
+}
+@keyframes award-sweep {
+  0%,
+  55% {
+    transform: skewX(-20deg) translateX(0);
+  }
+  100% {
+    transform: skewX(-20deg) translateX(330px);
+  }
+}
+@keyframes hole-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes burst {
+  50% {
+    transform: scale(1.25);
+    opacity: 0.6;
+  }
+}
