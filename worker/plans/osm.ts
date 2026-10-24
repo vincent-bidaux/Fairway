@@ -322,6 +322,8 @@ export async function refreshPlans(env: Env, opts: { limit?: number; slugs?: str
         .bind(golf.id, msg)
         .run();
       out.push({ slug: golf.slug, level: 'error', detail: msg });
+      // Every Overpass server is down or overloaded: stop here rather than hammering them with the next golfs.
+      if (msg.startsWith('Overpass indisponible')) break;
     }
   }
   return out;
