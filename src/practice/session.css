@@ -50,18 +50,6 @@
 .re-finish { font-weight: 600; margin-right: -4px; }
 .re-top { flex-shrink: 0; padding-top: 2px; }
 
-.hs { display: grid; gap: 0; padding: 0 10px; }
-.hs-btn { display: flex; align-items: center; justify-content: center; min-height: 44px; min-width: 0; }
-.hs-dot {
-  display: flex; align-items: center; justify-content: center;
-  width: min(calc(100% - 3px), 24px); aspect-ratio: 1; border-radius: 50%;
-  font-size: 10.5px; font-weight: 600; font-variant-numeric: tabular-nums;
-  color: var(--label2); background: var(--fill);
-  transition: background-color 0.2s, color 0.2s, transform 0.2s;
-}
-.hs-dot[class*='res-'] { background: var(--rc); color: var(--rc-fg); }
-.hs-btn.is-cur .hs-dot { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--label); transform: scale(1.08); }
-
 .re-sub { display: flex; align-items: center; gap: 10px; padding: 0 var(--gutter); min-height: 34px; }
 .re-info { display: inline-flex; align-items: center; gap: 4px; min-height: 34px; font-size: 13px; color: var(--label2); min-width: 0; }
 .re-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -296,10 +284,6 @@
 }
 
 .par-label svg { position: absolute; left: -14px; top: 50%; margin-top: -6px; }
-
-.hs--many { padding: 0 6px; }
-.hs--many .hs-dot { font-size: 9.5px; }
-.hs--many .hs-btn.is-cur .hs-dot { box-shadow: 0 0 0 1.5px var(--bg), 0 0 0 3px var(--label); transform: none; }
 
 .ctx-row { padding-top: 12px; padding-bottom: 12px; }
 .mood-q { font-size: 20px; font-weight: 700; text-align: center; padding: 4px 0 16px; }

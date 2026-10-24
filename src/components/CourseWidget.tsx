@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { CoursePlan, PlanHole, PlanLayer, PlanLevel, Ring, Shape } from '../../shared/plan';
+import { HoleGrid } from './HoleGrid';
 import { Icon } from './Icon';
 import { Sheet } from './Sheet';
 
@@ -258,7 +259,6 @@ export function CourseWidget({ plan, lat, lng }: Props) {
   const [loop, setLoop] = useState(0);
   const [hole, setHole] = useState<number | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
-  const strip = useRef<HTMLDivElement>(null);
 
   const loopHoles = useMemo(
     () => plan.holes.filter((h) => h.loop === loop && h.ref != null).sort((a, b) => (a.ref ?? 0) - (b.ref ?? 0)),
@@ -281,13 +281,6 @@ export function CourseWidget({ plan, lat, lng }: Props) {
   );
   const zp = useZoomPan(base, step);
 
-  // keep the selected chip centred in the strip
-  useEffect(() => {
-    const el = strip.current?.querySelector<HTMLElement>('[aria-current="true"]');
-    const s = strip.current;
-    if (el && s) s.scrollTo({ left: el.offsetLeft - s.clientWidth / 2 + el.offsetWidth / 2, behavior: 'smooth' });
-  }, [hole, loop]);
-
   const level = plan.quality.level;
   const loopInfo = loops[loop];
   const title = current ? `Trou ${current.ref}` : 'Plan du parcours';
@@ -297,7 +290,8 @@ export function CourseWidget({ plan, lat, lng }: Props) {
       ? `${loopLabel(loopInfo)} · ${km(loopInfo.len)}`
       : 'Trous non tracés';
   const u = zp.u;
-  const chrome = 118 + (loops.length > 1 ? 46 : 0);
+  // header + loop tabs + « Parcours » + rows of holes (9 per row): keeps the whole widget within the screen
+  const chrome = 60 + (loops.length > 1 ? 46 : 0) + 58 + Math.max(1, Math.ceil(loopHoles.length / 9)) * 44;
   const aspect = `${base.w} / ${base.h}`;
   const others = plan.holes.filter((h) => h.loop !== loop);
 
@@ -437,24 +431,18 @@ export function CourseWidget({ plan, lat, lng }: Props) {
         </a>
       </div>
 
-      <div className="cw-strip" ref={strip} role="tablist" aria-label="Trous">
-        <button type="button" role="tab" className="cw-chip cw-chip--all" aria-current={hole == null} aria-selected={hole == null} onClick={() => setHole(null)}>
+      <div className="cw-holes">
+        <button type="button" className={`cw-all${hole == null ? ' is-cur' : ''}`} aria-pressed={hole == null} onClick={() => setHole(null)}>
+          <Icon name="map" size={15} strokeWidth={2} />
           Parcours
         </button>
-        {loopHoles.map((h, i) => (
-          <button
-            key={i}
-            type="button"
-            role="tab"
-            className="cw-chip"
-            aria-current={hole === i}
-            aria-selected={hole === i}
-            aria-label={`Trou ${h.ref}${h.par ? `, par ${h.par}` : ''}`}
-            onClick={() => setHole(i)}
-          >
-            {h.ref}
-          </button>
-        ))}
+        {loopHoles.length > 0 && (
+          <HoleGrid
+            items={loopHoles.map((h, i) => ({ key: i, label: h.ref, aria: `Trou ${h.ref}${h.par ? `, par ${h.par}` : ''}` }))}
+            current={hole}
+            onPick={(i) => setHole(i)}
+          />
+        )}
       </div>
 
       <QualitySheet open={infoOpen} onClose={() => setInfoOpen(false)} plan={plan} lat={lat} lng={lng} />
@@ -528,7 +516,7 @@ export function CourseWidgetSkeleton() {
         </div>
       </header>
       <div className="cw-stage" style={{ aspectRatio: '6 / 5' }} />
-      <div className="cw-strip" />
+      <div className="cw-holes" />
     </section>
   );
 }

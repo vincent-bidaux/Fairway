@@ -5,6 +5,7 @@ import { girOf } from '../../shared/practice';
 import type { Golf } from '../../shared/types';
 import { Group, Switch } from '../components/Controls';
 import { Icon } from '../components/Icon';
+import { HoleGrid } from '../components/HoleGrid';
 import { BackButton, Screen } from '../components/Screen';
 import { Sheet } from '../components/Sheet';
 import { useUi } from '../ui';
@@ -165,24 +166,20 @@ const HoleView = memo(function HoleView({ e, locked, penTouched, onScore, onPar,
 // ------------------------------------------------------------------ bandeau
 function HoleStrip({ entries, cur, onGo }: { entries: HoleEntry[]; cur: number; onGo: (i: number) => void }) {
   return (
-    <div className={`hs${entries.length > 9 ? ' hs--many' : ''}`} role="tablist" aria-label="Trous" style={{ gridTemplateColumns: `repeat(${entries.length}, 1fr)` }}>
-      {entries.map((e, i) => {
+    <HoleGrid
+      className="hg--entry"
+      items={entries.map((e) => {
         const k = e.strokes != null ? resKey(e.strokes - e.par) : null;
-        return (
-          <button
-            key={e.hole}
-            type="button"
-            role="tab"
-            aria-selected={i === cur}
-            aria-label={`Trou ${e.hole}${e.strokes != null ? `, ${ariaScore(e.strokes, e.par)}` : ', non saisi'}`}
-            className={`hs-btn${i === cur ? ' is-cur' : ''}`}
-            onClick={() => onGo(i)}
-          >
-            <span className={`hs-dot${k ? ` res-${k}` : ''}`}>{e.hole}</span>
-          </button>
-        );
+        return {
+          key: e.hole,
+          label: e.hole,
+          aria: `Trou ${e.hole}${e.strokes != null ? `, ${ariaScore(e.strokes, e.par)}` : ', non saisi'}`,
+          dotClass: k ? `res-${k}` : undefined,
+        };
       })}
-    </div>
+      current={cur}
+      onPick={onGo}
+    />
   );
 }
 
