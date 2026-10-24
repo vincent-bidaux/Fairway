@@ -8,6 +8,10 @@ import { seedIfOutdated } from './seed';
 import { createAuth } from './auth';
 import { ensureDemo } from './demo';
 import { meApi } from './routes/me';
+import { refreshPlans } from './plans/osm';
+
+/** Must match the second cron in wrangler.jsonc. */
+const PLANS_CRON = '*/5 * * * *';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -36,7 +40,16 @@ app.all('*', (c) => c.env.ASSETS.fetch(c.req.raw));
 
 export default {
   fetch: app.fetch,
-  async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext) {
+  async scheduled(event: ScheduledController, env: Env, ctx: ExecutionContext) {
+    if (event.cron === PLANS_CRON) {
+      // Plans de parcours OSM : quelques golfs à chaque passage (jamais vérifiés, puis tous les 30 jours).
+      ctx.waitUntil(
+        refreshPlans(env, { limit: 3 })
+          .then((r) => r.length && console.log('plans', JSON.stringify(r)))
+          .catch((e) => console.error('plans', e)),
+      );
+      return;
+    }
     ctx.waitUntil(
       (async () => {
         // Fresh database or updated seed file: (re)load the bundled golf list and sources.

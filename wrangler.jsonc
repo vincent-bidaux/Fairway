@@ -24,7 +24,8 @@
   ],
 
   // Hourly: each run refreshes the sources that are due (oldest first, in batches).
-  "triggers": { "crons": ["17 * * * *"] },
+  // Every 5 min: course plans from OpenStreetMap (worker/plans/osm.ts), a few golfs per run.
+  "triggers": { "crons": ["17 * * * *", "*/5 * * * *"] },
 
   "vars": {
     "ANTHROPIC_MODEL": "claude-haiku-5-5",

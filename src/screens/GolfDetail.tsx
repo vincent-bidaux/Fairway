@@ -3,6 +3,8 @@ import type { Golf } from '../../shared/types';
 import { getGolf, type GolfDetailData } from '../api';
 import { GolfBanner, GolfPhoto } from '../components/GolfBanner';
 import { GolfCross } from '../components/GolfCross';
+import { CourseWidget, CourseWidgetSkeleton } from '../components/CourseWidget';
+import { usePlan } from '../plans';
 import { EventCell } from '../components/EventCell';
 import { Group, Row } from '../components/Controls';
 import { Icon } from '../components/Icon';
@@ -24,6 +26,8 @@ export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
     if (data) setGolf(data);
   }, [data]);
 
+  const plan = usePlan(golf);
+
   const back = <BackButton onClick={ui.back} />;
 
   if (!golf) {
@@ -43,9 +47,20 @@ export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
   const cityLine = [golf.postcode, golf.city].filter(Boolean).join(' ');
   const crossGolf: Golf = { ...golf, upcomingCount: golf.upcomingCount ?? events?.length };
 
+  // With a course plan, the plan widget leads the page and the location map moves down, just above the photo.
+  const hasPlan = plan.known && (plan.loading || plan.plan !== null);
+
   return (
     <Screen title={golf.name} left={back}>
-      <GolfBanner golf={golf} />
+      {hasPlan ? (
+        plan.plan ? (
+          <CourseWidget plan={plan.plan} lat={golf.lat} lng={golf.lng} />
+        ) : (
+          <CourseWidgetSkeleton />
+        )
+      ) : (
+        <GolfBanner golf={golf} />
+      )}
 
       <div className="golf-hero">
         <GolfCross golf={crossGolf} size={96} />
@@ -136,6 +151,8 @@ export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
           />
         ))}
       </Group>
+
+      {hasPlan && <GolfBanner golf={golf} />}
 
       <GolfPhoto golf={golf} />
     </Screen>
