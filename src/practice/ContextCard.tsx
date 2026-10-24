@@ -31,7 +31,7 @@ export function contextInsight(ctx: Ctx | undefined): string | null {
   }
   if (!best || Math.round(best.gap) < 1) return null;
   const n = Math.round(best.gap);
-  return `Vous jouez ${n} coup${n > 1 ? 's' : ''} de mieux quand ${PHRASE[best.kind][best.good - 1]} que quand ${PHRASE[best.kind][best.bad - 1]}.`;
+  return `Vous jouez ${n} coup${n > 1 ? 's' : ''} de moins quand ${PHRASE[best.kind][best.good - 1]} que quand ${PHRASE[best.kind][best.bad - 1]}.`;
 }
 
 export function ContextBars({ ctx, size = 28, titles = true }: { ctx: Ctx; size?: number; titles?: boolean }) {
