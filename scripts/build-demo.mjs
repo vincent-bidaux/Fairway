@@ -128,10 +128,10 @@ function playHole(par, t, detailed) {
 // Parties marquantes : cible imposée (relatif au par sur 18 trous)
 const OVERRIDE = { '2026-07-11': 15 };
 
-function playRound(pars, date, slug, detailed) {
+function playRound(pars, date, slug, detailed, adj = 0) {
   const t = progress(date);
   const k = pars.length / 18;
-  const target = (OVERRIDE[date] ?? targetRel18(date, slug)) * k;
+  const target = (OVERRIDE[date] ?? targetRel18(date, slug) + adj) * k;
   const puttTarget = (lerp(36, 31, t) + (rnd() - 0.5) * 2) * k;
   let best = null;
   for (let i = 0; i < 4000; i++) {
@@ -178,23 +178,73 @@ function rangeSession(date, note) {
 
 // ---------------------------------------------------------------- assemblage
 const TEES = ['jaune', 'jaune', 'jaune', 'blanc'];
+// Météo par date (même tirage pour la journée) : l'hiver et le printemps sont plus capricieux.
+function weatherOf(date) {
+  const m = Number(date.slice(5, 7));
+  const summer = m >= 6 && m <= 9;
+  return Number(pick(summer ? { 1: 0.03, 2: 0.07, 3: 0.25, 4: 0.4, 5: 0.25 } : { 1: 0.15, 2: 0.25, 3: 0.35, 4: 0.18, 5: 0.07 }));
+}
+const clamp5 = (x) => Math.max(1, Math.min(5, Math.round(x)));
+
+// Compétitions jouées (titre de l'événement = titre de la partie)
+const EVENTS = {
+  '2025-06-07': 'Trophée des Vignerons — Stableford',
+  '2025-07-05': 'Coupe du Président',
+  '2025-09-27': 'Trophée Crédit Maritime — Scramble à 2',
+  '2026-04-25': 'Coupe des Seniors Bluegreen',
+  '2026-07-11': 'Grand Prix Seniors de La Prée',
+  '2026-10-17': 'Trophée des Vendanges — Stableford',
+};
+
+// Coups de maître imposés : [date, trou, coups] (le reste suit le tirage)
+const FORCED = [
+  ['2025-08-09', 6, 1], // trou en un au par 3 de La Palmyre
+  ['2026-04-11', 9, 3], // eagle au par 5 du 9 à La Prée
+  ['2025-11-15', 4, 2], // birdie au par 3
+  ['2026-05-30', 1, 4], // birdie au par 5 d'Oléron
+  ['2026-07-11', 15, 4], // birdie au par 5
+  ['2026-07-11', 4, 3], // birdie au par 4
+  ['2026-08-22', 9, 2], // birdie au par 3
+  ['2026-09-19', 8, 4], // birdie au par 5
+  ['2026-10-17', 3, 2], // birdie au par 3
+];
+
 const sessions = PLAN.map(([date, time, slug, kind, holes, note], i) => {
-  const base = { id: uuid(), kind, golf_slug: slug, course: '', played_at: `${date}T${time}:00` };
-  if (kind === 'range') return { ...base, ...rangeSession(date, note) };
+  const weather = weatherOf(date);
+  const base = { id: uuid(), kind, golf_slug: slug, course: '', played_at: `${date}T${time}:00`, weather };
+  if (kind === 'range') {
+    const r = rangeSession(date, note);
+    return { ...base, ...r, mood: r.feeling, body: clamp5(3 + rnd() * 1.6) };
+  }
 
   const layout = PARS[slug];
   if (!layout) throw new Error(`Pars manquants pour ${slug}`);
   const pars = layout.pars.slice(0, holes);
   const roundNumber = PLAN.slice(0, i + 1).filter((p) => p[3] === 'round').length;
-  const played = playRound(pars, date, slug, roundNumber > 3);
+  // Forme : tirage large ; dos bloqué en février. La météo et la forme pèsent sur le score.
+  const body = date === '2026-02-21' ? 1 : date === '2026-07-11' ? 5 : clamp5(3.3 + (rnd() - 0.5) * 3.2);
+  const played = playRound(pars, date, slug, roundNumber > 3, (3 - weather) * 1.6 + (3 - body) * 1.2);
+  for (const [d, hole, strokes] of FORCED) {
+    if (d !== date || !played[hole - 1]) continue;
+    const h = played[hole - 1];
+    const putts = strokes === 1 ? 0 : h.par - strokes >= 2 ? 1 : 1;
+    Object.assign(h, { strokes, putts, penalties: 0, gir: h.gir == null ? null : strokes - putts <= h.par - 2 ? 1 : 0, up_down: h.up_down == null ? null : strokes - putts <= h.par - 2 ? null : 1 });
+    if (h.par >= 4 && h.fairway !== null) h.fairway = 'hit';
+  }
   const rel = played.reduce((s, h) => s + h.strokes - h.par, 0);
+  // Forme et humeur : la forme suit la saison et un peu le hasard, l'humeur suit le score et la météo.
+  const gap = (rel * 18) / holes - lerp(28, 19, progress(date));
+  const mood = clamp5(3 - gap / 3 + (weather - 3) * 0.4 + (rnd() - 0.5));
   return {
     ...base,
     holes,
     start_hole: 1,
     tee: TEES[Math.floor(rnd() * TEES.length)],
-    feeling: Math.max(1, Math.min(5, Math.round(3.5 - (rel / holes) * 18 / 10 + 1.2 + (rnd() - 0.5)))),
-    notes: note,
+    feeling: mood,
+    mood,
+    body,
+    event_title: EVENTS[date] ?? null,
+    notes: date === '2026-02-21' ? 'Dos bloqué depuis le 5, j’ai fini en marchant.' : note,
     holes_data: played.map((h, k) => ({ hole: k + 1, ...h })),
   };
 });

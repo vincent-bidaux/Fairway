@@ -23,6 +23,10 @@ interface DemoSession {
   balls?: number;
   focus?: string;
   feeling?: number;
+  mood?: number;
+  body?: number;
+  weather?: number;
+  event_title?: string | null;
   notes: string | null;
   holes_data?: Array<Omit<HoleEntry, 'sand'> & { sand?: 0 | 1 | null }>;
   drills?: Drill[];
@@ -78,12 +82,14 @@ export async function ensureDemo(env: Env, origin: string, opts: { reset?: boole
     stmts.push(
       db
         .prepare(
-          `INSERT INTO play_sessions (id, user_id, kind, golf_id, course, played_at, holes, start_hole, tee, duration_min, balls, focus, feeling, notes)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          `INSERT INTO play_sessions (id, user_id, kind, golf_id, course, played_at, holes, start_hole, tee, duration_min, balls, focus, feeling, notes,
+             event_title, mood, body, weather)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         )
         .bind(
           s.id, DEMO_USER_ID, s.kind, golfId.get(s.golf_slug) ?? null, s.course ?? '', shift(s.played_at, days), s.holes ?? null,
           s.start_hole ?? 1, s.tee ?? null, s.duration_min ?? null, s.balls ?? null, s.focus ?? null, s.feeling ?? null, s.notes,
+          s.event_title ?? null, s.mood ?? null, s.body ?? null, s.weather ?? null,
         ),
     );
     for (const h of s.holes_data ?? []) {

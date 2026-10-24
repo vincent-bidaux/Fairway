@@ -4,6 +4,9 @@ export interface RoundRow {
   id: string;
   played_at: string;
   golf_name: string | null;
+  mood: number | null;
+  body: number | null;
+  weather: number | null;
   holes: HoleEntry[];
 }
 export interface RangeRow {
@@ -18,7 +21,8 @@ const r1 = (x: number) => Math.round(x * 10) / 10;
 const pct = (a: number, n: number) => (n ? Math.round((100 * a) / n) : null);
 
 export function roundStats(rounds: RoundRow[]): RoundStats {
-  const dist = { eagle: 0, birdie: 0, par: 0, bogey: 0, double: 0, triple: 0 };
+  const dist = { eagle: 0, birdie: 0, par: 0, bogey: 0, double: 0, triple: 0, albatross: 0, ace: 0 };
+  const ctx = { mood: [0, 0, 0, 0, 0].map(() => ({ n: 0, rel: 0, holes: 0 })), body: [0, 0, 0, 0, 0].map(() => ({ n: 0, rel: 0, holes: 0 })), weather: [0, 0, 0, 0, 0].map(() => ({ n: 0, rel: 0, holes: 0 })) };
   const byPar: Record<number, { sum: number; n: number }> = { 3: { sum: 0, n: 0 }, 4: { sum: 0, n: 0 }, 5: { sum: 0, n: 0 } };
   const fw = { n: 0, hit: 0, left: 0, right: 0, short: 0 };
   const gir = { n: 0, hit: 0 };
@@ -40,6 +44,8 @@ export function roundStats(rounds: RoundRow[]): RoundStats {
       const d = h.strokes! - h.par;
       rel += d;
       strokes += h.strokes!;
+      if (h.strokes === 1) dist.ace++;
+      if (d <= -3) dist.albatross++;
       if (d <= -2) dist.eagle++;
       else if (d === -1) dist.birdie++;
       else if (d === 0) dist.par++;
@@ -84,6 +90,15 @@ export function roundStats(rounds: RoundRow[]): RoundStats {
     }
     holesPlayed += played.length;
     relSum += rel;
+    for (const k of ['mood', 'body', 'weather'] as const) {
+      const lvl = r[k];
+      if (lvl && lvl >= 1 && lvl <= 5) {
+        const b = ctx[k][lvl - 1];
+        b.n++;
+        b.rel += rel;
+        b.holes += played.length;
+      }
+    }
     const rel18 = r1((rel * 18) / played.length);
     const date = r.played_at.slice(0, 10);
     series.push({
@@ -125,6 +140,11 @@ export function roundStats(rounds: RoundRow[]): RoundStats {
     },
     upDown: { ...ud, pct: pct(ud.made, ud.n) },
     penalties: { per18: holesPlayed ? r1((pen * 18) / holesPlayed) : null },
+    context: {
+      mood: ctx.mood.map((b, i) => ({ level: i + 1, rounds: b.n, rel18: b.holes ? r1((b.rel * 18) / b.holes) : null })),
+      body: ctx.body.map((b, i) => ({ level: i + 1, rounds: b.n, rel18: b.holes ? r1((b.rel * 18) / b.holes) : null })),
+      weather: ctx.weather.map((b, i) => ({ level: i + 1, rounds: b.n, rel18: b.holes ? r1((b.rel * 18) / b.holes) : null })),
+    },
   };
 }
 

@@ -15,8 +15,13 @@ const rounds: RoundStats = {
   rel18: 20.4,
   best: { id: 's0', rel: 17, strokes: 89, holes: 18, date: iso(12), golf: 'Golf de Démonstration' },
   series: rels.map((r, i) => ({ id: `s${i}`, date: iso((rels.length - i) * 14), rel18: r, strokes: 72 + r, holes: 18, putts18: 34 - Math.round(i / 3), firPct: 40 + ((i * 7) % 20), girPct: 10 + ((i * 5) % 18), pen18: 3 - (i % 3), udPct: 15 + ((i * 6) % 20) })),
-  dist: { eagle: 0, birdie: 11, par: 62, bogey: 88, double: 41, triple: 14 },
+  dist: { eagle: 1, birdie: 11, par: 62, bogey: 88, double: 41, triple: 14, albatross: 0, ace: 0 },
   byPar: { 3: 0.9, 4: 1.2, 5: 1.1 },
+  context: {
+    mood: [26, 23, 21, 19, 17].map((r, i) => ({ level: i + 1, rounds: 2 + i, rel18: r })),
+    body: [27, 23, 21, 20, 18].map((r, i) => ({ level: i + 1, rounds: 1 + i, rel18: r })),
+    weather: [25, 22, 21, 19, 19].map((r, i) => ({ level: i + 1, rounds: 3, rel18: r })),
+  },
   fairways: { n: 160, hit: 78, left: 34, right: 42, short: 6, pct: 49 },
   gir: { n: 216, hit: 46, pct: 21 },
   putts: { per18: 32.1, threePuttPct: 12, perGir: 1.9, n: 216 },
@@ -77,7 +82,7 @@ export const sampleProfile: Profile = {
   ],
 };
 
-const base = { golf_id: null, course: '', place: null, start_hole: 1, tee: null, focus: null, feeling: null, notes: null } as const;
+const base = { golf_id: null, course: '', place: null, start_hole: 1, tee: null, focus: null, feeling: null, notes: null, event_id: null, event_title: null, mood: 3, body: 3, weather: 4 } as const;
 export const sampleSessions: PlaySession[] = [
   { ...base, id: 'a1', kind: 'round', golf_name: 'Golf de Démonstration', golf_city: 'La Rochelle', played_at: `${iso(5)}T09:30:00`, holes: 18, duration_min: null, balls: null, summary: { strokes: 91, par: 72, played: 18, putts: 32 } },
   { ...base, id: 'a2', kind: 'range', golf_name: 'Golf de Démonstration', golf_city: 'La Rochelle', played_at: `${iso(9)}T17:00:00`, holes: null, duration_min: 60, balls: 70 },

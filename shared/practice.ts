@@ -42,6 +42,13 @@ export interface PlaySession {
   balls: number | null;
   focus: string | null;
   feeling: number | null;
+  /** Compétition de l'agenda Fairway jouée ce jour-là (le titre devient celui de la séance). */
+  event_id: number | null;
+  event_title: string | null;
+  /** Échelles 1–5, 3 = normal / OK. Humeur, forme physique, météo. */
+  mood: number | null;
+  body: number | null;
+  weather: number | null;
   notes: string | null;
   updated_at?: string;
   hole_entries?: HoleEntry[];
@@ -68,14 +75,56 @@ export interface RoundStats {
     pen18: number;
     udPct: number | null;
   }>;
-  dist: { eagle: number; birdie: number; par: number; bogey: number; double: number; triple: number }; // nombres de trous
+  /** Nombres de trous. eagle = eagle ou mieux ; albatross et ace sont des sous-ensembles signalés à part. */
+  dist: { eagle: number; birdie: number; par: number; bogey: number; double: number; triple: number; albatross: number; ace: number };
   byPar: { 3: number | null; 4: number | null; 5: number | null }; // coups moyens relatifs au par
   fairways: { n: number; hit: number; left: number; right: number; short: number; pct: number | null };
   gir: { n: number; hit: number; pct: number | null };
   putts: { per18: number | null; threePuttPct: number | null; perGir: number | null; n: number };
   upDown: { n: number; made: number; pct: number | null };
   penalties: { per18: number | null };
+  /** Score moyen (relatif, ramené à 18 trous) selon l'humeur, la forme et la météo saisies (index 0 = niveau 1). */
+  context: Record<'mood' | 'body' | 'weather', Array<{ level: number; rounds: number; rel18: number | null }>>;
 }
+
+export type HighlightKind = 'ace' | 'albatross' | 'eagle' | 'birdie';
+
+/** « Coup de maître » : un trou joué sous le par (ou un trou en un). */
+export interface Highlight {
+  session_id: string;
+  hole: number;
+  par: number;
+  strokes: number;
+  putts: number | null;
+  fairway: Fairway | null;
+  gir: 0 | 1 | null;
+  stroke_index: number | null;
+  kind: HighlightKind;
+  played_at: string;
+  golf_id: number | null;
+  golf_name: string | null;
+  golf_city: string | null;
+  course: string;
+  event_title: string | null;
+  holes: number | null;
+  /** Score de la partie au moment du coup (cumul relatif) et total final, pour la phrase de récap. */
+  round_strokes: number;
+  round_rel: number;
+  weather: number | null;
+}
+
+export function highlightKind(par: number, strokes: number): HighlightKind | null {
+  if (strokes === 1) return 'ace';
+  const d = strokes - par;
+  if (d <= -3) return 'albatross';
+  if (d === -2) return 'eagle';
+  if (d === -1) return 'birdie';
+  return null;
+}
+
+export const MOOD_LABELS = ['Très mauvaise', 'Mauvaise', 'Normale', 'Bonne', 'Excellente'] as const;
+export const BODY_LABELS = ['Blessé', 'Fatigué', 'OK', 'En forme', 'Fantastique'] as const;
+export const WEATHER_LABELS = ['Sale temps', 'Médiocre', 'OK', 'Beau', 'Fantastique'] as const;
 
 export interface RangeStats {
   count: number;

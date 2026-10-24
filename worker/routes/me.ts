@@ -1,6 +1,6 @@
 // API « Mes parties » : tout est rattaché au joueur connecté (cookie de session Better Auth).
 import { Hono } from 'hono';
-import type { Drill, HoleEntry, PlaySession, StatsPeriod, StatsResponse } from '../../shared/practice';
+import { highlightKind, type Drill, type Highlight, type HoleEntry, type PlaySession, type StatsPeriod, type StatsResponse } from '../../shared/practice';
 import { createAuth } from '../auth';
 import type { Env } from '../env';
 import { rangeStats, roundStats, type RangeRow, type RoundRow } from '../lib/stats';
@@ -34,7 +34,7 @@ meApi.get('/', async (c) => {
 
 // ---------------------------------------------------------------- séances
 const SESSION_COLS = `s.id, s.kind, s.golf_id, g.name AS golf_name, g.city AS golf_city, s.course, s.place, s.played_at, s.holes,
-  s.start_hole, s.tee, s.duration_min, s.balls, s.focus, s.feeling, s.notes, s.updated_at`;
+  s.start_hole, s.tee, s.duration_min, s.balls, s.focus, s.feeling, s.event_id, s.event_title, s.mood, s.body, s.weather, s.notes, s.updated_at`;
 
 meApi.get('/sessions', async (c) => {
   const uid = c.get('userId');
@@ -107,20 +107,31 @@ meApi.put('/sessions/:id', async (c) => {
   const course = str(b.course, 60) ?? '';
   const holes = b.kind === 'round' ? (b.holes === 9 ? 9 : 18) : null;
   const db = c.env.DB;
+  // Compétition liée : on vérifie qu'elle existe et on recopie son titre.
+  let eventId = int(b.event_id, 1, 1e9);
+  let eventTitle: string | null = null;
+  if (eventId) {
+    const ev = await db.prepare(`SELECT title FROM events WHERE id = ?`).bind(eventId).first<{ title: string }>();
+    if (ev) eventTitle = ev.title;
+    else eventId = null;
+  }
   const stmts: D1PreparedStatement[] = [
     db
       .prepare(
-        `INSERT INTO play_sessions (id, user_id, kind, golf_id, course, place, played_at, holes, start_hole, tee, duration_min, balls, focus, feeling, notes)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        `INSERT INTO play_sessions (id, user_id, kind, golf_id, course, place, played_at, holes, start_hole, tee, duration_min, balls, focus, feeling, notes,
+           event_id, event_title, mood, body, weather)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
          ON CONFLICT(id) DO UPDATE SET kind=excluded.kind, golf_id=excluded.golf_id, course=excluded.course, place=excluded.place,
            played_at=excluded.played_at, holes=excluded.holes, start_hole=excluded.start_hole, tee=excluded.tee,
            duration_min=excluded.duration_min, balls=excluded.balls, focus=excluded.focus, feeling=excluded.feeling,
-           notes=excluded.notes, deleted_at=NULL, updated_at=datetime('now')`,
+           notes=excluded.notes, event_id=excluded.event_id, event_title=excluded.event_title, mood=excluded.mood, body=excluded.body,
+           weather=excluded.weather, deleted_at=NULL, updated_at=datetime('now')`,
       )
       .bind(
         id, uid, b.kind, golfId, course, str(b.place, 120), b.played_at.length === 16 ? `${b.played_at}:00` : b.played_at, holes,
         int(b.start_hole, 1, 18) ?? 1, str(b.tee, 20), int(b.duration_min, 1, 600), int(b.balls, 1, 2000), str(b.focus, 120),
         int(b.feeling, 1, 5), str(b.notes, 2000),
+        eventId, eventId ? eventTitle : str(b.event_title, 160), int(b.mood, 1, 5), int(b.body, 1, 5), int(b.weather, 1, 5),
       ),
     db.prepare(`DELETE FROM round_holes WHERE session_id = ?`).bind(id),
     db.prepare(`DELETE FROM range_drills WHERE session_id = ?`).bind(id),
@@ -224,10 +235,10 @@ async function loadForStats(env: Env, uid: string, from: string | null, to: stri
   const where = `user_id = ? AND deleted_at IS NULL AND played_at < ?${from ? ' AND played_at >= ?' : ''}`;
   const params = from ? [uid, `${to}T99`, from] : [uid, `${to}T99`];
   const sessions = await env.DB.prepare(
-    `SELECT s.id, s.kind, s.played_at, s.duration_min, s.balls, g.name AS golf_name FROM play_sessions s LEFT JOIN golfs g ON g.id = s.golf_id WHERE ${where.replace(/user_id|deleted_at|played_at/g, (m) => `s.${m}`)}`,
+    `SELECT s.id, s.kind, s.played_at, s.duration_min, s.balls, s.mood, s.body, s.weather, g.name AS golf_name FROM play_sessions s LEFT JOIN golfs g ON g.id = s.golf_id WHERE ${where.replace(/user_id|deleted_at|played_at/g, (m) => `s.${m}`)}`,
   )
     .bind(...params)
-    .all<{ id: string; kind: string; played_at: string; duration_min: number | null; balls: number | null; golf_name: string | null }>();
+    .all<{ id: string; kind: string; played_at: string; duration_min: number | null; balls: number | null; golf_name: string | null; mood: number | null; body: number | null; weather: number | null }>();
   const ids = sessions.results.map((s) => s.id);
   const holes = new Map<string, HoleEntry[]>();
   const drills = new Map<string, RangeRow['drills']>();
@@ -252,7 +263,7 @@ async function loadForStats(env: Env, uid: string, from: string | null, to: stri
   const rounds: RoundRow[] = [];
   const ranges: RangeRow[] = [];
   for (const s of sessions.results) {
-    if (s.kind === 'round') rounds.push({ id: s.id, played_at: s.played_at, golf_name: s.golf_name, holes: holes.get(s.id) ?? [] });
+    if (s.kind === 'round') rounds.push({ id: s.id, played_at: s.played_at, golf_name: s.golf_name, mood: s.mood, body: s.body, weather: s.weather, holes: holes.get(s.id) ?? [] });
     else ranges.push({ id: s.id, played_at: s.played_at, duration_min: s.duration_min, balls: s.balls, drills: drills.get(s.id) ?? [] });
   }
   return { rounds, ranges };
@@ -358,4 +369,24 @@ meApi.put('/index/:date', async (c) => {
 meApi.delete('/index/:date', async (c) => {
   await c.env.DB.prepare(`DELETE FROM index_history WHERE user_id = ? AND as_of = ?`).bind(c.get('userId'), c.req.param('date')).run();
   return c.json({ ok: true });
+});
+
+// ---------------------------------------------------------------- coups de maître
+meApi.get('/highlights', async (c) => {
+  const limit = Math.min(Math.max(Number(c.req.query('limit') ?? 50) || 50, 1), 500);
+  const rows = await c.env.DB.prepare(
+    `SELECT h.session_id, h.hole, h.par, h.strokes, h.putts, h.fairway, h.gir, gh.stroke_index,
+            s.played_at, s.golf_id, g.name AS golf_name, g.city AS golf_city, s.course, s.event_title, s.holes, s.weather,
+            (SELECT SUM(x.strokes) FROM round_holes x WHERE x.session_id = s.id) AS round_strokes,
+            (SELECT SUM(x.strokes - x.par) FROM round_holes x WHERE x.session_id = s.id AND x.strokes IS NOT NULL) AS round_rel
+     FROM round_holes h
+     JOIN play_sessions s ON s.id = h.session_id
+     LEFT JOIN golfs g ON g.id = s.golf_id
+     LEFT JOIN golf_holes gh ON gh.golf_id = s.golf_id AND gh.course = s.course AND gh.hole = h.hole
+     WHERE s.user_id = ? AND s.deleted_at IS NULL AND h.strokes IS NOT NULL AND (h.strokes < h.par OR h.strokes = 1)
+     ORDER BY s.played_at DESC, h.hole DESC LIMIT ${limit}`,
+  )
+    .bind(c.get('userId'))
+    .all<Omit<Highlight, 'kind'>>();
+  return c.json(rows.results.map((r) => ({ ...r, kind: highlightKind(r.par, r.strokes) })));
 });

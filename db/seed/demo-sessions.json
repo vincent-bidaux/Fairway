@@ -1,14 +1,18 @@
 [
  {
-  "id": "75d18b9d-8d9d-49a1-9b2f-5c866fd065cb",
+  "id": "5d18b9d8-d9d9-4a19-b2f5-c866fd065cbb",
   "kind": "round",
   "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
   "course": "",
   "played_at": "2025-04-12T09:40:00",
+  "weather": 3,
   "holes": 18,
   "start_hole": 1,
   "tee": "jaune",
   "feeling": 2,
+  "mood": 2,
+  "body": 3,
+  "event_title": null,
   "notes": "Première partie notée. Beaucoup de balles à droite.",
   "holes_data": [
    {
@@ -194,21 +198,25 @@
   ]
  },
  {
-  "id": "9949bba0-e759-4ff9-9b41-f6500d9aaa10",
+  "id": "949bba0e-759f-4f9d-b41f-6500d9aaa100",
   "kind": "round",
   "golf_slug": "golf-la-rochelle-sud-la-jarne",
   "course": "",
   "played_at": "2025-04-27T10:15:00",
+  "weather": 3,
   "holes": 9,
   "start_hole": 1,
-  "tee": "jaune",
+  "tee": "blanc",
   "feeling": 3,
+  "mood": 3,
+  "body": 2,
+  "event_title": null,
   "notes": null,
   "holes_data": [
    {
     "hole": 1,
     "par": 4,
-    "strokes": 5,
+    "strokes": 6,
     "putts": 2,
     "fairway": null,
     "gir": null,
@@ -218,18 +226,18 @@
    {
     "hole": 2,
     "par": 4,
-    "strokes": 5,
+    "strokes": 6,
     "putts": 2,
     "fairway": null,
     "gir": null,
-    "penalties": 0,
+    "penalties": 1,
     "up_down": null
    },
    {
     "hole": 3,
     "par": 4,
-    "strokes": 6,
-    "putts": 3,
+    "strokes": 7,
+    "putts": 2,
     "fairway": null,
     "gir": null,
     "penalties": 0,
@@ -249,7 +257,7 @@
     "hole": 5,
     "par": 3,
     "strokes": 4,
-    "putts": 1,
+    "putts": 2,
     "fairway": null,
     "gir": null,
     "penalties": 0,
@@ -258,8 +266,8 @@
    {
     "hole": 6,
     "par": 4,
-    "strokes": 7,
-    "putts": 3,
+    "strokes": 6,
+    "putts": 2,
     "fairway": null,
     "gir": null,
     "penalties": 1,
@@ -268,11 +276,11 @@
    {
     "hole": 7,
     "par": 4,
-    "strokes": 7,
-    "putts": 2,
+    "strokes": 6,
+    "putts": 3,
     "fairway": null,
     "gir": null,
-    "penalties": 1,
+    "penalties": 0,
     "up_down": null
    },
    {
@@ -288,7 +296,7 @@
    {
     "hole": 9,
     "par": 4,
-    "strokes": 4,
+    "strokes": 5,
     "putts": 2,
     "fairway": null,
     "gir": null,
@@ -298,14 +306,15 @@
   ]
  },
  {
-  "id": "5e82dc66-a5ff-4376-b0a4-4a2f206bda14",
+  "id": "80bb909d-22f7-4ee3-9369-2248c6a3b2e5",
   "kind": "range",
   "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
   "course": "",
   "played_at": "2025-05-10T18:00:00",
+  "weather": 3,
   "duration_min": 60,
-  "balls": 70,
-  "focus": "putting,chip",
+  "balls": 50,
+  "focus": "putting,approach",
   "feeling": 4,
   "notes": null,
   "drills": [
@@ -323,7 +332,1213 @@
     "label": "Putts à 2 m",
     "distance_m": 2,
     "attempts": 10,
-    "successes": 4
+    "successes": 5
+   },
+   {
+    "position": 3,
+    "category": "putting",
+    "label": "Putts à 4 m",
+    "distance_m": 4,
+    "attempts": 10,
+    "successes": 2
+   },
+   {
+    "position": 4,
+    "category": "approach",
+    "label": "Approches à 50 m dans le rond",
+    "distance_m": 50,
+    "attempts": 15,
+    "successes": 3
+   }
+  ],
+  "mood": 4,
+  "body": 4
+ },
+ {
+  "id": "266f5f11-734f-4ab2-99aa-4212daaeb447",
+  "kind": "round",
+  "golf_slug": "golf-bluegreen-rochefort-ocean-saint-laurent-de-la-pree",
+  "course": "",
+  "played_at": "2025-05-24T08:50:00",
+  "weather": 3,
+  "holes": 18,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 2,
+  "mood": 2,
+  "body": 2,
+  "event_title": null,
+  "notes": "Vent fort sur le retour.",
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 2,
+    "par": 5,
+    "strokes": 9,
+    "putts": 3,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 3,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 5,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 6,
+    "putts": 1,
+    "fairway": null,
+    "gir": null,
+    "penalties": 1,
+    "up_down": null
+   },
+   {
+    "hole": 8,
+    "par": 4,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 10,
+    "par": 4,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 11,
+    "par": 5,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 12,
+    "par": 4,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 13,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": null,
+    "gir": null,
+    "penalties": 1,
+    "up_down": null
+   },
+   {
+    "hole": 14,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 15,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 16,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 17,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 18,
+    "par": 5,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": null,
+    "gir": null,
+    "penalties": 0,
+    "up_down": null
+   }
+  ]
+ },
+ {
+  "id": "095d4827-bce1-4d10-b643-05242d88ed6f",
+  "kind": "round",
+  "golf_slug": "golf-de-saintes-fontcouverte",
+  "course": "",
+  "played_at": "2025-06-07T09:30:00",
+  "weather": 4,
+  "holes": 18,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 4,
+  "mood": 4,
+  "body": 3,
+  "event_title": "Trophée des Vignerons — Stableford",
+  "notes": null,
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 3,
+    "strokes": 4,
+    "putts": 3,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 3,
+    "par": 5,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 5,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 3,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 8,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 9,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 10,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 11,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 12,
+    "par": 4,
+    "strokes": 3,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 13,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 14,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 15,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "short",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 16,
+    "par": 4,
+    "strokes": 6,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 17,
+    "par": 4,
+    "strokes": 9,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 2,
+    "up_down": 0
+   },
+   {
+    "hole": 18,
+    "par": 3,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   }
+  ]
+ },
+ {
+  "id": "49a24e0b-f5a4-4d27-891b-f7fc3d023931",
+  "kind": "range",
+  "golf_slug": "golf-la-rochelle-sud-la-jarne",
+  "course": "",
+  "played_at": "2025-06-21T19:00:00",
+  "weather": 3,
+  "duration_min": 90,
+  "balls": 50,
+  "focus": "putting,long",
+  "feeling": 4,
+  "notes": null,
+  "drills": [
+   {
+    "position": 1,
+    "category": "putting",
+    "label": "Putts à 1 m",
+    "distance_m": 1,
+    "attempts": 10,
+    "successes": 7
+   },
+   {
+    "position": 2,
+    "category": "putting",
+    "label": "Putts à 2 m",
+    "distance_m": 2,
+    "attempts": 10,
+    "successes": 5
+   },
+   {
+    "position": 3,
+    "category": "long",
+    "label": "Driver dans le couloir",
+    "distance_m": null,
+    "attempts": 20,
+    "successes": 7
+   }
+  ],
+  "mood": 4,
+  "body": 4
+ },
+ {
+  "id": "6c3fde20-aa30-4719-a177-a5013945a9dc",
+  "kind": "round",
+  "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
+  "course": "",
+  "played_at": "2025-07-05T08:30:00",
+  "weather": 4,
+  "holes": 18,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 4,
+  "mood": 4,
+  "body": 3,
+  "event_title": "Coupe du Président",
+  "notes": null,
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 2,
+    "par": 5,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 5,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 10,
+    "par": 5,
+    "strokes": 7,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 11,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 12,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 13,
+    "par": 4,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 14,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 15,
+    "par": 5,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 16,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 17,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 18,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 1
+   }
+  ]
+ },
+ {
+  "id": "b4eefb59-23e5-4ba0-b20a-0f8d5b168970",
+  "kind": "round",
+  "golf_slug": "golf-de-trousse-chemise-les-portes-en-re",
+  "course": "",
+  "played_at": "2025-07-19T09:00:00",
+  "weather": 2,
+  "holes": 9,
+  "start_hole": 1,
+  "tee": "blanc",
+  "feeling": 3,
+  "mood": 3,
+  "body": 5,
+  "event_title": null,
+  "notes": "Vacances sur l’île de Ré.",
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 3,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 5,
+    "strokes": 6,
+    "putts": 3,
+    "fairway": "left",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 5,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 3,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 1
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "short",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 5,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   }
+  ]
+ },
+ {
+  "id": "802238c7-c264-4e45-8275-1616162664d4",
+  "kind": "round",
+  "golf_slug": "golf-de-trousse-chemise-les-portes-en-re",
+  "course": "",
+  "played_at": "2025-07-26T17:30:00",
+  "weather": 4,
+  "holes": 9,
+  "start_hole": 1,
+  "tee": "blanc",
+  "feeling": 4,
+  "mood": 4,
+  "body": 2,
+  "event_title": null,
+  "notes": null,
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 5,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 5,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 3,
+    "strokes": 5,
+    "putts": 3,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 5,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   }
+  ]
+ },
+ {
+  "id": "9b44199a-c344-4a39-b2b0-acc54c99e0f0",
+  "kind": "round",
+  "golf_slug": "la-palmyre-golf-resort-la-palmyre",
+  "course": "",
+  "played_at": "2025-08-09T08:45:00",
+  "weather": 4,
+  "holes": 9,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 5,
+  "mood": 5,
+  "body": 3,
+  "event_title": null,
+  "notes": "Pins et sable partout.",
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 5,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 5,
+    "par": 5,
+    "strokes": 8,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 3,
+    "strokes": 1,
+    "putts": 0,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 6,
+    "putts": 3,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 3,
+    "strokes": 5,
+    "putts": 3,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   }
+  ]
+ },
+ {
+  "id": "2a6686b3-b233-4867-9b4f-1003d6409edb",
+  "kind": "round",
+  "golf_slug": "golf-de-royan-saint-palais-sur-mer",
+  "course": "",
+  "played_at": "2025-08-23T09:10:00",
+  "weather": 4,
+  "holes": 18,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 4,
+  "mood": 4,
+  "body": 4,
+  "event_title": null,
+  "notes": null,
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 3,
+    "par": 3,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 5,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 5,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 7,
+    "par": 3,
+    "strokes": 5,
+    "putts": 3,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 4,
+    "strokes": 6,
+    "putts": 3,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 8,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 10,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 11,
+    "par": 4,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 2,
+    "up_down": 0
+   },
+   {
+    "hole": 12,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 13,
+    "par": 5,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 14,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 15,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 16,
+    "par": 3,
+    "strokes": 3,
+    "putts": 2,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 17,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 18,
+    "par": 5,
+    "strokes": 6,
+    "putts": 1,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   }
+  ]
+ },
+ {
+  "id": "c51442b9-cc8e-4399-bd61-67cada91d0a4",
+  "kind": "range",
+  "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
+  "course": "",
+  "played_at": "2025-09-13T18:30:00",
+  "weather": 5,
+  "duration_min": 90,
+  "balls": 50,
+  "focus": "putting,chip",
+  "feeling": 3,
+  "notes": "Travail du putting court.",
+  "drills": [
+   {
+    "position": 1,
+    "category": "putting",
+    "label": "Putts à 1 m",
+    "distance_m": 1,
+    "attempts": 10,
+    "successes": 8
+   },
+   {
+    "position": 2,
+    "category": "putting",
+    "label": "Putts à 2 m",
+    "distance_m": 2,
+    "attempts": 10,
+    "successes": 5
    },
    {
     "position": 3,
@@ -339,220 +1554,32 @@
     "label": "Chips à moins d’1 m",
     "distance_m": null,
     "attempts": 15,
-    "successes": 3
+    "successes": 5
    }
-  ]
+  ],
+  "mood": 3,
+  "body": 3
  },
  {
-  "id": "a8118412-8b33-4fc9-a79a-45ea16191fae",
+  "id": "a3525cf4-319a-4c69-a74d-d333e95dfeaf",
   "kind": "round",
-  "golf_slug": "golf-bluegreen-rochefort-ocean-saint-laurent-de-la-pree",
+  "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
   "course": "",
-  "played_at": "2025-05-24T08:50:00",
+  "played_at": "2025-09-27T10:00:00",
+  "weather": 5,
   "holes": 18,
   "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 1,
-  "notes": "Vent fort sur le retour.",
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 3,
-    "strokes": 3,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 2,
-    "par": 5,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 3,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 1,
-    "up_down": null
-   },
-   {
-    "hole": 8,
-    "par": 4,
-    "strokes": 7,
-    "putts": 3,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 9,
-    "par": 5,
-    "strokes": 8,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 10,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 11,
-    "par": 5,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 12,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 13,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 14,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 15,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 16,
-    "par": 4,
-    "strokes": 6,
-    "putts": 3,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 17,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 18,
-    "par": 5,
-    "strokes": 6,
-    "putts": 1,
-    "fairway": null,
-    "gir": null,
-    "penalties": 0,
-    "up_down": null
-   }
-  ]
- },
- {
-  "id": "65e58e51-d638-4f6d-9bae-b0a8a541e271",
-  "kind": "round",
-  "golf_slug": "golf-de-saintes-fontcouverte",
-  "course": "",
-  "played_at": "2025-06-07T09:30:00",
-  "holes": 18,
-  "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 2,
+  "tee": "blanc",
+  "feeling": 5,
+  "mood": 5,
+  "body": 5,
+  "event_title": "Trophée Crédit Maritime — Scramble à 2",
   "notes": null,
   "holes_data": [
    {
     "hole": 1,
     "par": 4,
-    "strokes": 6,
+    "strokes": 5,
     "putts": 2,
     "fairway": "right",
     "gir": 0,
@@ -561,76 +1588,6 @@
    },
    {
     "hole": 2,
-    "par": 3,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 6,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 1,
-    "up_down": null
-   },
-   {
-    "hole": 5,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 3,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 3,
-    "strokes": 3,
-    "putts": 2,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 9,
     "par": 5,
     "strokes": 7,
     "putts": 2,
@@ -640,17 +1597,27 @@
     "up_down": 0
    },
    {
-    "hole": 10,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
+    "hole": 3,
+    "par": 3,
+    "strokes": 2,
+    "putts": 1,
+    "fairway": null,
+    "gir": 1,
     "penalties": 0,
-    "up_down": 0
+    "up_down": null
    },
    {
-    "hole": 11,
+    "hole": 4,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 5,
     "par": 3,
     "strokes": 3,
     "putts": 1,
@@ -660,39 +1627,39 @@
     "up_down": 1
    },
    {
-    "hole": 12,
+    "hole": 6,
     "par": 4,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "right",
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "left",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
    },
    {
-    "hole": 13,
-    "par": 3,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 14,
+    "hole": 7,
     "par": 4,
     "strokes": 6,
     "putts": 2,
-    "fairway": "right",
+    "fairway": "short",
     "gir": 0,
     "penalties": 1,
     "up_down": 0
    },
    {
-    "hole": 15,
+    "hole": 8,
     "par": 4,
     "strokes": 4,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 5,
     "putts": 1,
     "fairway": "left",
     "gir": 0,
@@ -700,7 +1667,165 @@
     "up_down": 1
    },
    {
+    "hole": 10,
+    "par": 5,
+    "strokes": 6,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 11,
+    "par": 3,
+    "strokes": 3,
+    "putts": 2,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 12,
+    "par": 4,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 13,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 14,
+    "par": 3,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 15,
+    "par": 5,
+    "strokes": 8,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
     "hole": 16,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 17,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 18,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   }
+  ]
+ },
+ {
+  "id": "c33b3b9d-204c-4d16-a984-08ed48e32548",
+  "kind": "round",
+  "golf_slug": "golf-du-cognac-saint-brice",
+  "course": "",
+  "played_at": "2025-10-18T09:20:00",
+  "weather": 3,
+  "holes": 18,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 4,
+  "mood": 4,
+  "body": 5,
+  "event_title": null,
+  "notes": "Week-end à Cognac.",
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 4,
+    "strokes": 6,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 5,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 1,
+    "penalties": 1,
+    "up_down": null
+   },
+   {
+    "hole": 5,
+    "par": 3,
+    "strokes": 3,
+    "putts": 0,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
     "par": 4,
     "strokes": 6,
     "putts": 3,
@@ -710,20 +1835,120 @@
     "up_down": 0
    },
    {
-    "hole": 17,
+    "hole": 7,
     "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
+    "strokes": 6,
+    "putts": 3,
+    "fairway": "left",
     "gir": 0,
     "penalties": 0,
-    "up_down": 1
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 3,
+    "strokes": 3,
+    "putts": 2,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 6,
+    "putts": 1,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 10,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 11,
+    "par": 4,
+    "strokes": 5,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 12,
+    "par": 5,
+    "strokes": 6,
+    "putts": 3,
+    "fairway": "right",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 13,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "short",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 14,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 15,
+    "par": 3,
+    "strokes": 3,
+    "putts": 2,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 16,
+    "par": 5,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 17,
+    "par": 4,
+    "strokes": 6,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
    },
    {
     "hole": 18,
     "par": 3,
-    "strokes": 7,
-    "putts": 3,
+    "strokes": 4,
+    "putts": 2,
     "fairway": null,
     "gir": 0,
     "penalties": 0,
@@ -732,13 +1957,469 @@
   ]
  },
  {
-  "id": "b52c6e81-2860-464b-b98e-cb0433057323",
-  "kind": "range",
+  "id": "27af33ba-6fca-44b2-a606-7472b0471fb8",
+  "kind": "round",
   "golf_slug": "golf-la-rochelle-sud-la-jarne",
   "course": "",
-  "played_at": "2025-06-21T19:00:00",
-  "duration_min": 90,
+  "played_at": "2025-11-15T10:30:00",
+  "weather": 2,
+  "holes": 9,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 5,
+  "mood": 5,
+  "body": 5,
+  "event_title": null,
+  "notes": "Terrain gras, pas de roule.",
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 4,
+    "strokes": 6,
+    "putts": 3,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 3,
+    "strokes": 2,
+    "putts": 1,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 5,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 5,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   }
+  ]
+ },
+ {
+  "id": "196fe7dd-8d59-4ef2-b529-8f11e5b900b2",
+  "kind": "range",
+  "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
+  "course": "",
+  "played_at": "2026-01-17T11:00:00",
+  "weather": 3,
+  "duration_min": 75,
   "balls": 100,
+  "focus": "putting,chip",
+  "feeling": 3,
+  "notes": "Reprise après les fêtes.",
+  "drills": [
+   {
+    "position": 1,
+    "category": "putting",
+    "label": "Putts à 1 m",
+    "distance_m": 1,
+    "attempts": 10,
+    "successes": 8
+   },
+   {
+    "position": 2,
+    "category": "putting",
+    "label": "Putts à 2 m",
+    "distance_m": 2,
+    "attempts": 10,
+    "successes": 5
+   },
+   {
+    "position": 3,
+    "category": "chip",
+    "label": "Chips à moins d’1 m",
+    "distance_m": null,
+    "attempts": 15,
+    "successes": 5
+   }
+  ],
+  "mood": 3,
+  "body": 3
+ },
+ {
+  "id": "e6d21f33-aa98-4e65-9131-2271ea9dfc90",
+  "kind": "round",
+  "golf_slug": "golf-bluegreen-rochefort-ocean-saint-laurent-de-la-pree",
+  "course": "",
+  "played_at": "2026-02-21T10:45:00",
+  "weather": 2,
+  "holes": 18,
+  "start_hole": 1,
+  "tee": "blanc",
+  "feeling": 1,
+  "mood": 1,
+  "body": 1,
+  "event_title": null,
+  "notes": "Dos bloqué depuis le 5, j’ai fini en marchant.",
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 5,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 5,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 8,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 10,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 11,
+    "par": 5,
+    "strokes": 8,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 12,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 13,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 14,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 15,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 16,
+    "par": 4,
+    "strokes": 6,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 17,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 18,
+    "par": 5,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   }
+  ]
+ },
+ {
+  "id": "c24135c0-3332-4051-bd45-195ee7194530",
+  "kind": "round",
+  "golf_slug": "golf-du-chateau-de-la-vallade-saint-porchaire",
+  "course": "",
+  "played_at": "2026-03-14T09:30:00",
+  "weather": 2,
+  "holes": 9,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 2,
+  "mood": 2,
+  "body": 2,
+  "event_title": null,
+  "notes": null,
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 4,
+    "strokes": 8,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 3,
+    "strokes": 3,
+    "putts": 2,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 3,
+    "par": 3,
+    "strokes": 5,
+    "putts": 3,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 5,
+    "par": 3,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 3,
+    "strokes": 3,
+    "putts": 1,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 8,
+    "par": 3,
+    "strokes": 4,
+    "putts": 0,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   }
+  ]
+ },
+ {
+  "id": "8eea372a-b25a-4658-96ff-a78a968b8508",
+  "kind": "range",
+  "golf_slug": "golf-bluegreen-rochefort-ocean-saint-laurent-de-la-pree",
+  "course": "",
+  "played_at": "2026-03-28T17:45:00",
+  "weather": 2,
+  "duration_min": 60,
+  "balls": 70,
   "focus": "putting,long",
   "feeling": 3,
   "notes": null,
@@ -765,7 +2446,7 @@
     "label": "Putts à 4 m",
     "distance_m": 4,
     "attempts": 10,
-    "successes": 1
+    "successes": 2
    },
    {
     "position": 4,
@@ -773,228 +2454,298 @@
     "label": "Driver dans le couloir",
     "distance_m": null,
     "attempts": 20,
-    "successes": 9
+    "successes": 10
    }
-  ]
+  ],
+  "mood": 3,
+  "body": 4
  },
  {
-  "id": "e8fb8477-e5e9-44ad-b5f7-25d0162380e9",
+  "id": "50e0c15a-af85-487c-a8cf-546c5d3c4c9d",
   "kind": "round",
   "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
   "course": "",
-  "played_at": "2025-07-05T08:30:00",
-  "holes": 18,
+  "played_at": "2026-04-11T09:00:00",
+  "weather": 3,
+  "holes": 9,
   "start_hole": 1,
   "tee": "jaune",
-  "feeling": 2,
-  "notes": null,
+  "feeling": 5,
+  "mood": 5,
+  "body": 3,
+  "event_title": null,
+  "notes": "Neuf trous après le boulot… un samedi.",
   "holes_data": [
    {
     "hole": 1,
     "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 2,
+    "par": 5,
+    "strokes": 8,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 3,
+    "strokes": 3,
+    "putts": 1,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 5,
+    "par": 3,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 8,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 3,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   }
+  ]
+ },
+ {
+  "id": "45180dd4-47f3-43d0-9bb3-528f2ddfe747",
+  "kind": "round",
+  "golf_slug": "golf-bluegreen-niort-romagne-niort",
+  "course": "",
+  "played_at": "2026-04-25T08:40:00",
+  "weather": 5,
+  "holes": 18,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 5,
+  "mood": 5,
+  "body": 3,
+  "event_title": "Coupe des Seniors Bluegreen",
+  "notes": null,
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 5,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 4,
     "strokes": 7,
     "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 5,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 3,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 8,
+    "par": 5,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 10,
+    "par": 5,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 11,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 12,
+    "par": 3,
+    "strokes": 3,
+    "putts": 2,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 13,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 14,
+    "par": 4,
+    "strokes": 6,
+    "putts": 1,
     "fairway": "right",
     "gir": 0,
     "penalties": 2,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 5,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 3,
-    "par": 3,
-    "strokes": 4,
-    "putts": 3,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 5,
-    "putts": 3,
-    "fairway": "left",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "short",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 6,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 4,
-    "strokes": 6,
-    "putts": 3,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 5,
-    "strokes": 8,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 10,
-    "par": 5,
-    "strokes": 6,
-    "putts": 3,
-    "fairway": "right",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 11,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 12,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 13,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 14,
-    "par": 3,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
     "up_down": 1
    },
    {
     "hole": 15,
-    "par": 5,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "right",
+    "par": 4,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
-    "up_down": 1
+    "up_down": 0
    },
    {
     "hole": 16,
     "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
+    "strokes": 3,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 1,
     "penalties": 0,
-    "up_down": 0
+    "up_down": null
    },
    {
     "hole": 17,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 18,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   }
-  ]
- },
- {
-  "id": "0916f303-0517-46ed-b8b7-1d5f0e4dcc03",
-  "kind": "round",
-  "golf_slug": "golf-de-trousse-chemise-les-portes-en-re",
-  "course": "",
-  "played_at": "2025-07-19T09:00:00",
-  "holes": 9,
-  "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 2,
-  "notes": "Vacances sur l’île de Ré.",
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
     "par": 3,
     "strokes": 3,
     "putts": 2,
@@ -1004,472 +2755,10 @@
     "up_down": null
    },
    {
-    "hole": 3,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 4,
-    "strokes": 7,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 5,
-    "strokes": 7,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 4,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   }
-  ]
- },
- {
-  "id": "cc978695-c3e3-45af-870e-ebfcc12f36eb",
-  "kind": "round",
-  "golf_slug": "golf-de-trousse-chemise-les-portes-en-re",
-  "course": "",
-  "played_at": "2025-07-26T17:30:00",
-  "holes": 9,
-  "start_hole": 1,
-  "tee": "blanc",
-  "feeling": 2,
-  "notes": null,
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 2,
-    "par": 3,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 3,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 5,
-    "strokes": 8,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   }
-  ]
- },
- {
-  "id": "af99d063-45c9-4023-89a7-158f4dd65131",
-  "kind": "round",
-  "golf_slug": "la-palmyre-golf-resort-la-palmyre",
-  "course": "",
-  "played_at": "2025-08-09T08:45:00",
-  "holes": 9,
-  "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 2,
-  "notes": "Pins et sable partout.",
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 4,
-    "strokes": 5,
-    "putts": 3,
-    "fairway": "right",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 3,
-    "par": 3,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 5,
-    "strokes": 7,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 5,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 6,
-    "par": 3,
-    "strokes": 5,
-    "putts": 0,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 5,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 8,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   }
-  ]
- },
- {
-  "id": "d4f14089-ec51-4fd0-adab-017f4f8737a7",
-  "kind": "round",
-  "golf_slug": "golf-de-royan-saint-palais-sur-mer",
-  "course": "",
-  "played_at": "2025-08-23T09:10:00",
-  "holes": 18,
-  "start_hole": 1,
-  "tee": "blanc",
-  "feeling": 2,
-  "notes": null,
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 4,
-    "strokes": 6,
-    "putts": 3,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
-    "par": 3,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 5,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 5,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 3,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "left",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 9,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 10,
-    "par": 4,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 11,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 12,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 13,
-    "par": 5,
-    "strokes": 7,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 14,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 15,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "short",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 16,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 17,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
     "hole": 18,
     "par": 5,
-    "strokes": 7,
-    "putts": 3,
+    "strokes": 6,
+    "putts": 2,
     "fairway": "right",
     "gir": 0,
     "penalties": 0,
@@ -1478,16 +2767,17 @@
   ]
  },
  {
-  "id": "81d3fd05-5800-4669-aabe-debc0e6621ee",
+  "id": "e2d0012c-0f8d-4c92-afcd-7b1698b1b5b0",
   "kind": "range",
-  "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
+  "golf_slug": "golf-la-rochelle-sud-la-jarne",
   "course": "",
-  "played_at": "2025-09-13T18:30:00",
-  "duration_min": 60,
-  "balls": 70,
+  "played_at": "2026-05-16T18:15:00",
+  "weather": 5,
+  "duration_min": 45,
+  "balls": 50,
   "focus": "putting,chip",
   "feeling": 4,
-  "notes": "Travail du putting court.",
+  "notes": null,
   "drills": [
    {
     "position": 1,
@@ -1495,7 +2785,7 @@
     "label": "Putts à 1 m",
     "distance_m": 1,
     "attempts": 10,
-    "successes": 7
+    "successes": 9
    },
    {
     "position": 2,
@@ -1503,7 +2793,7 @@
     "label": "Putts à 2 m",
     "distance_m": 2,
     "attempts": 10,
-    "successes": 5
+    "successes": 6
    },
    {
     "position": 3,
@@ -1519,26 +2809,160 @@
     "label": "Chips à moins d’1 m",
     "distance_m": null,
     "attempts": 15,
-    "successes": 4
+    "successes": 7
+   }
+  ],
+  "mood": 4,
+  "body": 4
+ },
+ {
+  "id": "1028de8c-944e-4adf-860d-c787050ac095",
+  "kind": "round",
+  "golf_slug": "golf-club-d-oleron-saint-pierre-d-oleron",
+  "course": "",
+  "played_at": "2026-05-30T09:15:00",
+  "weather": 4,
+  "holes": 9,
+  "start_hole": 1,
+  "tee": "jaune",
+  "feeling": 5,
+  "mood": 5,
+  "body": 3,
+  "event_title": null,
+  "notes": null,
+  "holes_data": [
+   {
+    "hole": 1,
+    "par": 5,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 2,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 4,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 5,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 7,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 8,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 9,
+    "par": 5,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 1,
+    "up_down": null
    }
   ]
  },
  {
-  "id": "d418d59c-13f2-4542-b0bb-c7076f957a4f",
+  "id": "009b31d3-679f-4899-b959-0e140a007a19",
   "kind": "round",
-  "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
+  "golf_slug": "golf-bluegreen-mazieres-en-gatine-mazieres-en-gatine",
   "course": "",
-  "played_at": "2025-09-27T10:00:00",
+  "played_at": "2026-06-13T08:30:00",
+  "weather": 4,
   "holes": 18,
   "start_hole": 1,
-  "tee": "blanc",
-  "feeling": 2,
+  "tee": "jaune",
+  "feeling": 4,
+  "mood": 4,
+  "body": 4,
+  "event_title": null,
   "notes": null,
   "holes_data": [
    {
     "hole": 1,
     "par": 4,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 4,
     "strokes": 6,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 3,
+    "par": 4,
+    "strokes": 5,
     "putts": 2,
     "fairway": "left",
     "gir": 0,
@@ -1546,49 +2970,29 @@
     "up_down": 0
    },
    {
-    "hole": 2,
-    "par": 5,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 3,
+    "hole": 4,
     "par": 3,
-    "strokes": 5,
+    "strokes": 4,
     "putts": 2,
     "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
    },
    {
     "hole": 5,
-    "par": 3,
+    "par": 4,
     "strokes": 5,
     "putts": 2,
-    "fairway": null,
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
    },
    {
     "hole": 6,
-    "par": 4,
-    "strokes": 5,
+    "par": 5,
+    "strokes": 6,
     "putts": 2,
     "fairway": "hit",
     "gir": 0,
@@ -1597,251 +3001,47 @@
    },
    {
     "hole": 7,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 8,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 5,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 10,
-    "par": 5,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "short",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 11,
-    "par": 3,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 12,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "short",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 13,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 14,
     "par": 3,
     "strokes": 4,
     "putts": 2,
     "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 15,
-    "par": 5,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 16,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 17,
-    "par": 4,
-    "strokes": 5,
-    "putts": 0,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 18,
-    "par": 4,
-    "strokes": 6,
-    "putts": 3,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   }
-  ]
- },
- {
-  "id": "f8258c82-5f1c-44bc-9937-c71b4495264a",
-  "kind": "round",
-  "golf_slug": "golf-du-cognac-saint-brice",
-  "course": "",
-  "played_at": "2025-10-18T09:20:00",
-  "holes": 18,
-  "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 2,
-  "notes": "Week-end à Cognac.",
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 2,
-    "par": 4,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
-    "par": 5,
-    "strokes": 8,
-    "putts": 3,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
    },
    {
     "hole": 8,
-    "par": 3,
-    "strokes": 3,
-    "putts": 2,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 9,
     "par": 5,
-    "strokes": 8,
-    "putts": 3,
+    "strokes": 6,
+    "putts": 1,
     "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
    },
    {
-    "hole": 10,
+    "hole": 9,
     "par": 4,
     "strokes": 4,
     "putts": 1,
-    "fairway": "hit",
+    "fairway": "left",
     "gir": 0,
     "penalties": 0,
     "up_down": 1
    },
    {
-    "hole": 11,
+    "hole": 10,
     "par": 4,
-    "strokes": 7,
+    "strokes": 5,
     "putts": 2,
     "fairway": "hit",
     "gir": 0,
-    "penalties": 1,
+    "penalties": 0,
     "up_down": 0
    },
    {
-    "hole": 12,
-    "par": 5,
+    "hole": 11,
+    "par": 4,
     "strokes": 6,
     "putts": 2,
     "fairway": "hit",
@@ -1850,19 +3050,29 @@
     "up_down": 0
    },
    {
-    "hole": 13,
+    "hole": 12,
     "par": 4,
-    "strokes": 4,
+    "strokes": 5,
     "putts": 1,
-    "fairway": "short",
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
-    "up_down": 1
+    "up_down": 0
+   },
+   {
+    "hole": 13,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
    },
    {
     "hole": 14,
-    "par": 4,
-    "strokes": 5,
+    "par": 5,
+    "strokes": 7,
     "putts": 2,
     "fairway": "right",
     "gir": 0,
@@ -1871,23 +3081,23 @@
    },
    {
     "hole": 15,
-    "par": 3,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 2,
-    "up_down": 0
-   },
-   {
-    "hole": 16,
-    "par": 5,
-    "strokes": 5,
+    "par": 4,
+    "strokes": 4,
     "putts": 1,
-    "fairway": "hit",
+    "fairway": "left",
     "gir": 0,
     "penalties": 0,
     "up_down": 1
+   },
+   {
+    "hole": 16,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
    },
    {
     "hole": 17,
@@ -1901,131 +3111,28 @@
    },
    {
     "hole": 18,
-    "par": 3,
-    "strokes": 4,
-    "putts": 3,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   }
-  ]
- },
- {
-  "id": "a8346cbb-c812-4023-a05b-6b83d7b9399e",
-  "kind": "round",
-  "golf_slug": "golf-la-rochelle-sud-la-jarne",
-  "course": "",
-  "played_at": "2025-11-15T10:30:00",
-  "holes": 9,
-  "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 3,
-  "notes": "Terrain gras, pas de roule.",
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 3,
-    "par": 4,
-    "strokes": 6,
+    "par": 5,
+    "strokes": 5,
     "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 6,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 2,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
+    "fairway": "left",
     "gir": 0,
     "penalties": 0,
     "up_down": 1
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 6,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 5,
-    "strokes": 7,
-    "putts": 3,
-    "fairway": "short",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
    }
   ]
  },
  {
-  "id": "7a84d77c-9267-49ce-ada8-e0b609fa682d",
+  "id": "57e2907b-e82e-4c62-9d49-96f8594c7150",
   "kind": "range",
-  "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
+  "golf_slug": "golf-club-d-oleron-saint-pierre-d-oleron",
   "course": "",
-  "played_at": "2026-01-17T11:00:00",
+  "played_at": "2026-06-27T19:00:00",
+  "weather": 5,
   "duration_min": 60,
   "balls": 100,
   "focus": "putting,approach",
-  "feeling": 3,
-  "notes": "Reprise après les fêtes.",
+  "feeling": 4,
+  "notes": null,
   "drills": [
    {
     "position": 1,
@@ -2059,1060 +3166,42 @@
     "attempts": 15,
     "successes": 6
    }
-  ]
+  ],
+  "mood": 4,
+  "body": 4
  },
  {
-  "id": "7fa7ab70-1233-498f-97ef-3614341a721d",
-  "kind": "round",
-  "golf_slug": "golf-bluegreen-rochefort-ocean-saint-laurent-de-la-pree",
-  "course": "",
-  "played_at": "2026-02-21T10:45:00",
-  "holes": 18,
-  "start_hole": 1,
-  "tee": "blanc",
-  "feeling": 2,
-  "notes": null,
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 5,
-    "strokes": 9,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 2,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 6,
-    "putts": 4,
-    "fairway": "left",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 4,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 9,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 10,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 11,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 12,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 13,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 14,
-    "par": 3,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 15,
-    "par": 4,
-    "strokes": 6,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 16,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 17,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 18,
-    "par": 5,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   }
-  ]
- },
- {
-  "id": "9e8fd2a0-ae19-47d1-aead-9c82401ea509",
-  "kind": "round",
-  "golf_slug": "golf-du-chateau-de-la-vallade-saint-porchaire",
-  "course": "",
-  "played_at": "2026-03-14T09:30:00",
-  "holes": 9,
-  "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 3,
-  "notes": null,
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 5,
-    "putts": 3,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 3,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 3,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   }
-  ]
- },
- {
-  "id": "927c19ec-fa9f-4fda-ab02-836d0ebbfd12",
-  "kind": "range",
-  "golf_slug": "golf-bluegreen-rochefort-ocean-saint-laurent-de-la-pree",
-  "course": "",
-  "played_at": "2026-03-28T17:45:00",
-  "duration_min": 60,
-  "balls": 100,
-  "focus": "putting,approach",
-  "feeling": 4,
-  "notes": null,
-  "drills": [
-   {
-    "position": 1,
-    "category": "putting",
-    "label": "Putts à 1 m",
-    "distance_m": 1,
-    "attempts": 10,
-    "successes": 8
-   },
-   {
-    "position": 2,
-    "category": "putting",
-    "label": "Putts à 2 m",
-    "distance_m": 2,
-    "attempts": 10,
-    "successes": 5
-   },
-   {
-    "position": 3,
-    "category": "putting",
-    "label": "Putts à 4 m",
-    "distance_m": 4,
-    "attempts": 10,
-    "successes": 2
-   },
-   {
-    "position": 4,
-    "category": "approach",
-    "label": "Approches à 50 m dans le rond",
-    "distance_m": 50,
-    "attempts": 15,
-    "successes": 6
-   }
-  ]
- },
- {
-  "id": "8df63fdd-53f9-4f66-84d8-bae459763ed1",
-  "kind": "round",
-  "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
-  "course": "",
-  "played_at": "2026-04-11T09:00:00",
-  "holes": 9,
-  "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 3,
-  "notes": "Neuf trous après le boulot… un samedi.",
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 2,
-    "par": 5,
-    "strokes": 8,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
-    "par": 3,
-    "strokes": 5,
-    "putts": 3,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 9,
-    "par": 5,
-    "strokes": 6,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   }
-  ]
- },
- {
-  "id": "552bd2b2-54da-47a3-96bd-407fc137f872",
-  "kind": "round",
-  "golf_slug": "golf-bluegreen-niort-romagne-niort",
-  "course": "",
-  "played_at": "2026-04-25T08:40:00",
-  "holes": 18,
-  "start_hole": 1,
-  "tee": "blanc",
-  "feeling": 3,
-  "notes": null,
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
-    "par": 3,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 4,
-    "strokes": 5,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 8,
-    "par": 5,
-    "strokes": 8,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 3,
-    "strokes": 3,
-    "putts": 2,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 10,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 11,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 12,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 13,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 14,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 15,
-    "par": 4,
-    "strokes": 3,
-    "putts": 0,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 16,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 17,
-    "par": 3,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 18,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   }
-  ]
- },
- {
-  "id": "aec00348-3c82-4068-9a3f-04c3145e66aa",
-  "kind": "range",
-  "golf_slug": "golf-la-rochelle-sud-la-jarne",
-  "course": "",
-  "played_at": "2026-05-16T18:15:00",
-  "duration_min": 60,
-  "balls": 70,
-  "focus": "putting,chip",
-  "feeling": 3,
-  "notes": null,
-  "drills": [
-   {
-    "position": 1,
-    "category": "putting",
-    "label": "Putts à 1 m",
-    "distance_m": 1,
-    "attempts": 10,
-    "successes": 9
-   },
-   {
-    "position": 2,
-    "category": "putting",
-    "label": "Putts à 2 m",
-    "distance_m": 2,
-    "attempts": 10,
-    "successes": 6
-   },
-   {
-    "position": 3,
-    "category": "putting",
-    "label": "Putts à 4 m",
-    "distance_m": 4,
-    "attempts": 10,
-    "successes": 2
-   },
-   {
-    "position": 4,
-    "category": "chip",
-    "label": "Chips à moins d’1 m",
-    "distance_m": null,
-    "attempts": 15,
-    "successes": 7
-   }
-  ]
- },
- {
-  "id": "b942c068-9f97-4699-bf20-55d5fe50877a",
-  "kind": "round",
-  "golf_slug": "golf-club-d-oleron-saint-pierre-d-oleron",
-  "course": "",
-  "played_at": "2026-05-30T09:15:00",
-  "holes": 9,
-  "start_hole": 1,
-  "tee": "blanc",
-  "feeling": 2,
-  "notes": null,
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 3,
-    "par": 4,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 3,
-    "strokes": 3,
-    "putts": 2,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 5,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 7,
-    "par": 4,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 8,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 5,
-    "strokes": 7,
-    "putts": 4,
-    "fairway": "right",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   }
-  ]
- },
- {
-  "id": "6dc1880b-ccd3-4a06-be21-1238e262cc8f",
-  "kind": "round",
-  "golf_slug": "golf-bluegreen-mazieres-en-gatine-mazieres-en-gatine",
-  "course": "",
-  "played_at": "2026-06-13T08:30:00",
-  "holes": 18,
-  "start_hole": 1,
-  "tee": "blanc",
-  "feeling": 2,
-  "notes": null,
-  "holes_data": [
-   {
-    "hole": 1,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 2,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 3,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 4,
-    "par": 3,
-    "strokes": 5,
-    "putts": 3,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 6,
-    "par": 5,
-    "strokes": 7,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 7,
-    "par": 3,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 8,
-    "par": 5,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 9,
-    "par": 4,
-    "strokes": 6,
-    "putts": 1,
-    "fairway": "left",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 10,
-    "par": 4,
-    "strokes": 3,
-    "putts": 0,
-    "fairway": "short",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 11,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 12,
-    "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 13,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 14,
-    "par": 5,
-    "strokes": 7,
-    "putts": 2,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 15,
-    "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 16,
-    "par": 3,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 17,
-    "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 18,
-    "par": 5,
-    "strokes": 9,
-    "putts": 3,
-    "fairway": "right",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   }
-  ]
- },
- {
-  "id": "e48bc985-8fff-4a9d-9357-bd3d932fd6c6",
-  "kind": "range",
-  "golf_slug": "golf-club-d-oleron-saint-pierre-d-oleron",
-  "course": "",
-  "played_at": "2026-06-27T19:00:00",
-  "duration_min": 45,
-  "balls": 100,
-  "focus": "putting,chip",
-  "feeling": 4,
-  "notes": null,
-  "drills": [
-   {
-    "position": 1,
-    "category": "putting",
-    "label": "Putts à 1 m",
-    "distance_m": 1,
-    "attempts": 10,
-    "successes": 8
-   },
-   {
-    "position": 2,
-    "category": "putting",
-    "label": "Putts à 2 m",
-    "distance_m": 2,
-    "attempts": 10,
-    "successes": 7
-   },
-   {
-    "position": 3,
-    "category": "chip",
-    "label": "Chips à moins d’1 m",
-    "distance_m": null,
-    "attempts": 15,
-    "successes": 5
-   }
-  ]
- },
- {
-  "id": "90ce8bc4-2b96-4200-b92f-8327bda629eb",
+  "id": "f55f971c-dc48-4342-a39c-2850b25c2208",
   "kind": "round",
   "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
   "course": "",
   "played_at": "2026-07-11T08:20:00",
+  "weather": 4,
   "holes": 18,
   "start_hole": 1,
   "tee": "blanc",
-  "feeling": 3,
+  "feeling": 5,
+  "mood": 5,
+  "body": 5,
+  "event_title": "Grand Prix Seniors de La Prée",
   "notes": "Meilleure carte de l’année !",
   "holes_data": [
    {
     "hole": 1,
     "par": 4,
-    "strokes": 3,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 1,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
     "penalties": 0,
-    "up_down": null
+    "up_down": 0
    },
    {
     "hole": 2,
     "par": 5,
-    "strokes": 9,
+    "strokes": 7,
     "putts": 3,
-    "fairway": "hit",
+    "fairway": "short",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3120,8 +3209,8 @@
    {
     "hole": 3,
     "par": 3,
-    "strokes": 5,
-    "putts": 3,
+    "strokes": 4,
+    "putts": 2,
     "fairway": null,
     "gir": 0,
     "penalties": 0,
@@ -3130,39 +3219,39 @@
    {
     "hole": 4,
     "par": 4,
-    "strokes": 5,
-    "putts": 2,
+    "strokes": 3,
+    "putts": 1,
     "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 5,
-    "par": 3,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 6,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "short",
     "gir": 1,
     "penalties": 0,
     "up_down": null
    },
    {
+    "hole": 5,
+    "par": 3,
+    "strokes": 3,
+    "putts": 1,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 6,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
     "hole": 7,
     "par": 4,
-    "strokes": 7,
+    "strokes": 5,
     "putts": 2,
-    "fairway": "right",
+    "fairway": "left",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3171,18 +3260,18 @@
     "hole": 8,
     "par": 4,
     "strokes": 5,
-    "putts": 2,
-    "fairway": "right",
+    "putts": 1,
+    "fairway": "left",
     "gir": 0,
-    "penalties": 0,
-    "up_down": 0
+    "penalties": 1,
+    "up_down": 1
    },
    {
     "hole": 9,
     "par": 5,
-    "strokes": 6,
-    "putts": 1,
-    "fairway": "right",
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3190,69 +3279,69 @@
    {
     "hole": 10,
     "par": 5,
-    "strokes": 6,
-    "putts": 2,
+    "strokes": 5,
+    "putts": 1,
     "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
+    "hole": 11,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
     "gir": 0,
     "penalties": 0,
     "up_down": 0
    },
    {
-    "hole": 11,
-    "par": 3,
-    "strokes": 3,
-    "putts": 2,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
     "hole": 12,
     "par": 4,
-    "strokes": 4,
+    "strokes": 5,
     "putts": 2,
-    "fairway": "right",
-    "gir": 1,
+    "fairway": "left",
+    "gir": 0,
     "penalties": 0,
-    "up_down": null
+    "up_down": 0
    },
    {
     "hole": 13,
     "par": 4,
-    "strokes": 4,
-    "putts": 1,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 1
-   },
-   {
-    "hole": 14,
-    "par": 3,
-    "strokes": 3,
-    "putts": 2,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 15,
-    "par": 5,
     "strokes": 5,
     "putts": 1,
     "fairway": "hit",
     "gir": 0,
     "penalties": 0,
-    "up_down": 1
+    "up_down": 0
+   },
+   {
+    "hole": 14,
+    "par": 3,
+    "strokes": 4,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 15,
+    "par": 5,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
    },
    {
     "hole": 16,
     "par": 4,
     "strokes": 5,
-    "putts": 1,
-    "fairway": "hit",
+    "putts": 2,
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3261,18 +3350,18 @@
     "hole": 17,
     "par": 4,
     "strokes": 4,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 1,
+    "putts": 1,
+    "fairway": "right",
+    "gir": 0,
     "penalties": 0,
-    "up_down": null
+    "up_down": 1
    },
    {
     "hole": 18,
     "par": 4,
     "strokes": 4,
     "putts": 2,
-    "fairway": "right",
+    "fairway": "hit",
     "gir": 1,
     "penalties": 0,
     "up_down": null
@@ -3280,20 +3369,34 @@
   ]
  },
  {
-  "id": "3a5b5260-98e0-470f-8de3-733b059b7ece",
+  "id": "73ed9080-748b-4e2f-9bec-ddaaaba9a45c",
   "kind": "round",
   "golf_slug": "golf-de-margaux-margaux",
   "course": "",
   "played_at": "2026-08-01T09:00:00",
+  "weather": 4,
   "holes": 18,
   "start_hole": 1,
   "tee": "jaune",
-  "feeling": 2,
+  "feeling": 4,
+  "mood": 4,
+  "body": 4,
+  "event_title": null,
   "notes": "Parcours exigeant, greens rapides.",
   "holes_data": [
    {
     "hole": 1,
     "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 2,
+    "par": 4,
     "strokes": 5,
     "putts": 2,
     "fairway": "right",
@@ -3302,19 +3405,9 @@
     "up_down": 0
    },
    {
-    "hole": 2,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
     "hole": 3,
     "par": 3,
-    "strokes": 6,
+    "strokes": 4,
     "putts": 2,
     "fairway": null,
     "gir": 0,
@@ -3324,29 +3417,29 @@
    {
     "hole": 4,
     "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "hit",
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
-    "up_down": 0
+    "up_down": 1
    },
    {
     "hole": 5,
     "par": 4,
-    "strokes": 6,
+    "strokes": 4,
     "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
+    "fairway": "right",
+    "gir": 1,
     "penalties": 0,
-    "up_down": 0
+    "up_down": null
    },
    {
     "hole": 6,
     "par": 4,
-    "strokes": 6,
+    "strokes": 5,
     "putts": 2,
-    "fairway": "left",
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3355,10 +3448,10 @@
     "hole": 7,
     "par": 3,
     "strokes": 5,
-    "putts": 2,
+    "putts": 1,
     "fairway": null,
     "gir": 0,
-    "penalties": 0,
+    "penalties": 1,
     "up_down": 0
    },
    {
@@ -3366,7 +3459,7 @@
     "par": 4,
     "strokes": 5,
     "putts": 2,
-    "fairway": "right",
+    "fairway": "short",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3375,8 +3468,8 @@
     "hole": 9,
     "par": 5,
     "strokes": 7,
-    "putts": 1,
-    "fairway": "left",
+    "putts": 3,
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3384,22 +3477,22 @@
    {
     "hole": 10,
     "par": 4,
-    "strokes": 6,
-    "putts": 1,
+    "strokes": 7,
+    "putts": 2,
     "fairway": "right",
     "gir": 0,
-    "penalties": 2,
-    "up_down": 1
+    "penalties": 0,
+    "up_down": 0
    },
    {
     "hole": 11,
     "par": 4,
-    "strokes": 5,
+    "strokes": 4,
     "putts": 1,
-    "fairway": "hit",
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
-    "up_down": 0
+    "up_down": 1
    },
    {
     "hole": 12,
@@ -3414,7 +3507,17 @@
    {
     "hole": 13,
     "par": 5,
-    "strokes": 6,
+    "strokes": 8,
+    "putts": 1,
+    "fairway": "left",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 0
+   },
+   {
+    "hole": 14,
+    "par": 4,
+    "strokes": 5,
     "putts": 2,
     "fairway": "hit",
     "gir": 0,
@@ -3422,21 +3525,11 @@
     "up_down": 0
    },
    {
-    "hole": 14,
-    "par": 4,
-    "strokes": 5,
-    "putts": 3,
-    "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
     "hole": 15,
     "par": 4,
     "strokes": 5,
-    "putts": 0,
-    "fairway": "hit",
+    "putts": 2,
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3444,45 +3537,49 @@
    {
     "hole": 16,
     "par": 3,
-    "strokes": 4,
+    "strokes": 3,
     "putts": 2,
     "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 17,
-    "par": 4,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": "hit",
     "gir": 1,
     "penalties": 0,
     "up_down": null
    },
    {
+    "hole": 17,
+    "par": 4,
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
+   },
+   {
     "hole": 18,
     "par": 5,
-    "strokes": 8,
-    "putts": 3,
-    "fairway": "short",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
+    "strokes": 5,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
    }
   ]
  },
  {
-  "id": "8c98a262-13ff-4594-a1bb-80669b263fe1",
+  "id": "016fdae9-e211-42f9-98c9-ee10a94252df",
   "kind": "round",
   "golf_slug": "angouleme-golf-l-hirondelle-angouleme",
   "course": "",
   "played_at": "2026-08-22T10:10:00",
+  "weather": 2,
   "holes": 18,
   "start_hole": 1,
   "tee": "jaune",
-  "feeling": 2,
+  "feeling": 4,
+  "mood": 4,
+  "body": 4,
+  "event_title": null,
   "notes": null,
   "holes_data": [
    {
@@ -3490,7 +3587,7 @@
     "par": 4,
     "strokes": 5,
     "putts": 2,
-    "fairway": "short",
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3498,22 +3595,22 @@
    {
     "hole": 2,
     "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
-    "par": 4,
     "strokes": 4,
     "putts": 2,
     "fairway": "hit",
     "gir": 1,
     "penalties": 0,
     "up_down": null
+   },
+   {
+    "hole": 3,
+    "par": 4,
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "hit",
+    "gir": 0,
+    "penalties": 1,
+    "up_down": 1
    },
    {
     "hole": 4,
@@ -3528,45 +3625,55 @@
    {
     "hole": 5,
     "par": 5,
-    "strokes": 6,
+    "strokes": 7,
     "putts": 2,
-    "fairway": "hit",
+    "fairway": "right",
     "gir": 0,
-    "penalties": 0,
+    "penalties": 1,
     "up_down": 0
    },
    {
     "hole": 6,
     "par": 4,
-    "strokes": 5,
-    "putts": 2,
-    "fairway": "hit",
+    "strokes": 4,
+    "putts": 1,
+    "fairway": "left",
     "gir": 0,
     "penalties": 0,
-    "up_down": 0
+    "up_down": 1
    },
    {
     "hole": 7,
     "par": 3,
-    "strokes": 5,
-    "putts": 3,
+    "strokes": 3,
+    "putts": 2,
     "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
+   },
+   {
+    "hole": 8,
+    "par": 4,
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
    },
    {
-    "hole": 8,
-    "par": 4,
-    "strokes": 5,
-    "putts": 0,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 2,
-    "up_down": 1
+    "hole": 9,
+    "par": 3,
+    "strokes": 2,
+    "putts": 1,
+    "fairway": null,
+    "gir": 1,
+    "penalties": 0,
+    "up_down": null
    },
    {
-    "hole": 9,
+    "hole": 10,
     "par": 3,
     "strokes": 3,
     "putts": 1,
@@ -3576,24 +3683,14 @@
     "up_down": 1
    },
    {
-    "hole": 10,
-    "par": 3,
-    "strokes": 4,
-    "putts": 2,
-    "fairway": null,
-    "gir": 0,
-    "penalties": 0,
-    "up_down": 0
-   },
-   {
     "hole": 11,
     "par": 4,
     "strokes": 4,
-    "putts": 1,
+    "putts": 2,
     "fairway": "left",
-    "gir": 0,
+    "gir": 1,
     "penalties": 0,
-    "up_down": 1
+    "up_down": null
    },
    {
     "hole": 12,
@@ -3608,17 +3705,17 @@
    {
     "hole": 13,
     "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
-    "up_down": 0
+    "up_down": 1
    },
    {
     "hole": 14,
     "par": 4,
-    "strokes": 5,
+    "strokes": 6,
     "putts": 2,
     "fairway": "hit",
     "gir": 0,
@@ -3628,7 +3725,7 @@
    {
     "hole": 15,
     "par": 3,
-    "strokes": 5,
+    "strokes": 4,
     "putts": 2,
     "fairway": null,
     "gir": 0,
@@ -3640,7 +3737,7 @@
     "par": 4,
     "strokes": 7,
     "putts": 2,
-    "fairway": "right",
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3648,9 +3745,9 @@
    {
     "hole": 17,
     "par": 4,
-    "strokes": 7,
+    "strokes": 6,
     "putts": 2,
-    "fairway": "hit",
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3658,9 +3755,9 @@
    {
     "hole": 18,
     "par": 5,
-    "strokes": 6,
-    "putts": 1,
-    "fairway": "left",
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3668,39 +3765,33 @@
   ]
  },
  {
-  "id": "a0cb1a99-20d9-41bb-bb4f-80a62fc91918",
+  "id": "ed2f5241-dae6-4b4e-a361-97d60afe308c",
   "kind": "round",
   "golf_slug": "golf-la-rochelle-sud-la-jarne",
   "course": "",
   "played_at": "2026-09-19T09:30:00",
+  "weather": 4,
   "holes": 9,
   "start_hole": 1,
   "tee": "jaune",
-  "feeling": 3,
+  "feeling": 4,
+  "mood": 4,
+  "body": 2,
+  "event_title": null,
   "notes": null,
   "holes_data": [
    {
     "hole": 1,
     "par": 4,
-    "strokes": 6,
-    "putts": 3,
+    "strokes": 4,
+    "putts": 1,
     "fairway": "hit",
-    "gir": 1,
-    "penalties": 1,
-    "up_down": null
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 1
    },
    {
     "hole": 2,
-    "par": 4,
-    "strokes": 8,
-    "putts": 2,
-    "fairway": "hit",
-    "gir": 0,
-    "penalties": 1,
-    "up_down": 0
-   },
-   {
-    "hole": 3,
     "par": 4,
     "strokes": 4,
     "putts": 2,
@@ -3710,61 +3801,71 @@
     "up_down": null
    },
    {
+    "hole": 3,
+    "par": 4,
+    "strokes": 6,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
     "hole": 4,
     "par": 3,
-    "strokes": 2,
-    "putts": 1,
+    "strokes": 4,
+    "putts": 2,
     "fairway": null,
-    "gir": 1,
+    "gir": 0,
     "penalties": 0,
-    "up_down": null
+    "up_down": 0
    },
    {
     "hole": 5,
     "par": 3,
-    "strokes": 3,
-    "putts": 1,
+    "strokes": 5,
+    "putts": 2,
     "fairway": null,
     "gir": 0,
     "penalties": 0,
-    "up_down": 1
+    "up_down": 0
    },
    {
     "hole": 6,
     "par": 4,
-    "strokes": 5,
+    "strokes": 8,
     "putts": 2,
     "fairway": "hit",
     "gir": 0,
-    "penalties": 0,
+    "penalties": 1,
     "up_down": 0
    },
    {
     "hole": 7,
     "par": 4,
-    "strokes": 5,
+    "strokes": 4,
     "putts": 2,
     "fairway": "hit",
-    "gir": 0,
+    "gir": 1,
     "penalties": 0,
-    "up_down": 0
+    "up_down": null
    },
    {
     "hole": 8,
     "par": 5,
-    "strokes": 6,
+    "strokes": 4,
     "putts": 1,
-    "fairway": "right",
-    "gir": 0,
+    "fairway": "hit",
+    "gir": 1,
     "penalties": 0,
-    "up_down": 0
+    "up_down": null
    },
    {
     "hole": 9,
     "par": 4,
     "strokes": 5,
     "putts": 2,
-    "fairway": "right",
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3772,33 +3873,37 @@
   ]
  },
  {
-  "id": "bdf1b095-647e-40d4-aa12-6a118d7f4d22",
+  "id": "6c9d8c23-bcbb-4367-86b6-474f83897643",
   "kind": "round",
   "golf_slug": "golf-de-la-pree-la-rochelle-marsilly",
   "course": "",
   "played_at": "2026-10-17T09:45:00",
+  "weather": 2,
   "holes": 18,
   "start_hole": 1,
-  "tee": "jaune",
-  "feeling": 3,
+  "tee": "blanc",
+  "feeling": 2,
+  "mood": 2,
+  "body": 3,
+  "event_title": "Trophée des Vendanges — Stableford",
   "notes": null,
   "holes_data": [
    {
     "hole": 1,
     "par": 4,
-    "strokes": 5,
+    "strokes": 4,
     "putts": 2,
-    "fairway": "left",
-    "gir": 0,
+    "fairway": "hit",
+    "gir": 1,
     "penalties": 0,
-    "up_down": 0
+    "up_down": null
    },
    {
     "hole": 2,
     "par": 5,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
+    "strokes": 7,
+    "putts": 3,
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3817,37 +3922,37 @@
     "hole": 4,
     "par": 4,
     "strokes": 4,
-    "putts": 1,
-    "fairway": "right",
-    "gir": 0,
+    "putts": 2,
+    "fairway": "hit",
+    "gir": 1,
     "penalties": 0,
-    "up_down": 1
+    "up_down": null
    },
    {
     "hole": 5,
     "par": 3,
-    "strokes": 5,
-    "putts": 2,
+    "strokes": 2,
+    "putts": 1,
     "fairway": null,
-    "gir": 0,
+    "gir": 1,
     "penalties": 0,
-    "up_down": 0
+    "up_down": null
    },
    {
     "hole": 6,
     "par": 4,
-    "strokes": 6,
+    "strokes": 4,
     "putts": 2,
     "fairway": "hit",
-    "gir": 0,
+    "gir": 1,
     "penalties": 0,
-    "up_down": 0
+    "up_down": null
    },
    {
     "hole": 7,
     "par": 4,
     "strokes": 7,
-    "putts": 2,
+    "putts": 3,
     "fairway": "hit",
     "gir": 0,
     "penalties": 0,
@@ -3856,18 +3961,18 @@
    {
     "hole": 8,
     "par": 4,
-    "strokes": 5,
+    "strokes": 7,
     "putts": 2,
-    "fairway": "hit",
+    "fairway": "short",
     "gir": 0,
-    "penalties": 0,
+    "penalties": 1,
     "up_down": 0
    },
    {
     "hole": 9,
     "par": 5,
-    "strokes": 8,
-    "putts": 2,
+    "strokes": 6,
+    "putts": 1,
     "fairway": "hit",
     "gir": 0,
     "penalties": 0,
@@ -3876,17 +3981,17 @@
    {
     "hole": 10,
     "par": 5,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "left",
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
-    "up_down": 1
+    "up_down": 0
    },
    {
     "hole": 11,
     "par": 3,
-    "strokes": 5,
+    "strokes": 4,
     "putts": 2,
     "fairway": null,
     "gir": 0,
@@ -3896,9 +4001,9 @@
    {
     "hole": 12,
     "par": 4,
-    "strokes": 6,
-    "putts": 2,
-    "fairway": "right",
+    "strokes": 5,
+    "putts": 1,
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3906,39 +4011,39 @@
    {
     "hole": 13,
     "par": 4,
-    "strokes": 5,
-    "putts": 3,
+    "strokes": 4,
+    "putts": 1,
     "fairway": "hit",
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 14,
-    "par": 3,
-    "strokes": 2,
-    "putts": 1,
-    "fairway": null,
-    "gir": 1,
-    "penalties": 0,
-    "up_down": null
-   },
-   {
-    "hole": 15,
-    "par": 5,
-    "strokes": 5,
-    "putts": 1,
-    "fairway": "left",
     "gir": 0,
     "penalties": 0,
     "up_down": 1
    },
    {
+    "hole": 14,
+    "par": 3,
+    "strokes": 5,
+    "putts": 2,
+    "fairway": null,
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
+    "hole": 15,
+    "par": 5,
+    "strokes": 7,
+    "putts": 2,
+    "fairway": "right",
+    "gir": 0,
+    "penalties": 0,
+    "up_down": 0
+   },
+   {
     "hole": 16,
     "par": 4,
     "strokes": 5,
-    "putts": 2,
-    "fairway": "left",
+    "putts": 1,
+    "fairway": "hit",
     "gir": 0,
     "penalties": 0,
     "up_down": 0
@@ -3950,18 +4055,18 @@
     "putts": 2,
     "fairway": "right",
     "gir": 0,
-    "penalties": 1,
+    "penalties": 0,
     "up_down": 0
    },
    {
     "hole": 18,
     "par": 4,
-    "strokes": 3,
-    "putts": 0,
-    "fairway": "short",
+    "strokes": 6,
+    "putts": 1,
+    "fairway": "right",
     "gir": 0,
     "penalties": 0,
-    "up_down": 1
+    "up_down": 0
    }
   ]
  }
