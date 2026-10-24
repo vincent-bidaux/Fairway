@@ -24,6 +24,7 @@ import { SessionDetail } from './practice/screens/SessionDetail';
 import { SessionEditor } from './practice/screens/SessionEditor';
 import { SessionsList } from './practice/screens/SessionsList';
 import { StatDetail } from './practice/screens/StatDetail';
+import { HighlightsList } from './practice/screens/HighlightsList';
 
 export function App() {
   const { favorites } = usePrefs();
@@ -116,6 +117,7 @@ export function App() {
             {r.type === 'profile' && <ProfileEdit />}
             {r.type === 'stat' && <StatDetail metric={r.metric} />}
             {r.type === 'sessions' && <SessionsList kind={r.kind} />}
+            {r.type === 'highlights' && <HighlightsList />}
           </Page>
         ))}
 

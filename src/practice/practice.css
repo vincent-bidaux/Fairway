@@ -843,3 +843,5 @@
 
 .legend .legend-name { overflow: visible; white-space: normal; }
 .legend .legend-item { align-items: flex-start; }
+
+.tile-sub--extra { margin-top: 2px; }

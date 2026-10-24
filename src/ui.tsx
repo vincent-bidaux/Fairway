@@ -12,9 +12,10 @@ export type Route =
   | { type: 'session-editor'; kind?: SessionKind; session?: PlaySession }
   | { type: 'profile' }
   | { type: 'stat'; metric: StatMetric }
-  | { type: 'sessions'; kind?: SessionKind };
+  | { type: 'sessions'; kind?: SessionKind }
+  | { type: 'highlights' };
 
-export type StatMetric = 'score' | 'distribution' | 'byPar' | 'fairways' | 'gir' | 'putts' | 'upDown' | 'penalties' | 'index' | 'practice' | 'drills';
+export type StatMetric = 'score' | 'distribution' | 'byPar' | 'fairways' | 'gir' | 'putts' | 'upDown' | 'penalties' | 'index' | 'practice' | 'drills' | 'context';
 
 export interface Ui {
   push: (r: Route) => void;

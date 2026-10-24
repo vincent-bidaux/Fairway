@@ -324,3 +324,67 @@ button.hl:active {
     opacity: 0.6;
   }
 }
+
+/* Humeur, forme, météo */
+.ctxb {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+}
+.ctxb-title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--label2);
+}
+.ctxb-cols {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  align-items: end;
+}
+.ctxb-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+.ctxb-val {
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ctxb-bar {
+  display: block;
+  width: 62%;
+  max-width: 34px;
+  border-radius: 6px 6px 3px 3px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.ctxb-col.is-empty .ctxb-val {
+  color: var(--label3);
+}
+.ctxb-col.is-empty .ctxb-bar {
+  opacity: 0.22;
+}
+.ctxb-col.is-empty .ctx-badge {
+  opacity: 0.4;
+}
+.ctxb-n {
+  font-size: 10.5px;
+  color: var(--label2);
+  font-variant-numeric: tabular-nums;
+}
+.ctx-insight {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 500;
+}

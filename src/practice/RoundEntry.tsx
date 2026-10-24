@@ -447,7 +447,7 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
         />
         <CompetitionGroup s={s} onChange={(p) => update((x) => ({ ...x, ...p }))} />
         <BeforeGroup s={s} onChange={(p) => update((x) => ({ ...x, ...p }))} />
-        <Group title="Humeur">
+        <Group>
           <div className="row row--block ctx-row">
             <ContextPicker kind="mood" value={s.mood} onChange={(v) => update((x) => ({ ...x, mood: v }))} />
           </div>

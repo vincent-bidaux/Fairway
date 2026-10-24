@@ -67,7 +67,7 @@
   color: #fff;
   background: var(--ctx);
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
-  opacity: 0.55;
+  opacity: 0.88;
   transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
 }
 
@@ -78,7 +78,8 @@
 }
 
 .ctx-option.is-dim {
-  opacity: 0.3;
+  opacity: 0.38;
+  filter: saturate(0.7);
 }
 
 .ctx-option:active {

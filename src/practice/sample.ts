@@ -1,5 +1,5 @@
 // Données fictives pour l'aperçu grisé (utilisateur non connecté). Aucune n'est réelle.
-import type { PlaySession, RoundStats, StatsResponse } from '../../shared/practice';
+import type { Highlight, PlaySession, RoundStats, StatsResponse } from '../../shared/practice';
 import type { Profile } from './api';
 
 const iso = (daysAgo: number) => {
@@ -87,4 +87,8 @@ export const sampleSessions: PlaySession[] = [
   { ...base, id: 'a1', kind: 'round', golf_name: 'Golf de Démonstration', golf_city: 'La Rochelle', played_at: `${iso(5)}T09:30:00`, holes: 18, duration_min: null, balls: null, summary: { strokes: 91, par: 72, played: 18, putts: 32 } },
   { ...base, id: 'a2', kind: 'range', golf_name: 'Golf de Démonstration', golf_city: 'La Rochelle', played_at: `${iso(9)}T17:00:00`, holes: null, duration_min: 60, balls: 70 },
   { ...base, id: 'a3', kind: 'round', golf_name: 'Golf des Pins', golf_city: 'Royan', played_at: `${iso(19)}T10:00:00`, holes: 9, duration_min: null, balls: null, summary: { strokes: 47, par: 36, played: 9, putts: 16 } },
+];
+
+export const sampleHighlights: Highlight[] = [
+  { session_id: 'h1', hole: 7, par: 4, strokes: 3, putts: 1, fairway: 'hit', gir: 1, stroke_index: 5, kind: 'birdie', played_at: `${iso(12)}T10:00:00`, golf_id: 0, golf_name: 'Golf de Démonstration', golf_city: 'La Rochelle', course: '', event_title: 'Trophée des Vendanges', holes: 18, round_strokes: 91, round_rel: 19, weather: 4 },
 ];

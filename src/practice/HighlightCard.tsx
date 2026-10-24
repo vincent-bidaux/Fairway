@@ -4,6 +4,7 @@ import { ContextBadge } from './contextIcons';
 import { AwardBadge, KIND_LABEL } from './AwardBadge';
 import { TrophyGlyph } from './glyphs';
 import { HoleDiagram } from './HoleDiagram';
+import { useHolePlan } from './holePlan';
 import { golfLabel, initials, rel } from './statsFormat';
 import './highlights.css';
 
@@ -44,6 +45,7 @@ export interface CardPlayer {
 }
 
 export function HighlightCard({ h, player, onOpen, interactive = true }: { h: Highlight; player: CardPlayer; onOpen?: () => void; interactive?: boolean }) {
+  const real = useHolePlan(h.course === '' ? h.golf_id : null, h.hole);
   const title = highlightTitle(h);
   const recap = highlightRecap(h);
   const ctx = roundContext(h);
@@ -100,6 +102,7 @@ export function HighlightCard({ h, player, onOpen, interactive = true }: { h: Hi
           putts={h.putts}
           fairway={h.fairway}
           ace={h.kind === 'ace'}
+          real={real}
           label={`Schéma du trou ${h.hole}, par ${h.par}, ${h.strokes} coup${h.strokes > 1 ? 's' : ''}`}
         />
       </span>

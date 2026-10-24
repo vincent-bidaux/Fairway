@@ -13,7 +13,7 @@ export const CONTEXT_LABELS: Record<ContextKind, readonly string[]> = { mood: MO
 const COLORS: Record<ContextKind, string[]> = {
   mood: ['var(--red)', 'var(--orange)', 'var(--gray)', 'var(--teal)', 'var(--tint)'],
   body: ['var(--red)', 'var(--orange)', 'var(--gray)', 'var(--teal)', 'var(--tint)'],
-  weather: ['var(--indigo)', 'var(--blue)', 'var(--gray)', 'var(--cyan)', 'var(--orange)'],
+  weather: ['var(--indigo)', 'var(--blue)', 'var(--gray)', 'var(--cyan)', 'var(--sun, #f5b400)'],
 };
 
 export function contextColor(kind: ContextKind, level: number): string {
@@ -102,7 +102,7 @@ export function ContextGlyph({ kind, level, size = 24 }: { kind: ContextKind; le
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.7}
+      strokeWidth={size >= 28 ? 1.9 : 1.7}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -124,7 +124,7 @@ export function ContextBadge({ kind, level, size = 36, label }: { kind: ContextK
         role="img"
         aria-label={`${CONTEXT_TITLES[kind]} : ${text}`}
       >
-        <ContextGlyph kind={kind} level={level} size={Math.round(size * 0.62)} />
+        <ContextGlyph kind={kind} level={level} size={Math.round(size * 0.66)} />
       </span>
       {label && <span className="ctx-badge-label">{text}</span>}
     </span>
@@ -158,7 +158,7 @@ export function ContextPicker({ kind, value, onChange }: { kind: ContextKind; va
                 onChange(on ? null : level);
               }}
             >
-              <ContextGlyph kind={kind} level={level} size={26} />
+              <ContextGlyph kind={kind} level={level} size={32} />
             </button>
           );
         })}

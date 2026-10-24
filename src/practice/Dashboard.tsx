@@ -3,13 +3,15 @@ import type { ReactNode } from 'react';
 import type { RangeStats, RoundStats, StatsResponse } from '../../shared/practice';
 import { Icon } from '../components/Icon';
 import type { StatMetric } from '../ui';
+import { ContextBars, contextInsight, hasContext } from './ContextCard';
 import type { Profile } from './api';
 import { BarChart, DotRange, Legend, Ring, Sparkline, StackedBar, type Segment } from './charts';
-import { duration, fmtDateShort, nf, pctText, rel } from './statsFormat';
+import { birdieCaption, duration, fmtDateShort, nf, pctText, plural, practiceBuckets, rel } from './statsFormat';
 import './practice.css';
 
 export const MIN_ROUNDS = 3;
 const MINUS = '−';
+export type DashMetric = StatMetric | 'context';
 
 /** Écart avec la période précédente. better = sens qui est une amélioration. */
 export function Delta({ cur, prev, better, digits = 1, unit = '', label = 'vs période précédente' }: { cur: number | null; prev: number | null | undefined; better: 'up' | 'down'; digits?: number; unit?: string; label?: string }) {
@@ -37,9 +39,9 @@ function Tile({
 }: {
   title: string;
   color: string;
-  metric: StatMetric;
+  metric: DashMetric;
   wide?: boolean;
-  onOpen: (m: StatMetric) => void;
+  onOpen: (m: DashMetric) => void;
   children: ReactNode;
   hint?: string;
 }) {
@@ -95,7 +97,7 @@ export function lastWeeks(range: RangeStats, n = 12): Array<{ week: string; minu
   return out;
 }
 
-export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; profile: Profile | null; onOpen: (m: StatMetric) => void }) {
+export function Dashboard({ stats, profile, onOpen, totalRanges = 0 }: { stats: StatsResponse; profile: Profile | null; onOpen: (m: DashMetric) => void; totalRanges?: number }) {
   const r = stats.rounds;
   const p = stats.prevRounds;
   const enough = r.count >= MIN_ROUNDS;
@@ -103,7 +105,7 @@ export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; pr
   const history = profile?.index_history ?? [];
   const lastIdx = history[history.length - 1];
   const prevIdx = history.length > 1 ? history[history.length - 2] : null;
-  const weeks = lastWeeks(stats.range, 12);
+  const { buckets, unit } = practiceBuckets(stats.range.weekly, stats.period, stats.from, stats.to);
   const drills = stats.range.drills
     .filter((d) => d.category === 'putting' && d.points.length > 0)
     .sort((a, b) => (a.distance_m ?? 99) - (b.distance_m ?? 99))
@@ -137,6 +139,7 @@ export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; pr
               <span className="tile-sub">{total ? `${total} trous joués` : 'Aucun trou saisi'}</span>
               <StackedBar segments={segs} height={16} />
               <Legend segments={segs} columns={3} />
+              {birdieCaption(r.dist) && <span className="tile-sub tile-sub--extra">Birdie+ : {birdieCaption(r.dist)}</span>}
             </>
           );
         })()}
@@ -236,23 +239,42 @@ export function Dashboard({ stats, profile, onOpen }: { stats: StatsResponse; pr
       </Tile>
 
       <Tile title="Practice" color="var(--blue)" metric="practice" wide onOpen={onOpen}>
-        <span className="tile-row">
+        {stats.range.count === 0 ? (
           <span className="tile-col">
-            <Value dim={stats.range.count === 0}>{stats.range.count ? duration(stats.range.minutes) : '—'}</Value>
+            <Value dim>{'\u2014'}</Value>
             <span className="tile-sub">
-              {stats.range.count} {stats.range.count > 1 ? 'séances' : 'séance'} · {stats.range.balls.toLocaleString('fr-FR')} balles
+              Aucune séance de practice sur la période{totalRanges > 0 ? ` · ${plural(totalRanges, 'séance')} au total` : ''}
             </span>
           </span>
-        </span>
-        <BarChart
-          bars={weeks.map((w, i) => ({ key: w.week, value: w.minutes, axis: i % 4 === 0 ? fmtDateShort(w.week) : '' }))}
-          height={112}
-          minMax={60}
-          color="var(--blue)"
-          yFormat={(n) => `${n}`}
-          ariaLabel={`Minutes de practice par semaine, ${weeks.length} dernières semaines : ${stats.range.minutes} minutes au total`}
-        />
+        ) : (
+          <>
+            <span className="tile-row">
+              <span className="tile-col">
+                <Value>{duration(stats.range.minutes)}</Value>
+                <span className="tile-sub">
+                  {plural(stats.range.count, 'séance')} · {plural(stats.range.balls, 'balle')}
+                </span>
+              </span>
+            </span>
+            <BarChart
+              bars={buckets.map((w) => ({ key: w.key, value: w.minutes, axis: w.label }))}
+              height={112}
+              minMax={unit === 'week' ? 60 : 90}
+              color="var(--blue)"
+              yFormat={(n) => `${n}`}
+              ariaLabel={`Minutes de practice par ${unit === 'week' ? 'semaine' : 'mois'} : ${stats.range.minutes} minutes au total`}
+            />
+          </>
+        )}
       </Tile>
+
+      {hasContext(r.context) && (
+        <Tile title="Humeur, forme et météo" color="var(--pink)" metric="context" wide onOpen={onOpen}>
+          <span className="tile-sub">Score moyen selon vos conditions de jeu</span>
+          <ContextBars ctx={r.context} size={26} />
+          {contextInsight(r.context) && <span className="ctx-insight">{contextInsight(r.context)}</span>}
+        </Tile>
+      )}
 
       <Tile title="Exercices de putting" color="var(--pink)" metric="drills" wide onOpen={onOpen}>
         {drills.length === 0 ? (

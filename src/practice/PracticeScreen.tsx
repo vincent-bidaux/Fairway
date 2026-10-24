@@ -1,17 +1,19 @@
 // Onglet « Mes parties » : tableau de bord (connecté) ou aperçu grisé + invitation (non connecté).
 import { useEffect, useRef, useState } from 'react';
-import type { PlaySession, StatsPeriod, StatsResponse } from '../../shared/practice';
+import type { Highlight, PlaySession, StatsPeriod, StatsResponse } from '../../shared/practice';
 import { Group, Row, Segmented, Spinner } from '../components/Controls';
 import { Icon } from '../components/Icon';
 import { NavIconButton, Screen } from '../components/Screen';
 import { EmptyState, ErrorState } from '../components/States';
 import { PARTIES_LABEL } from '../components/TabBar';
-import { useUi } from '../ui';
+import { useUi, type Route, type StatMetric } from '../ui';
 import { useAccount, useDataVersion } from './account';
 import { getProfile, getStats, listSessions, type Profile } from './api';
-import { Dashboard } from './Dashboard';
+import { Dashboard, type DashMetric } from './Dashboard';
+import { HighlightCarousel } from './HighlightCarousel';
+import { getHighlights } from './highlightsApi';
 import { PlayerCard } from './PlayerCard';
-import { sampleProfile, sampleSessions, sampleStats } from './sample';
+import { sampleHighlights, sampleProfile, sampleSessions, sampleStats } from './sample';
 import { SessionCell } from './SessionCell';
 import { PERIODS, readPeriod, writePeriod } from './statsFormat';
 import './practice.css';
@@ -19,6 +21,7 @@ import './practice.css';
 interface Loaded {
   profile: Profile | null;
   sessions: PlaySession[];
+  highlights: Highlight[];
 }
 
 export function PracticeScreen({ active: _active }: { active: boolean }) {
@@ -42,10 +45,10 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
       return;
     }
     let live = true;
-    Promise.all([getProfile().catch(() => null), listSessions()])
-      .then(([profile, sessions]) => {
+    Promise.all([getProfile().catch(() => null), listSessions(), getHighlights(20).catch(() => [] as Highlight[])])
+      .then(([profile, sessions, highlights]) => {
         if (!live) return;
-        setData({ profile, sessions });
+        setData({ profile, sessions, highlights });
         setError(null);
       })
       .catch((e: Error) => live && setError(e.message));
@@ -96,6 +99,7 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
               <div className="pr-period">
                 <Segmented value="6m" options={[...PERIODS]} onChange={() => {}} label="Période" />
               </div>
+              <HighlightCarousel items={sampleHighlights} player={{ name: sampleProfile.display_name ?? '', photo: null }} onOpen={() => {}} onAll={() => {}} interactive={false} />
               <Dashboard stats={sampleStats} profile={sampleProfile} onOpen={() => {}} />
               <Group title="Dernières séances">
                 {sampleSessions.map((s) => (
@@ -173,8 +177,16 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
           <div className="pr-period">
             <Segmented value={period} options={[...PERIODS]} onChange={onPeriod} label="Période" />
           </div>
+          {data.highlights.length > 0 && (
+            <HighlightCarousel
+              items={data.highlights}
+              player={{ name: data.profile?.display_name?.trim() || me.user.name, photo: data.profile?.photo ?? null }}
+              onOpen={(id) => ui.push({ type: 'session', id })}
+              onAll={() => ui.push({ type: 'highlights' } as unknown as Route)}
+            />
+          )}
           <div className={statsBusy ? 'pr-busy' : undefined} aria-busy={statsBusy}>
-            <Dashboard stats={stats} profile={data.profile} onOpen={(metric) => ui.push({ type: 'stat', metric })} />
+            <Dashboard stats={stats} profile={data.profile} totalRanges={me.ranges} onOpen={(metric: DashMetric) => ui.push({ type: 'stat', metric: metric as StatMetric })} />
           </div>
 
           <Group title="Dernières séances">
