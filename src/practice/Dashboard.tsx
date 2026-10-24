@@ -139,7 +139,7 @@ export function Dashboard({ stats, profile, onOpen, totalRanges = 0 }: { stats: 
               <span className="tile-sub">{total ? `${total} trous joués` : 'Aucun trou saisi'}</span>
               <StackedBar segments={segs} height={16} />
               <Legend segments={segs} columns={3} />
-              {birdieCaption(r.dist) && <span className="tile-sub tile-sub--extra">Birdie+ : {birdieCaption(r.dist)}</span>}
+              {birdieCaption(r.dist) && <span className="tile-sub tile-sub--extra">Birdie+ {birdieCaption(r.dist)}</span>}
             </>
           );
         })()}
@@ -259,7 +259,7 @@ export function Dashboard({ stats, profile, onOpen, totalRanges = 0 }: { stats: 
             <BarChart
               bars={buckets.map((w) => ({ key: w.key, value: w.minutes, axis: w.label }))}
               height={112}
-              minMax={unit === 'week' ? 60 : 90}
+              minMax={60}
               color="var(--blue)"
               yFormat={(n) => `${n}`}
               ariaLabel={`Minutes de practice par ${unit === 'week' ? 'semaine' : 'mois'} : ${stats.range.minutes} minutes au total`}

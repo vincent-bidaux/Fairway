@@ -17,7 +17,7 @@ export const highlightDate = (playedAt: string) => {
 };
 
 export function highlightTitle(h: Pick<Highlight, 'kind' | 'hole'>): string {
-  return `${KIND_LABEL[h.kind]} au trou ${h.hole}`;
+  return h.kind === 'ace' ? `Trou en un au ${h.hole}` : `${KIND_LABEL[h.kind]} au trou ${h.hole}`;
 }
 
 /** Phrase de récap générée à partir des données du trou. */
@@ -66,7 +66,7 @@ export function HighlightCard({ h, player, onOpen, interactive = true }: { h: Hi
     <Tag type={interactive ? 'button' : undefined} className={`hl hl--${tone}`} onClick={interactive ? onOpen : undefined} aria-label={interactive ? summary : undefined} aria-hidden={interactive ? undefined : true}>
       <span className="hl-head">
         <span className="hl-badge">
-          <AwardBadge kind={h.kind as HighlightKind} size={84} />
+          <AwardBadge kind={h.kind as HighlightKind} size={78} />
           <span className="hl-kind">{KIND_LABEL[h.kind]}</span>
         </span>
         <span className="hl-titles">
@@ -74,20 +74,22 @@ export function HighlightCard({ h, player, onOpen, interactive = true }: { h: Hi
           <span className="hl-date">{highlightDate(h.played_at)}</span>
           <span className="hl-golf">
             {golf}
-            {h.golf_city ? <span> · {h.golf_city}</span> : null}
+            {h.golf_city ? <span>{h.golf_city}</span> : null}
           </span>
         </span>
       </span>
 
-      {(h.event_title || h.weather != null) && (
+      {h.event_title && (
         <span className="hl-meta">
-          {h.event_title && (
-            <span className="hl-event">
-              <TrophyGlyph size={14} />
-              <span>{h.event_title}</span>
-            </span>
-          )}
-          {h.weather != null && <ContextBadge kind="weather" level={h.weather} size={26} />}
+          <span className="hl-event">
+            <TrophyGlyph size={14} />
+            <span>{h.event_title}</span>
+          </span>
+        </span>
+      )}
+      {h.weather != null && (
+        <span className="hl-weather">
+          <ContextBadge kind="weather" level={h.weather} size={28} />
         </span>
       )}
 

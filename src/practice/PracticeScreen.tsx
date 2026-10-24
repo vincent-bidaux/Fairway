@@ -6,7 +6,7 @@ import { Icon } from '../components/Icon';
 import { NavIconButton, Screen } from '../components/Screen';
 import { EmptyState, ErrorState } from '../components/States';
 import { PARTIES_LABEL } from '../components/TabBar';
-import { useUi, type Route, type StatMetric } from '../ui';
+import { useUi } from '../ui';
 import { useAccount, useDataVersion } from './account';
 import { getProfile, getStats, listSessions, type Profile } from './api';
 import { Dashboard, type DashMetric } from './Dashboard';
@@ -182,11 +182,11 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
               items={data.highlights}
               player={{ name: data.profile?.display_name?.trim() || me.user.name, photo: data.profile?.photo ?? null }}
               onOpen={(id) => ui.push({ type: 'session', id })}
-              onAll={() => ui.push({ type: 'highlights' } as unknown as Route)}
+              onAll={() => ui.push({ type: 'highlights' })}
             />
           )}
           <div className={statsBusy ? 'pr-busy' : undefined} aria-busy={statsBusy}>
-            <Dashboard stats={stats} profile={data.profile} totalRanges={me.ranges} onOpen={(metric: DashMetric) => ui.push({ type: 'stat', metric: metric as StatMetric })} />
+            <Dashboard stats={stats} profile={data.profile} totalRanges={me.ranges} onOpen={(metric: DashMetric) => ui.push({ type: 'stat', metric })} />
           </div>
 
           <Group title="Dernières séances">

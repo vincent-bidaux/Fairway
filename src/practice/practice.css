@@ -845,3 +845,31 @@
 .legend .legend-item { align-items: flex-start; }
 
 .tile-sub--extra { margin-top: 2px; }
+
+.pcard-licence {
+  font-size: 12px;
+  opacity: 0.72;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2px;
+}
+.sess-title-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.sess-title-row .sess-title {
+  min-width: 0;
+}
+.sess-trophy {
+  flex: none;
+  display: inline-flex;
+  color: var(--orange);
+}
+
+.tile .chart-readout { min-height: 0; }
+.legend-dot { margin-top: 3px; }
+
+.sess-sub { display: flex; }
+.sess-sub-golf { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.sess-sub-date { flex: none; white-space: pre; }

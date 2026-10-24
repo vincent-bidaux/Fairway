@@ -74,6 +74,7 @@ export function PlayerCard({
             <span className="pcard-club">
               {club.length ? club.join(' · ') : 'Ajoutez votre golf d’attache'}
             </span>
+            {profile?.licence && <span className="pcard-licence">Licence ffgolf {profile.licence}</span>}
           </span>
           <Icon name="chevron" size={14} strokeWidth={2.8} className="pcard-chev" />
         </button>

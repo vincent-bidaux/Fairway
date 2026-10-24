@@ -6,11 +6,12 @@ import { BackButton, Screen } from '../../components/Screen';
 import { ErrorState } from '../../components/States';
 import type { StatMetric } from '../../ui';
 import { useUi } from '../../ui';
-import { useDataVersion } from '../account';
+import { useAccount, useDataVersion } from '../account';
 import { getProfile, getStats, type Profile } from '../api';
+import { ContextBars, contextInsight, hasContext } from '../ContextCard';
 import { BarChart, DotRange, Legend, LineChart, Ring, StackedBar, type LinePoint } from '../charts';
-import { Delta, MIN_ROUNDS, distSegments, fairwaySegments, lastWeeks } from '../Dashboard';
-import { PERIODS, duration, fmtDateShort, fmtDateShortYear, nf, parseLocal, pctText, readPeriod, rel, writePeriod } from '../statsFormat';
+import { Delta, MIN_ROUNDS, distSegments, fairwaySegments } from '../Dashboard';
+import { PERIODS, birdieCaption, duration, plural, practiceBuckets, fmtDateShort, fmtDateShortYear, nf, parseLocal, pctText, readPeriod, rel, writePeriod } from '../statsFormat';
 import '../practice.css';
 
 interface Meta {
@@ -96,6 +97,14 @@ const META: Record<StatMetric, Meta> = {
     color: 'var(--blue)',
     explain: ['Temps passé et balles frappées lors de vos séances de practice, semaine par semaine (du lundi au dimanche).'],
   },
+  context: {
+    title: 'Humeur, forme et météo',
+    color: 'var(--pink)',
+    explain: [
+      'Score moyen (relatif au par, ramené à 18 trous) de vos parties selon l’humeur, la forme physique et la météo que vous avez notées. Plus la barre est basse, mieux vous avez joué.',
+      'Les niveaux sans partie sont grisés. Renseignez ces trois notes à chaque partie pour affiner la comparaison.',
+    ],
+  },
   drills: {
     title: 'Exercices',
     color: 'var(--pink)',
@@ -103,7 +112,6 @@ const META: Record<StatMetric, Meta> = {
   },
 };
 
-const PERIOD_WEEKS: Record<StatsPeriod, number | null> = { '1m': 5, '3m': 13, '6m': 26, '1y': 52, all: null };
 
 function useStatsData(period: StatsPeriod) {
   const version = useDataVersion();
@@ -261,6 +269,7 @@ function Body({ metric, stats, profile, period }: { metric: StatMetric; stats: S
         <>
           <Card>
             <Big value={total} unit="trous joués" />
+            {birdieCaption(r.dist) && <p className="sd-note" style={{ marginTop: 4 }}>Birdie ou mieux {birdieCaption(r.dist)}.</p>}
             <div style={{ marginTop: 14 }}>
               <StackedBar segments={segs} height={22} gap={3} />
             </div>
@@ -285,6 +294,17 @@ function Body({ metric, stats, profile, period }: { metric: StatMetric; stats: S
             })}
           </Group>
         </>
+      );
+    }
+
+    case 'context': {
+      if (!hasContext(r.context)) return <Card><Notice>Renseignez l’humeur, la forme et la météo sur au moins deux niveaux différents pour voir la comparaison.</Notice></Card>;
+      const insight = contextInsight(r.context);
+      return (
+        <Card>
+          {insight && <p className="ctx-insight" style={{ marginTop: 0, marginBottom: 14, fontSize: 16, fontWeight: 600 }}>{insight}</p>}
+          <ContextBars ctx={r.context} size={34} />
+        </Card>
       );
     }
 
@@ -499,16 +519,18 @@ const toIsoLocal = (t: number) => {
 function PracticeBody({ stats, period, color }: { stats: StatsResponse; period: StatsPeriod; color: string }) {
   const [what, setWhat] = useState<'minutes' | 'balls'>('minutes');
   const rg = stats.range;
-  let n = PERIOD_WEEKS[period];
-  if (n == null) {
-    const first = rg.weekly[0]?.week;
-    n = first ? Math.min(104, Math.max(12, Math.ceil((Date.now() - parseLocal(first).getTime()) / (7 * 86400000)) + 1)) : 12;
-  }
-  const weeks = lastWeeks(rg, n);
-  const every = Math.max(1, Math.ceil(weeks.length / 5));
-  const weekCount = weeks.length;
-  if (rg.count === 0) return <Card><Notice>Aucune séance de practice sur cette période.</Notice></Card>;
-  const val = (w: (typeof weeks)[number]) => (what === 'minutes' ? w.minutes : w.balls);
+  const account = useAccount();
+  const total = account.status === 'in' ? account.me.ranges : 0;
+  const { buckets, unit } = practiceBuckets(rg.weekly, period, stats.from, stats.to);
+  if (rg.count === 0)
+    return (
+      <Card>
+        <Notice>
+          Aucune séance de practice sur la période{total > 0 ? ` · ${plural(total, 'séance')} au total` : ''}.
+        </Notice>
+      </Card>
+    );
+  const val = (w: (typeof buckets)[number]) => (what === 'minutes' ? w.minutes : w.balls);
   return (
     <Card>
       <Big value={what === 'minutes' ? duration(rg.minutes) : rg.balls.toLocaleString('fr-FR')} unit={what === 'minutes' ? `en ${rg.count} séance${rg.count > 1 ? 's' : ''}` : 'balles frappées'} color={color} />
@@ -517,16 +539,16 @@ function PracticeBody({ stats, period, color }: { stats: StatsResponse; period: 
         <Segmented value={what} onChange={setWhat} label="Mesure" options={[{ value: 'minutes', label: 'Minutes' }, { value: 'balls', label: 'Balles' }]} />
       </div>
       <BarChart
-        bars={weeks.map((w, i) => ({ key: w.week, value: val(w), axis: i % every === 0 ? fmtDateShort(w.week) : '' }))}
+        bars={buckets.map((w) => ({ key: w.key, value: val(w), axis: w.label }))}
         height={200}
         color={color}
-        minMax={what === 'minutes' ? 60 : 50}
+        minMax={unit === 'week' ? (what === 'minutes' ? 60 : 50) : what === 'minutes' ? 90 : 80}
         yFormat={(v) => `${v}`}
-        ariaLabel={`${what === 'minutes' ? 'Minutes' : 'Balles'} de practice par semaine sur ${weekCount} semaines`}
-        placeholder="Touchez une barre pour voir une semaine"
+        ariaLabel={`${what === 'minutes' ? 'Minutes' : 'Balles'} de practice par ${unit === 'week' ? 'semaine' : 'mois'}`}
+        placeholder={`Touchez une barre pour voir ${unit === 'week' ? 'une semaine' : 'un mois'}`}
         describe={(b) => (
           <>
-            <span>Semaine du {fmtDateShort(b.key)}</span>
+            <span>{buckets.find((x) => x.key === b.key)?.long ?? b.key}</span>
             <span>
               <b>{what === 'minutes' ? duration(b.value) : `${b.value} balles`}</b>
             </span>

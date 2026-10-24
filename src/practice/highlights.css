@@ -48,7 +48,7 @@ button.hl:active {
 .hl-head {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 .hl-badge {
   flex: none;
@@ -56,7 +56,7 @@ button.hl:active {
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  width: 88px;
+  width: 80px;
 }
 .hl-kind {
   font-size: 11px;
@@ -72,7 +72,7 @@ button.hl:active {
   min-width: 0;
 }
 .hl-title {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.12;
   font-weight: 800;
   letter-spacing: -0.4px;
@@ -80,13 +80,16 @@ button.hl:active {
 .hl-date {
   font-size: 14px;
   color: var(--label2);
-  text-transform: capitalize;
+}
+.hl-date::first-letter {
+  text-transform: uppercase;
 }
 .hl-golf {
   font-size: 14px;
   font-weight: 600;
 }
 .hl-golf span {
+  display: block;
   font-weight: 400;
   color: var(--label2);
 }
@@ -196,9 +199,9 @@ button.hl:active {
 }
 .hl-section-head {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 0 calc(var(--gutter) + 4px) 8px;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0 calc(var(--gutter) + 4px) 10px;
 }
 .hl-section-head h3 {
   margin: 0;
@@ -387,4 +390,16 @@ button.hl:active {
   font-size: 14px;
   line-height: 1.4;
   font-weight: 500;
+}
+
+.hl-weather {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+.hl-titles {
+  padding-right: 22px;
+}
+.hl-meta {
+  justify-content: flex-start;
 }
