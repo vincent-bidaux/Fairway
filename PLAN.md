@@ -72,6 +72,12 @@ D1 « fairway-db » : departments · golfs · sources · events · crawl_runs
       La carte de situation passe juste avant la photo. Sans plan, la fiche est inchangée.
 - [x] API : `GET /api/plans/:slug`, champ `planLevel` sur les golfs ; admin : `GET /api/admin/plans`, `POST /api/admin/plans/refresh?limit=&slug=&force=1`.
 - [ ] Après le premier passage complet : relire les golfs « inexistant » (mauvais tracé rattaché ?) et ceux sans tracé.
+- [ ] **Extension à toute la France : extraction par téléchargement plutôt que par Overpass.** Les serveurs Overpass publics
+      limitent les requêtes par IP (les Workers partagent les IP de Cloudflare) : environ 5 golfs par heure en Nouvelle-Aquitaine.
+      Méthode prévue : un workflow GitHub Actions mensuel télécharge l'export France de Geofabrik (`france-latest.osm.pbf`),
+      filtre avec osmium (`leisure=golf_course`, `golf=*`, eau et bois autour), construit les plans avec le code de
+      `worker/plans/osm.ts` (à partager en module), puis les écrit dans D1 avec wrangler (secret `CLOUDFLARE_API_TOKEN`).
+      Le cron Overpass reste pour mettre à jour un golf isolé.
 
 ## Sprint 1 — mise en production (à faire)
 
