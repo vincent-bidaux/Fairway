@@ -22,7 +22,7 @@ interface SeedGolf {
 }
 
 /** Bump when db/seed/*.json changes: the next cron re-applies the seed (upsert, nothing is deleted). */
-export const SEED_VERSION = '2026-10-23.4';
+export const SEED_VERSION = '2026-10-24.1';
 
 interface SeedSource {
   label: string;
@@ -80,18 +80,18 @@ export async function applySeed(env: Env) {
     );
   }
   // Pars officiels (cartes de score des clubs). Une correction votée par les joueurs n'est jamais écrasée.
-  for (const [slug, h] of Object.entries(holesSeed as Record<string, { source_url: string; pars: number[]; stroke_index: number[] | null }>)) {
+  for (const [slug, h] of Object.entries(holesSeed as Record<string, { source?: string; source_url: string; pars: number[]; stroke_index: number[] | null }>)) {
     h.pars.forEach((par, i) => {
       stmts.push(
         db
           .prepare(
             `INSERT INTO golf_holes (golf_id, course, hole, par, stroke_index, source, source_url)
-             SELECT id, '', ?, ?, ?, 'club', ? FROM golfs WHERE slug = ?
+             SELECT id, '', ?, ?, ?, ?, ? FROM golfs WHERE slug = ?
              ON CONFLICT(golf_id, course, hole) DO UPDATE SET par = excluded.par, stroke_index = excluded.stroke_index,
-               source = 'club', source_url = excluded.source_url, updated_at = datetime('now')
+               source = excluded.source, source_url = excluded.source_url, updated_at = datetime('now')
              WHERE golf_holes.source <> 'players'`,
           )
-          .bind(i + 1, par, h.stroke_index?.[i] ?? null, h.source_url, slug),
+          .bind(i + 1, par, h.stroke_index?.[i] ?? null, h.source === 'osm' ? 'osm' : 'club', h.source_url, slug),
       );
     });
   }

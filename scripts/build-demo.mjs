@@ -200,6 +200,7 @@ const EVENTS = {
 const FORCED = [
   ['2025-08-09', 6, 1], // trou en un au par 3 de La Palmyre
   ['2026-04-11', 9, 3], // eagle au par 5 du 9 à La Prée
+  ['2025-08-23', 4, 2], // birdie au par 3 de Royan (plan OSM réel)
   ['2025-11-15', 4, 2], // birdie au par 3
   ['2026-05-30', 1, 4], // birdie au par 5 d'Oléron
   ['2026-07-11', 15, 4], // birdie au par 5

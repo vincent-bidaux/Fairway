@@ -136,17 +136,17 @@
   ]
  },
  "golf-de-trousse-chemise-les-portes-en-re": {
-  "source": "estimé (parcours type) — à remplacer par la vraie carte",
+  "source": "OpenStreetMap",
   "pars": [
    4,
+   4,
    3,
    5,
    4,
-   4,
    3,
-   4,
    5,
-   4
+   4,
+   3
   ]
  },
  "la-palmyre-golf-resort-la-palmyre": {
@@ -164,26 +164,26 @@
   ]
  },
  "golf-de-royan-saint-palais-sur-mer": {
-  "source": "estimé (total par 72 officiel)",
+  "source": "OpenStreetMap",
   "pars": [
    4,
    4,
+   5,
    3,
+   4,
+   4,
+   4,
+   3,
+   4,
    5,
    4,
    4,
-   3,
-   4,
    5,
    4,
    4,
-   3,
-   5,
-   4,
    4,
    3,
-   4,
-   5
+   4
   ]
  },
  "golf-de-saintes-fontcouverte": {

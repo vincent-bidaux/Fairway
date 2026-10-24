@@ -374,5 +374,46 @@
    6,
    4
   ]
+ },
+ "golf-de-royan-saint-palais-sur-mer": {
+  "source": "osm",
+  "source_url": "https://www.openstreetmap.org/",
+  "pars": [
+   4,
+   4,
+   5,
+   3,
+   4,
+   4,
+   4,
+   3,
+   4,
+   5,
+   4,
+   4,
+   5,
+   4,
+   4,
+   4,
+   3,
+   4
+  ],
+  "stroke_index": null
+ },
+ "golf-de-trousse-chemise-les-portes-en-re": {
+  "source": "osm",
+  "source_url": "https://www.openstreetmap.org/",
+  "pars": [
+   4,
+   4,
+   3,
+   5,
+   4,
+   3,
+   5,
+   4,
+   3
+  ],
+  "stroke_index": null
  }
 }
