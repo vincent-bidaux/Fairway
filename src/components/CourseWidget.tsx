@@ -6,7 +6,9 @@ import { Sheet } from './Sheet';
 
 const ORDER: PlanLayer[] = ['rough', 'scrub', 'wood', 'water', 'fairway', 'driving_range', 'tee', 'bunker', 'green'];
 const MAX_ZOOM = 8;
-const HOLE_ASPECT = 4 / 5;
+/** Stage shape, shared by the course view and the hole view so the widget never changes size. */
+const MIN_ASPECT = 0.78;
+const MAX_ASPECT = 1.2;
 
 type Box = { x: number; y: number; w: number; h: number };
 type Pt = [number, number];
@@ -51,7 +53,7 @@ const PlanBase = memo(function PlanBase({ plan }: { plan: CoursePlan }) {
 });
 
 /** Rotation qui met le départ en bas et le green en haut. */
-function holeFrame(h: PlanHole) {
+function holeFrame(h: PlanHole, aspect: number) {
   const p = pts(h.line);
   const t = p[0], e = p[p.length - 1];
   const theta = -Math.PI / 2 - Math.atan2(e[1] - t[1], e[0] - t[0]);
@@ -61,9 +63,11 @@ function holeFrame(h: PlanHole) {
   const xs = rp.map((q) => q[0]), ys = rp.map((q) => q[1]);
   const minY = Math.min(...ys) - 45, maxY = Math.max(...ys) + 30;
   const h0 = maxY - minY;
-  const w0 = Math.max(Math.max(...xs) - Math.min(...xs) + 90, h0 * HOLE_ASPECT);
+  // same shape as the course view: widen around the line, or add room above and below
+  const w0 = Math.max(Math.max(...xs) - Math.min(...xs) + 90, h0 * aspect);
+  const hh = Math.max(h0, w0 / aspect);
   const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-  const box: Box = { x: cx - w0 / 2, y: minY, w: w0, h: Math.max(h0, w0 / HOLE_ASPECT) };
+  const box: Box = { x: cx - w0 / 2, y: minY - (hh - h0) / 2, w: w0, h: hh };
   // distance marks from the green, measured back along the line
   const total = lineLen(p);
   const marks: Array<{ m: number; at: Pt }> = [];
@@ -95,9 +99,9 @@ function courseBox(plan: CoursePlan): Box {
   plan.holes.forEach((h) => add(h.line));
   const pad = Math.max(x1 - x0, y1 - y0) * 0.04 + 12;
   let w = x1 - x0 + 2 * pad, h = y1 - y0 + 2 * pad;
-  // keep the stage between portrait 0.7 and landscape 1.8
-  if (w / h < 0.7) w = h * 0.7;
-  if (w / h > 1.8) h = w / 1.8;
+  // keep the stage between a slightly tall and a slightly wide shape (the hole view uses the same one)
+  if (w / h < MIN_ASPECT) w = h * MIN_ASPECT;
+  if (w / h > MAX_ASPECT) h = w / MAX_ASPECT;
   return { x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - h / 2, w, h };
 }
 
@@ -265,8 +269,8 @@ export function CourseWidget({ plan, lat, lng }: Props) {
     [plan, loop],
   );
   const current = hole != null ? loopHoles[hole] : undefined;
-  const hf = useMemo(() => (current ? holeFrame(current) : null), [current]);
   const cBox = useMemo(() => courseBox(plan), [plan]);
+  const hf = useMemo(() => (current ? holeFrame(current, cBox.w / cBox.h) : null), [current, cBox]);
   const base = hf ? hf.box : cBox;
 
   const step = useCallback(
@@ -283,7 +287,7 @@ export function CourseWidget({ plan, lat, lng }: Props) {
 
   const level = plan.quality.level;
   const loopInfo = loops[loop];
-  const title = current ? `Trou ${current.ref}` : 'Plan du parcours';
+  const title = current ? `Trou n° ${current.ref}` : 'Plan du parcours';
   const sub = current
     ? [current.par ? `Par ${current.par}` : null, current.hcp ? `Index ${current.hcp}` : null, `${current.len} m`].filter(Boolean).join(' · ')
     : loopInfo
@@ -291,8 +295,8 @@ export function CourseWidget({ plan, lat, lng }: Props) {
       : 'Trous non tracés';
   const u = zp.u;
   // header + loop tabs + « Parcours » + rows of holes (9 per row): keeps the whole widget within the screen
-  const chrome = 60 + (loops.length > 1 ? 46 : 0) + 58 + Math.max(1, Math.ceil(loopHoles.length / 9)) * 44;
-  const aspect = `${base.w} / ${base.h}`;
+  const chrome = 60 + (loops.length > 1 ? 46 : 0) + 16 + Math.max(1, Math.ceil(loopHoles.length / 9)) * 36;
+  const aspect = `${cBox.w} / ${cBox.h}`;
   const others = plan.holes.filter((h) => h.loop !== loop);
 
   const pick = (h: PlanHole) => {
@@ -308,7 +312,12 @@ export function CourseWidget({ plan, lat, lng }: Props) {
 
   return (
     <section className="cw" aria-label="Plan du parcours" style={{ '--cw-chrome': `${chrome}px` } as CSSProperties}>
-      <header className="cw-head">
+      <header className={`cw-head${current ? ' has-back' : ''}`}>
+        {current && (
+          <button type="button" className="cw-back" aria-label="Retour au plan du parcours" onClick={() => setHole(null)}>
+            <Icon name="chevron" size={20} strokeWidth={2.6} />
+          </button>
+        )}
         <div className="cw-titles">
           <h3 className="cw-title">{title}</h3>
           <p className="cw-sub">{sub}</p>
@@ -432,17 +441,12 @@ export function CourseWidget({ plan, lat, lng }: Props) {
       </div>
 
       <div className="cw-holes">
-        <button type="button" className={`cw-all${hole == null ? ' is-cur' : ''}`} aria-pressed={hole == null} onClick={() => setHole(null)}>
-          <Icon name="map" size={15} strokeWidth={2} />
-          Parcours
-        </button>
-        {loopHoles.length > 0 && (
-          <HoleGrid
-            items={loopHoles.map((h, i) => ({ key: i, label: h.ref, aria: `Trou ${h.ref}${h.par ? `, par ${h.par}` : ''}` }))}
-            current={hole}
-            onPick={(i) => setHole(i)}
-          />
-        )}
+        <HoleGrid
+          lead={{ label: 'Parcours', aria: 'Plan du parcours', onPick: () => setHole(null) }}
+          items={loopHoles.map((h, i) => ({ key: i, label: h.ref, aria: `Trou ${h.ref}${h.par ? `, par ${h.par}` : ''}` }))}
+          current={hole}
+          onPick={(i) => setHole(i)}
+        />
       </div>
 
       <QualitySheet open={infoOpen} onClose={() => setInfoOpen(false)} plan={plan} lat={lat} lng={lng} />

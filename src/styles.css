@@ -2118,6 +2118,29 @@ input[type='range']::-moz-range-thumb {
   min-height: 60px;
 }
 
+.cw-head.has-back {
+  padding-left: 4px;
+  gap: 2px;
+}
+
+.cw-back {
+  flex-shrink: 0;
+  width: 40px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  color: var(--tint);
+}
+
+.cw-back svg {
+  transform: scaleX(-1);
+}
+
+.cw-back:active {
+  opacity: 0.5;
+}
+
 .cw-titles {
   flex: 1;
   min-width: 0;
@@ -2377,20 +2400,22 @@ input[type='range']::-moz-range-thumb {
 
 
 /* ---------- Sélecteur de trous (HoleGrid) : 9 par ligne, en quinconce ---------- */
+/* --dot : diamètre d'une pastille, calculé sur la largeur du sélecteur (une colonne = 2 demi-colonnes). */
 
 .hg {
+  container-type: inline-size;
   display: grid;
   column-gap: 0;
-  row-gap: 4px;
-  padding: 2px 12px 4px;
+  row-gap: 0;
 }
 
 .hg-btn {
+  --dot: min(calc(200cqw / var(--halves) - 4px), 38px);
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 0;
-  min-height: 44px;
+  min-height: calc(var(--dot) + 6px);
   padding: 0;
   border-radius: 999px;
   -webkit-tap-highlight-color: transparent;
@@ -2399,20 +2424,31 @@ input[type='range']::-moz-range-thumb {
 .hg-dot {
   display: grid;
   place-items: center;
-  width: min(calc(100% - 5px), 38px);
-  aspect-ratio: 1;
-  border-radius: 50%;
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 999px;
   background: var(--fill);
   color: var(--label);
-  font-size: 15px;
+  font-size: min(15px, calc(var(--dot) * 0.5));
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  white-space: nowrap;
   transition: background-color 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s;
 }
 
+/* pastille de tête (« Parcours ») : même hauteur et même texte, en longueur */
+.hg-btn--lead {
+  justify-content: flex-start;
+}
+
+.hg-dot--lead {
+  width: calc(100% - 4px);
+  padding: 0 4px;
+}
+
 .hg-btn:active .hg-dot {
-  transform: scale(0.92);
+  transform: scale(0.94);
 }
 
 .hg-btn:focus-visible {
@@ -2423,7 +2459,7 @@ input[type='range']::-moz-range-thumb {
   box-shadow: 0 0 0 2px var(--bg2), 0 0 0 4px var(--tint);
 }
 
-/* trou choisi */
+/* sélection */
 .hg-btn.is-cur .hg-dot {
   background: var(--tint);
   color: var(--on-tint);
@@ -2433,6 +2469,10 @@ input[type='range']::-moz-range-thumb {
 .hg-dot[class*='res-'] {
   background: var(--rc);
   color: var(--rc-fg);
+}
+
+.hg--entry {
+  margin: 2px 10px 4px;
 }
 
 .hg--entry .hg-btn.is-cur .hg-dot {
@@ -2450,34 +2490,7 @@ input[type='range']::-moz-range-thumb {
   }
 }
 
+
 .cw-holes {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 0 8px;
-}
-
-.cw-all {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 36px;
-  margin: 0 0 2px 14px;
-  padding: 0 14px 0 12px;
-  border-radius: 18px;
-  background: var(--fill);
-  color: var(--label);
-  font-size: 15px;
-  font-weight: 600;
-  transition: background-color 0.18s, color 0.18s;
-}
-
-.cw-all.is-cur {
-  background: var(--tint);
-  color: var(--on-tint);
-}
-
-.cw-all:active {
-  transform: scale(0.96);
+  padding: 8px 10px 10px;
 }

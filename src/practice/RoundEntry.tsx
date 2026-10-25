@@ -97,7 +97,7 @@ const HoleView = memo(function HoleView({ e, locked, penTouched, onScore, onPar,
   return (
     <div className="hv">
       <div className="hv-head">
-        <h2>Trou {e.hole}</h2>
+        <h2>Trou n° {e.hole}</h2>
         <span className="hv-par">Par {e.par}</span>
       </div>
       <ScoreRuler key={`${e.hole}`} par={e.par} value={e.strokes} onSelect={onScore} parLocked={locked} onParChange={onPar} onUnlock={onUnlock} />
@@ -314,7 +314,7 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
 
   const tot = summarize(entries);
   const last = cur >= n - 1;
-  const gotoLabel = entries[cur] ? `Trou ${entries[cur].hole}` : '';
+  const gotoLabel = entries[cur] ? `Trou n° ${entries[cur].hole}` : '';
 
   const dateLabel = (() => {
     const d = new Date(s.played_at);
