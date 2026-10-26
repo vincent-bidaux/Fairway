@@ -1037,3 +1037,119 @@
   letter-spacing: 0.4px;
   color: var(--label2);
 }
+
+/* ===== Mon sac ========================================================== */
+.bag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 16px 12px;
+  min-width: 0;
+}
+.bag-pills.is-dim {
+  opacity: 0.55;
+}
+.bag-pill {
+  min-width: 30px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--label);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.bag-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px var(--gutter) 8px;
+  min-width: 0;
+}
+.bag-count {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.bag-count.is-full {
+  color: var(--orange);
+}
+.bag-reset {
+  min-height: 36px;
+  padding: 0;
+  font-size: 15px;
+  text-align: right;
+}
+.bag-note {
+  margin: 0 var(--gutter) 14px;
+  padding: 0 16px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--label2);
+}
+.bag-row:disabled {
+  opacity: 0.4;
+}
+.bag-short {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* --- Distances par club --------------------------------------------------- */
+.clubrows {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 4px;
+}
+.clubrow {
+  display: grid;
+  grid-template-columns: 30px 1fr 56px;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.clubrow-name {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.clubrow-track {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--fill);
+}
+.clubrow-range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--teal) 40%, transparent);
+}
+.clubrow-dot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 2px var(--bg2);
+}
+.clubrow-val {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.clubrow-val small {
+  font-weight: 500;
+  color: var(--label2);
+}
+.sd-note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--label2);
+}

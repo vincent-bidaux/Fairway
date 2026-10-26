@@ -80,6 +80,12 @@ export const sampleStats: StatsResponse = {
     ],
   },
   prevRange: null,
+  clubs: [
+    { club: "D", n: 24, avg: 212, min: 168, max: 241, median: 215 },
+    { club: "5W", n: 9, avg: 178, min: 150, max: 196, median: 181 },
+    { club: "7i", n: 14, avg: 128, min: 104, max: 142, median: 131 },
+    { club: "PW", n: 18, avg: 92, min: 70, max: 108, median: 94 },
+  ],
   wellbeing,
   prevWellbeing,
 };

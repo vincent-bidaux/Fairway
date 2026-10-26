@@ -5,6 +5,15 @@ export type Fairway = 'hit' | 'left' | 'right' | 'short';
 export type DrillCategory = 'long' | 'approach' | 'chip' | 'bunker' | 'putting';
 export type StatsPeriod = '1m' | '3m' | '6m' | '1y' | 'all';
 
+/** Un coup : position de la balle avant le coup (GPS) et club utilisé. Le 1er coup part du départ. */
+export interface Shot {
+  lat: number | null;
+  lon: number | null;
+  club: string | null;
+  /** Distance parcourue par ce coup en mètres (jusqu'au coup suivant, ou jusqu'au drapeau pour le dernier), si connue. */
+  dist?: number | null;
+}
+
 export interface HoleEntry {
   hole: number;
   par: number;
@@ -15,6 +24,62 @@ export interface HoleEntry {
   penalties: number;
   up_down: 0 | 1 | null;
   sand: 0 | 1 | null;
+  /** Coups placés sur la carte du trou (facultatif). */
+  shots?: Shot[] | null;
+}
+
+// ---------------------------------------------------------------- clubs
+export type ClubKind = 'wood' | 'hybrid' | 'iron' | 'wedge' | 'putter';
+export interface Club {
+  id: string;
+  label: string;
+  /** Libellé court pour les pastilles (« 7 », « PW »…). */
+  short: string;
+  kind: ClubKind;
+}
+
+/** Catalogue des clubs, du plus long au plus court. */
+export const CLUBS: Club[] = [
+  { id: 'D', label: 'Driver', short: 'Dr', kind: 'wood' },
+  { id: '3W', label: 'Bois 3', short: 'B3', kind: 'wood' },
+  { id: '5W', label: 'Bois 5', short: 'B5', kind: 'wood' },
+  { id: '7W', label: 'Bois 7', short: 'B7', kind: 'wood' },
+  { id: '2H', label: 'Hybride 2', short: 'H2', kind: 'hybrid' },
+  { id: '3H', label: 'Hybride 3', short: 'H3', kind: 'hybrid' },
+  { id: '4H', label: 'Hybride 4', short: 'H4', kind: 'hybrid' },
+  { id: '5H', label: 'Hybride 5', short: 'H5', kind: 'hybrid' },
+  { id: '3i', label: 'Fer 3', short: '3', kind: 'iron' },
+  { id: '4i', label: 'Fer 4', short: '4', kind: 'iron' },
+  { id: '5i', label: 'Fer 5', short: '5', kind: 'iron' },
+  { id: '6i', label: 'Fer 6', short: '6', kind: 'iron' },
+  { id: '7i', label: 'Fer 7', short: '7', kind: 'iron' },
+  { id: '8i', label: 'Fer 8', short: '8', kind: 'iron' },
+  { id: '9i', label: 'Fer 9', short: '9', kind: 'iron' },
+  { id: 'PW', label: 'Pitching wedge', short: 'PW', kind: 'wedge' },
+  { id: 'GW', label: 'Gap wedge', short: 'GW', kind: 'wedge' },
+  { id: 'SW', label: 'Sand wedge', short: 'SW', kind: 'wedge' },
+  { id: 'LW', label: 'Lob wedge', short: 'LW', kind: 'wedge' },
+  { id: 'P', label: 'Putter', short: 'Pt', kind: 'putter' },
+];
+export const CLUB_BY_ID: Record<string, Club> = Object.fromEntries(CLUBS.map((c) => [c.id, c]));
+/** Sac proposé tant que le joueur n'a pas déclaré le sien. */
+export const DEFAULT_BAG = ['D', '3W', '5W', '4H', '5i', '6i', '7i', '8i', '9i', 'PW', 'GW', 'SW', 'P'];
+/** Règle de golf : 14 clubs au maximum dans le sac. */
+export const MAX_CLUBS = 14;
+
+/** Trie et nettoie une liste d'identifiants de clubs (ordre du catalogue, sans doublon ni inconnu). */
+export function normalizeBag(ids: unknown): string[] {
+  if (!Array.isArray(ids)) return [];
+  const set = new Set(ids.filter((x): x is string => typeof x === 'string' && x in CLUB_BY_ID));
+  return CLUBS.filter((c) => set.has(c.id)).map((c) => c.id);
+}
+
+/** Distance en mètres entre deux positions GPS (formule de haversine). */
+export function geoDistance(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
+  const R = 6_371_000, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
 }
 
 export interface Drill {
@@ -151,6 +216,18 @@ export interface WellbeingStats {
   weather: WellbeingDim;
 }
 
+/** Distances par club (coups placés sur la carte ou dont la distance est connue). */
+export interface ClubStat {
+  club: string;
+  /** Nombre de coups mesurés. */
+  n: number;
+  avg: number;
+  min: number;
+  max: number;
+  /** Distance « habituelle » : médiane des coups. */
+  median: number;
+}
+
 export interface StatsResponse {
   period: StatsPeriod;
   from: string | null;
@@ -159,6 +236,8 @@ export interface StatsResponse {
   prevRounds: RoundStats | null;
   range: RangeStats;
   prevRange: RangeStats | null;
+  /** Distances par club sur la période (ordre du catalogue). */
+  clubs: ClubStat[];
   /** Humeur, forme, météo sur toutes les séances (parties et practice). */
   wellbeing: WellbeingStats;
   prevWellbeing: WellbeingStats | null;

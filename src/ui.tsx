@@ -15,7 +15,7 @@ export type Route =
   | { type: 'sessions'; kind?: SessionKind }
   | { type: 'highlights' };
 
-export type StatMetric = 'score' | 'distribution' | 'byPar' | 'fairways' | 'gir' | 'putts' | 'upDown' | 'penalties' | 'index' | 'practice' | 'drills' | 'context';
+export type StatMetric = 'score' | 'distribution' | 'byPar' | 'fairways' | 'gir' | 'putts' | 'upDown' | 'penalties' | 'index' | 'practice' | 'drills' | 'context' | 'clubs';
 
 export interface Ui {
   push: (r: Route) => void;

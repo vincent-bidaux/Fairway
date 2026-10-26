@@ -74,10 +74,13 @@ export interface Profile {
   handedness: 'right' | 'left' | null;
   licence: string | null;
   started_year: number | null;
+  /** Clubs du sac (identifiants de CLUBS), null tant que le joueur ne l'a pas déclaré. */
+  bag?: string[] | null;
   index_history: Array<{ as_of: string; hcp_index: number }>;
 }
 export const getProfile = () => call<Profile>('/api/me/profile');
-export const saveProfile = (p: Omit<Profile, 'index_history' | 'home_golf_name' | 'home_golf_city'>) => call('/api/me/profile', 'PUT', p);
+export const saveProfile = (p: Omit<Profile, 'index_history' | 'home_golf_name' | 'home_golf_city' | 'bag'>) => call('/api/me/profile', 'PUT', p);
+export const saveBag = (bag: string[]) => call<{ bag: string[] }>('/api/me/bag', 'PUT', { bag });
 export const putIndex = (asOf: string, hcp_index: number) => call(`/api/me/index/${asOf}`, 'PUT', { hcp_index });
 export const deleteIndex = (asOf: string) => call(`/api/me/index/${asOf}`, 'DELETE');
 

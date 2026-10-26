@@ -1,6 +1,6 @@
 // Cartes de statistiques façon Apple Santé. Utilisé avec de vraies données ou avec l'aperçu fictif grisé.
 import type { ReactNode } from 'react';
-import type { RangeStats, RoundStats, StatsResponse, WellbeingStats } from '../../shared/practice';
+import { CLUB_BY_ID, type ClubStat, type RangeStats, type RoundStats, type StatsResponse, type WellbeingStats } from '../../shared/practice';
 import { Icon } from '../components/Icon';
 import type { StatMetric } from '../ui';
 import { ContextBars, contextInsight, hasContext, hasWellbeing, roundLevel } from './ContextCard';
@@ -317,6 +317,10 @@ export function Dashboard({ stats, profile, onOpen, totalRanges = 0 }: { stats: 
         </Tile>
       )}
 
+      <Tile title="Distances par club" color="var(--teal)" metric="clubs" wide onOpen={onOpen}>
+        <ClubRows clubs={stats.clubs ?? []} limit={5} />
+      </Tile>
+
       <Tile title="Exercices de putting" color="var(--pink)" metric="drills" wide onOpen={onOpen}>
         {drills.length === 0 ? (
           <span className="tile-sub">Ajoutez des exercices (ex. 10 putts à 2 m) dans vos séances de practice pour suivre votre réussite.</span>
@@ -343,5 +347,33 @@ export function Dashboard({ stats, profile, onOpen, totalRanges = 0 }: { stats: 
         )}
       </Tile>
     </div>
+  );
+}
+
+/** Distance médiane par club (hors putter), du plus long au plus court. */
+export function ClubRows({ clubs, limit }: { clubs: ClubStat[]; limit?: number }) {
+  const list = clubs.filter((c) => c.club !== 'P');
+  if (!list.length) {
+    return <span className="tile-sub">Placez vos coups sur la carte du trou et notez vos clubs pendant la saisie d’une partie : vos distances apparaîtront ici.</span>;
+  }
+  const max = Math.max(...list.map((c) => c.max));
+  const shown = limit ? list.slice(0, limit) : list;
+  return (
+    <span className="clubrows">
+      {shown.map((c) => (
+        <span key={c.club} className="clubrow" aria-label={`${CLUB_BY_ID[c.club]?.label ?? c.club} : ${c.median} mètres en moyenne, de ${c.min} à ${c.max}, ${c.n} coups`}>
+          <span className="clubrow-name">{CLUB_BY_ID[c.club]?.short ?? c.club}</span>
+          <span className="clubrow-track">
+            <span className="clubrow-range" style={{ left: `${(c.min / max) * 100}%`, width: `${Math.max(1.5, ((c.max - c.min) / max) * 100)}%` }} />
+            <span className="clubrow-dot" style={{ left: `${(c.median / max) * 100}%` }} />
+          </span>
+          <span className="clubrow-val">
+            {c.median}
+            <small> m</small>
+          </span>
+        </span>
+      ))}
+      {limit && list.length > limit && <span className="tile-sub">+ {list.length - limit} autre{list.length - limit > 1 ? 's' : ''} club{list.length - limit > 1 ? 's' : ''}</span>}
+    </span>
   );
 }

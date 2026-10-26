@@ -10,16 +10,16 @@ const MAX_ZOOM = 8;
 const MIN_ASPECT = 0.78;
 const MAX_ASPECT = 1.2;
 
-type Box = { x: number; y: number; w: number; h: number };
-type Pt = [number, number];
+export type Box = { x: number; y: number; w: number; h: number };
+export type Pt = [number, number];
 
-const ringD = (r: Ring, close = true) => {
+export const ringD = (r: Ring, close = true) => {
   let d = '';
   for (let i = 0; i + 1 < r.length; i += 2) d += (i ? 'L' : 'M') + r[i] + ' ' + r[i + 1];
   return close ? d + 'Z' : d;
 };
 const shapeD = (s: Shape) => s.map((r) => ringD(r)).join('');
-const pts = (r: Ring): Pt[] => {
+export const pts = (r: Ring): Pt[] => {
   const o: Pt[] = [];
   for (let i = 0; i + 1 < r.length; i += 2) o.push([r[i], r[i + 1]]);
   return o;
@@ -39,7 +39,7 @@ function loopLabel(l: { holes: number; par: number | null }) {
 }
 
 /** Fond du plan (contour + surfaces), en mètres. Mémorisé : ne se redessine pas pendant un zoom. */
-const PlanBase = memo(function PlanBase({ plan }: { plan: CoursePlan }) {
+export const PlanBase = memo(function PlanBase({ plan }: { plan: CoursePlan }) {
   return (
     <>
       {plan.outline.map((s, i) => (
@@ -53,7 +53,7 @@ const PlanBase = memo(function PlanBase({ plan }: { plan: CoursePlan }) {
 });
 
 /** Rotation qui met le départ en bas et le green en haut. */
-function holeFrame(h: PlanHole, aspect: number) {
+export function holeFrame(h: PlanHole, aspect: number) {
   const p = pts(h.line);
   const t = p[0], e = p[p.length - 1];
   const theta = -Math.PI / 2 - Math.atan2(e[1] - t[1], e[0] - t[0]);
@@ -106,7 +106,7 @@ function courseBox(plan: CoursePlan): Box {
 }
 
 /** Zoom (pincement, double-tap, molette + Ctrl, boutons) et déplacement quand on est zoomé. */
-function useZoomPan(base: Box, onSwipe?: (dir: 1 | -1) => void) {
+export function useZoomPan(base: Box, onSwipe?: (dir: 1 | -1) => void) {
   const stage = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 1, h: 1 });
   const [view, setView] = useState({ k: 1, cx: base.x + base.w / 2, cy: base.y + base.h / 2 });
@@ -248,6 +248,11 @@ function useZoomPan(base: Box, onSwipe?: (dir: 1 | -1) => void) {
     zoomBy: (m: number) => zoomAt(view.k * m, [size.w / 2, size.h / 2]),
     reset: () => set(1, base.x + base.w / 2, base.y + base.h / 2),
     wasDrag: () => moved.current,
+    /** Point écran (clientX/clientY) → coordonnées du dessin (repère du viewBox). */
+    toWorld: (clientX: number, clientY: number): Pt => {
+      const r = stage.current!.getBoundingClientRect();
+      return toWorld([clientX - r.left, clientY - r.top]);
+    },
   };
 }
 

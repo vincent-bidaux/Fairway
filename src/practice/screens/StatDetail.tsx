@@ -11,7 +11,7 @@ import { getProfile, getStats, type Profile } from '../api';
 import { ContextBars, contextInsight, hasContext, hasWellbeing, roundLevel } from '../ContextCard';
 import { CONTEXT_LABELS, CONTEXT_TITLES, ContextBadge, contextColor, type ContextKind } from '../contextIcons';
 import { BarChart, DotRange, Legend, LineChart, Ring, StackedBar, type LinePoint } from '../charts';
-import { Delta, MIN_ROUNDS, distSegments, fairwaySegments } from '../Dashboard';
+import { ClubRows, Delta, MIN_ROUNDS, distSegments, fairwaySegments } from '../Dashboard';
 import { PERIODS, birdieCaption, duration, plural, practiceBuckets, fmtDateShort, fmtDateShortYear, nf, parseLocal, pctText, readPeriod, rel, writePeriod } from '../statsFormat';
 import '../practice.css';
 
@@ -107,6 +107,15 @@ const META: Record<StatMetric, Meta> = {
       'Renseignez ces trois notes à chaque séance pour affiner les statistiques.',
     ],
   },
+  clubs: {
+    title: 'Distances par club',
+    color: 'var(--teal)',
+    explain: [
+      'Distance de chaque coup placé sur la carte du trou pendant la saisie d’une partie, jusqu’au coup suivant ou jusqu’au drapeau pour le dernier.',
+      'Le point donne la distance médiane (la moitié de vos coups vont plus loin, l’autre moitié moins loin), la barre l’écart entre votre coup le plus court et le plus long.',
+      'Les distances sont mesurées sur la carte : touchez l’endroit où la balle s’est arrêtée, ou utilisez votre position sur le parcours.',
+    ],
+  },
   drills: {
     title: 'Exercices',
     color: 'var(--pink)',
@@ -146,12 +155,15 @@ const ts = (iso: string) => parseLocal(iso).getTime();
 export function StatDetail({ metric }: { metric: StatMetric }) {
   const ui = useUi();
   const meta = META[metric];
-  const [period, setPeriod] = useState<StatsPeriod>(readPeriod);
+  const account = useAccount();
+  const accountId = account.status === 'in' ? account.me.user.id : undefined;
+  // même période que le tableau de bord (mémorisée par compte)
+  const [period, setPeriod] = useState<StatsPeriod>(() => readPeriod(accountId));
   const { stats, profile, error, busy, retry } = useStatsData(period);
   const back = <BackButton onClick={ui.back} />;
   const onPeriod = (p: StatsPeriod) => {
     setPeriod(p);
-    writePeriod(p);
+    writePeriod(p, accountId);
   };
 
   if (!stats) {
@@ -498,6 +510,22 @@ function Body({ metric, stats, profile, period }: { metric: StatMetric; stats: S
 
     case 'drills':
       return <DrillsBody stats={stats} color={color} />;
+
+    case 'clubs': {
+      const list = (stats.clubs ?? []).filter((c) => c.club !== 'P');
+      return (
+        <Card>
+          {list.length ? (
+            <>
+              <ClubRows clubs={list} />
+              <p className="sd-note">{plural(list.reduce((a, c) => a + c.n, 0), 'coup mesuré', 'coups mesurés')} sur la période.</p>
+            </>
+          ) : (
+            <Notice>Placez vos coups sur la carte du trou et notez vos clubs pendant la saisie d’une partie pour voir vos distances.</Notice>
+          )}
+        </Card>
+      );
+    }
   }
 }
 

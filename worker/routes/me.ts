@@ -1,9 +1,9 @@
 // API « Mes parties » : tout est rattaché au joueur connecté (cookie de session Better Auth).
 import { Hono } from 'hono';
-import { highlightKind, type Drill, type Highlight, type HoleEntry, type PlaySession, type StatsPeriod, type StatsResponse } from '../../shared/practice';
+import { CLUB_BY_ID, highlightKind, MAX_CLUBS, normalizeBag, type Drill, type Highlight, type HoleEntry, type PlaySession, type Shot, type StatsPeriod, type StatsResponse } from '../../shared/practice';
 import { createAuth } from '../auth';
 import type { Env } from '../env';
-import { rangeStats, roundStats, wellbeingStats, type RangeRow, type RoundRow } from '../lib/stats';
+import { clubStats, rangeStats, roundStats, wellbeingStats, type RangeRow, type RoundRow } from '../lib/stats';
 import { ensureDemo, isDemo } from '../demo';
 
 type Vars = { userId: string; userName: string };
@@ -70,8 +70,10 @@ async function loadSession(env: Env, uid: string, id: string): Promise<PlaySessi
     .first<PlaySession>();
   if (!s) return null;
   if (s.kind === 'round') {
-    const h = await env.DB.prepare(`SELECT hole, par, strokes, putts, fairway, gir, penalties, up_down, sand FROM round_holes WHERE session_id = ? ORDER BY hole`).bind(id).all<HoleEntry>();
-    s.hole_entries = h.results;
+    const h = await env.DB.prepare(`SELECT hole, par, strokes, putts, fairway, gir, penalties, up_down, sand, shots FROM round_holes WHERE session_id = ? ORDER BY hole`)
+      .bind(id)
+      .all<HoleEntry & { shots: string | null }>();
+    s.hole_entries = h.results.map((r) => ({ ...r, shots: parseShots(r.shots) }));
   } else {
     const d = await env.DB.prepare(`SELECT position, category, label, distance_m, attempts, successes FROM range_drills WHERE session_id = ? ORDER BY position`).bind(id).all<Drill>();
     s.drills = d.results;
@@ -90,6 +92,30 @@ const int = (v: unknown, min: number, max: number): number | null => {
 };
 const str = (v: unknown, max = 500): string | null => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
 const bit = (v: unknown): 0 | 1 | null => (v === 1 || v === true ? 1 : v === 0 || v === false ? 0 : null);
+
+/** Coups d'un trou : positions GPS plausibles (France métropolitaine et DOM larges) et clubs du catalogue, 20 au plus. */
+function cleanShots(v: unknown): string | null {
+  if (!Array.isArray(v) || !v.length) return null;
+  const out: Shot[] = v.slice(0, 20).map((x) => {
+    const o = (x ?? {}) as Record<string, unknown>;
+    const lat = typeof o.lat === 'number' && Math.abs(o.lat) <= 90 ? Math.round(o.lat * 1e6) / 1e6 : null;
+    const lon = typeof o.lon === 'number' && Math.abs(o.lon) <= 180 ? Math.round(o.lon * 1e6) / 1e6 : null;
+    const club = typeof o.club === 'string' && o.club in CLUB_BY_ID ? o.club : null;
+    const dist = typeof o.dist === 'number' && o.dist >= 0 && o.dist <= 700 ? Math.round(o.dist) : null;
+    return { lat: lat != null && lon != null ? lat : null, lon: lat != null && lon != null ? lon : null, club, dist };
+  });
+  return out.some((x) => x.lat != null || x.club) ? JSON.stringify(out) : null;
+}
+
+export function parseShots(v: string | null | undefined): Shot[] | null {
+  if (!v) return null;
+  try {
+    const a = JSON.parse(v);
+    return Array.isArray(a) ? (a as Shot[]) : null;
+  } catch {
+    return null;
+  }
+}
 
 /** Créer ou remplacer une séance (l'id vient du téléphone : idempotent, rejouable hors ligne). */
 meApi.put('/sessions/:id', async (c) => {
@@ -146,8 +172,8 @@ meApi.put('/sessions/:id', async (c) => {
       const fairway = par >= 4 && ['hit', 'left', 'right', 'short'].includes(h.fairway as string) ? h.fairway : null;
       stmts.push(
         db
-          .prepare(`INSERT INTO round_holes (session_id, hole, par, strokes, putts, fairway, gir, penalties, up_down, sand) VALUES (?,?,?,?,?,?,?,?,?,?)`)
-          .bind(id, hole, par, int(h.strokes, 1, 20), int(h.putts, 0, 10), fairway, bit(h.gir), int(h.penalties, 0, 10) ?? 0, bit(h.up_down), bit(h.sand)),
+          .prepare(`INSERT INTO round_holes (session_id, hole, par, strokes, putts, fairway, gir, penalties, up_down, sand, shots) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
+          .bind(id, hole, par, int(h.strokes, 1, 20), int(h.putts, 0, 10), fairway, bit(h.gir), int(h.penalties, 0, 10) ?? 0, bit(h.up_down), bit(h.sand), cleanShots(h.shots)),
       );
       parVotes.push({ hole, par });
     }
@@ -246,12 +272,12 @@ async function loadForStats(env: Env, uid: string, from: string | null, to: stri
     const chunk = ids.slice(i, i + 90);
     const q = chunk.map(() => '?').join(',');
     const [h, d] = await env.DB.batch([
-      env.DB.prepare(`SELECT session_id, hole, par, strokes, putts, fairway, gir, penalties, up_down, sand FROM round_holes WHERE session_id IN (${q})`).bind(...chunk),
+      env.DB.prepare(`SELECT session_id, hole, par, strokes, putts, fairway, gir, penalties, up_down, sand, shots FROM round_holes WHERE session_id IN (${q})`).bind(...chunk),
       env.DB.prepare(`SELECT session_id, category, label, distance_m, attempts, successes FROM range_drills WHERE session_id IN (${q})`).bind(...chunk),
     ]);
-    for (const row of h.results as Array<HoleEntry & { session_id: string }>) {
+    for (const row of h.results as Array<Omit<HoleEntry, 'shots'> & { session_id: string; shots: string | null }>) {
       const list = holes.get(row.session_id) ?? [];
-      list.push(row);
+      list.push({ ...row, shots: parseShots(row.shots) });
       holes.set(row.session_id, list);
     }
     for (const row of d.results as Array<RangeRow['drills'][number] & { session_id: string }>) {
@@ -294,6 +320,7 @@ meApi.get('/stats', async (c) => {
     prevRounds: prev ? roundStats(prev.rounds) : null,
     range: rangeStats(cur.ranges),
     prevRange: prev ? rangeStats(prev.ranges) : null,
+    clubs: clubStats(cur.rounds.flatMap((r) => r.holes)),
     wellbeing: wellbeingStats(cur.wellbeing),
     prevWellbeing: prev ? wellbeingStats(prev.wellbeing) : null,
   };
@@ -330,13 +357,34 @@ meApi.get('/profile', async (c) => {
   const uid = c.get('userId');
   const p = await c.env.DB.prepare(
     `SELECT p.display_name, p.photo, p.home_golf_id, g.name AS home_golf_name, g.city AS home_golf_city, p.city, p.birth_year,
-            p.handedness, p.licence, p.started_year
+            p.handedness, p.licence, p.started_year, p.bag
      FROM player_profiles p LEFT JOIN golfs g ON g.id = p.home_golf_id WHERE p.user_id = ?`,
   )
     .bind(uid)
     .first();
   const idx = await c.env.DB.prepare(`SELECT as_of, hcp_index FROM index_history WHERE user_id = ? ORDER BY as_of`).bind(uid).all<{ as_of: string; hcp_index: number }>();
-  return c.json({ ...(p ?? { display_name: c.get('userName') }), index_history: idx.results });
+  const { bag, ...rest } = (p ?? { display_name: c.get('userName') }) as Record<string, unknown> & { bag?: string | null };
+  let clubs: string[] | null = null;
+  try {
+    clubs = bag ? normalizeBag(JSON.parse(bag)) : null;
+  } catch {
+    clubs = null;
+  }
+  return c.json({ ...rest, bag: clubs, index_history: idx.results });
+});
+
+/** Sac du joueur : liste d'identifiants de clubs (14 au plus). */
+meApi.put('/bag', async (c) => {
+  const uid = c.get('userId');
+  const b = await c.req.json<{ bag?: unknown }>().catch(() => ({}) as { bag?: unknown });
+  const bag = normalizeBag(b.bag).slice(0, MAX_CLUBS);
+  await c.env.DB.prepare(
+    `INSERT INTO player_profiles (user_id, bag) VALUES (?, ?)
+     ON CONFLICT(user_id) DO UPDATE SET bag = excluded.bag, updated_at = datetime('now')`,
+  )
+    .bind(uid, JSON.stringify(bag))
+    .run();
+  return c.json({ bag });
 });
 
 meApi.put('/profile', async (c) => {

@@ -1,11 +1,13 @@
 // Modifier la carte joueur : photo, nom, golf d'attache, ville, naissance, main, licence, index.
 import { useEffect, useRef, useState } from 'react';
+import { DEFAULT_BAG } from '../../../shared/practice';
 import { Field, Group, Row, Segmented, Spinner } from '../../components/Controls';
 import { BackButton, Screen } from '../../components/Screen';
 import { ErrorState } from '../../components/States';
 import { Sheet } from '../../components/Sheet';
 import { useUi } from '../../ui';
 import { touchData, useAccount } from '../account';
+import { BagPreview, BagSheet } from '../BagSheet';
 import { GolfPicker } from '../GolfPicker';
 import { deleteIndex, getProfile, putIndex, saveProfile, type Profile } from '../api';
 import { fmtDateShortYear, golfLabel, initials, nf } from '../statsFormat';
@@ -66,6 +68,8 @@ export function ProfileEdit() {
   const [saving, setSaving] = useState(false);
   const [golfSheet, setGolfSheet] = useState(false);
   const [indexSheet, setIndexSheet] = useState(false);
+  const [bag, setBag] = useState<string[] | null>(null);
+  const [bagSheet, setBagSheet] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -84,6 +88,7 @@ export function ProfileEdit() {
         setLicence(p.licence ?? '');
         setSince(p.started_year ? String(p.started_year) : '');
         setHistory(p.index_history);
+        setBag(p.bag ?? null);
         setError(null);
       })
       .catch((e: Error) => live && setError(e.message));
@@ -221,6 +226,14 @@ export function ProfileEdit() {
         </Field>
       </Group>
 
+      <Group
+        title="Mon sac"
+        footer={bag == null ? 'Proposition par défaut. Choisissez vos clubs pour les retrouver dans la saisie de vos parties.' : undefined}
+      >
+        <Row label="Clubs" value={bag == null ? 'Non renseigné' : `${bag.length} club${bag.length > 1 ? 's' : ''}`} chevron onClick={() => setBagSheet(true)} />
+        <BagPreview ids={bag ?? DEFAULT_BAG} dim={bag == null} />
+      </Group>
+
       <Group title="Index" footer="Votre index officiel s’affiche en grand sur votre carte. Gardez l’historique à jour pour suivre votre progression.">
         <Row label="Index actuel" value={current ? `${nf(current.hcp_index)} · ${fmtDateShortYear(current.as_of)}` : 'Non renseigné'} />
         <button type="button" className="row row--tap" onClick={() => setIndexSheet(true)}>
@@ -270,6 +283,7 @@ export function ProfileEdit() {
           setGolfName(null);
         }}
       />
+      <BagSheet open={bagSheet} onClose={() => setBagSheet(false)} bag={bag} onSaved={setBag} />
       <IndexSheet
         open={indexSheet}
         onClose={() => setIndexSheet(false)}

@@ -1,4 +1,4 @@
-import { girOf, type HoleEntry, type RangeStats, type RoundStats, type DrillCategory, type WellbeingDim, type WellbeingStats } from '../../shared/practice';
+import { CLUBS, girOf, type ClubStat, type Shot, type HoleEntry, type RangeStats, type RoundStats, type DrillCategory, type WellbeingDim, type WellbeingStats } from '../../shared/practice';
 
 export interface RoundRow {
   id: string;
@@ -203,4 +203,23 @@ export function rangeStats(rows: RangeRow[]): RangeStats {
     weekly: [...weeks.entries()].sort().map(([week, v]) => ({ week, ...v })),
     drills: [...drills.values()].sort((a, b) => b.points.length - a.points.length),
   };
+}
+
+/** Distances par club : chaque coup avec un club et une distance mesurée (en mètres). */
+export function clubStats(holes: Array<{ shots?: Shot[] | null }>): ClubStat[] {
+  const by = new Map<string, number[]>();
+  for (const h of holes) {
+    for (const s of h.shots ?? []) {
+      if (!s.club || s.dist == null || s.dist <= 0) continue;
+      const l = by.get(s.club) ?? [];
+      l.push(s.dist);
+      by.set(s.club, l);
+    }
+  }
+  return CLUBS.filter((c) => by.has(c.id)).map((c) => {
+    const l = by.get(c.id)!.slice().sort((a, b) => a - b);
+    const mid = Math.floor(l.length / 2);
+    const median = l.length % 2 ? l[mid] : (l[mid - 1] + l[mid]) / 2;
+    return { club: c.id, n: l.length, avg: Math.round(l.reduce((a, b) => a + b, 0) / l.length), min: l[0], max: l[l.length - 1], median: Math.round(median) };
+  });
 }

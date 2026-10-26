@@ -33,6 +33,8 @@ interface DemoSession {
 }
 
 const DAY = 86_400_000;
+/** Sac du compte de démo : 14 clubs. */
+const DEMO_BAG = ['D', '3W', '5W', '4H', '5i', '6i', '7i', '8i', '9i', 'PW', 'GW', 'SW', 'LW', 'P'];
 
 /** Décalage en semaines entières (les jours de la semaine restent les mêmes). */
 function weekShiftDays(lastPlayed: string, todayIso: string): number {
@@ -118,6 +120,7 @@ export async function ensureDemo(env: Env, origin: string, opts: { reset?: boole
            birth_year=excluded.birth_year, handedness=excluded.handedness, licence=excluded.licence, started_year=excluded.started_year`,
       )
       .bind(DEMO_USER_ID, p.display_name, golfId.get(p.home_golf_slug) ?? null, p.city, p.birth_year, p.handedness, p.licence, p.started_year),
+    db.prepare(`UPDATE player_profiles SET bag = ? WHERE user_id = ?`).bind(JSON.stringify(DEMO_BAG), DEMO_USER_ID),
     db.prepare(`DELETE FROM index_history WHERE user_id = ?`).bind(DEMO_USER_ID),
     db.prepare(`UPDATE "user" SET name = ? WHERE id = ?`).bind(p.display_name, DEMO_USER_ID),
   );
