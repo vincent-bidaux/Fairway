@@ -320,7 +320,7 @@ meApi.get('/stats', async (c) => {
     prevRounds: prev ? roundStats(prev.rounds) : null,
     range: rangeStats(cur.ranges),
     prevRange: prev ? rangeStats(prev.ranges) : null,
-    clubs: clubStats(cur.rounds.flatMap((r) => r.holes)),
+    clubs: clubStats(cur.rounds),
     wellbeing: wellbeingStats(cur.wellbeing),
     prevWellbeing: prev ? wellbeingStats(prev.wellbeing) : null,
   };

@@ -1,5 +1,5 @@
 // Données fictives pour l'aperçu grisé (utilisateur non connecté). Aucune n'est réelle.
-import type { Highlight, PlaySession, RoundStats, StatsResponse, WellbeingDim, WellbeingStats } from '../../shared/practice';
+import type { Highlight, PlaySession, RoundStats, StatsResponse, WellbeingDim, WellbeingStats, ClubStat } from '../../shared/practice';
 import type { Profile } from './api';
 
 const iso = (daysAgo: number) => {
@@ -62,6 +62,15 @@ const prevWellbeing: WellbeingStats = {
   weather: wbDim([3, 4, 3, 4, 2, 3, 4, 5, 3, 4, 3, 4]),
 };
 
+function sampleClub(club: string, n: number, median: number, sd: number): ClubStat {
+  const dists = Array.from({ length: n }, (_, i) => Math.round(median + sd * Math.sin(i * 2.3) * 1.6)).sort((a, b) => a - b);
+  return {
+    club, used: n, n, avg: median, median, min: dists[0], max: dists[n - 1], p25: dists[Math.floor(n / 4)], p75: dists[Math.floor((3 * n) / 4)], dists,
+    longest: { dist: dists[n - 1], date: iso(20), golf: 'Golf de la Prée', hole: 4 },
+    shortest: { dist: dists[0], date: iso(60), golf: 'Golf de Saintes', hole: 11 },
+  };
+}
+
 export const sampleStats: StatsResponse = {
   period: '6m',
   from: iso(180),
@@ -80,12 +89,7 @@ export const sampleStats: StatsResponse = {
     ],
   },
   prevRange: null,
-  clubs: [
-    { club: "D", n: 24, avg: 212, min: 168, max: 241, median: 215 },
-    { club: "5W", n: 9, avg: 178, min: 150, max: 196, median: 181 },
-    { club: "7i", n: 14, avg: 128, min: 104, max: 142, median: 131 },
-    { club: "PW", n: 18, avg: 92, min: 70, max: 108, median: 94 },
-  ],
+  clubs: [sampleClub('D', 24, 212, 18), sampleClub('5W', 9, 178, 12), sampleClub('7i', 14, 128, 9), sampleClub('PW', 18, 92, 8)],
   wellbeing,
   prevWellbeing,
 };

@@ -57,7 +57,8 @@ function makeFrame(hp: HolePlan): Frame {
     deg: f.deg,
     rot: ([x, y]) => [x * c - y * s, x * s + y * c],
     unrot: ([x, y]) => [x * c + y * s, -x * s + y * c],
-    box: f.box,
+    // de la place sous le départ pour la bulle d'aide (même proportions)
+    box: { x: f.box.x - (f.box.h * 0.12 * ASPECT) / 2, y: f.box.y, w: f.box.w + f.box.h * 0.12 * ASPECT, h: f.box.h * 1.12 },
     tee: holeTee(hp.hole),
     pin: holePin(hp.hole),
     green: holeGreen(hp.plan, hp.hole),
@@ -65,6 +66,8 @@ function makeFrame(hp: HolePlan): Frame {
 }
 
 const fmtM = (n: number) => `${Math.round(n)} m`;
+/** Avec la carte, le dernier coup placé finit dans le trou (au moins le départ et un 2e coup). */
+const isHoled = (shots: Shot[]) => shots.length >= 2 && shots[shots.length - 1].lat != null;
 const blank = (): Shot => ({ lat: null, lon: null, club: null });
 
 /** Fairway du drive déduit de la position du 2e coup : dans un fairway dessiné, sinon côté de la ligne du trou. */
@@ -132,6 +135,8 @@ function MapStage({
   const zp = useZoomPan(frame.box);
   const u = zp.u;
   const placed = points.map((p, i) => (p ? { p: frame.rot(p), i } : null)).filter((x): x is { p: Pt; i: number } => !!x);
+  // départ toujours visible : le coup 1 part du départ tant qu'aucun coup n'est placé
+  const teeGhost = placed.length === 0 ? frame.rot(frame.tee) : null;
   const last = placed.length ? placed[placed.length - 1] : null;
   const pin = frame.rot(frame.pin);
   const gBox = greenBox(frame.green, frame.pin);
@@ -179,6 +184,14 @@ function MapStage({
             </text>
           </g>
         ))}
+        {teeGhost && (
+          <g className={`sm-shot sm-shot--tee${current === 0 ? ' is-sel' : ''}`}>
+            <circle cx={teeGhost[0]} cy={teeGhost[1]} r={11 * u} strokeWidth={2 * u} />
+            <text x={teeGhost[0]} y={teeGhost[1]} fontSize={11 * u}>
+              1
+            </text>
+          </g>
+        )}
         {meR && near && (
           <g className="sm-me">
             <circle cx={meR[0]} cy={meR[1]} r={16 * u} className="sm-me-halo" />
@@ -263,7 +276,8 @@ export function HoleMapPanel({
   const origin = hp?.plan.origin;
   const canMap = !!(frame && origin);
   const shots = e.shots ?? [];
-  const holed = e.strokes != null && shots.length > 0 && e.strokes === shots.length;
+  // le dernier coup placé finit dans le trou : le score suit le nombre de coups (dès le 2e)
+  const holed = canMap && isHoled(shots);
   const points = useMemo(() => (frame ? shotPoints(shots, origin, frame.tee) : shots.map(() => null)), [shots, origin, frame]);
   // coup en cours : celui choisi dans la liste, sinon le dernier (pour son club), ou le départ
   const current = sel ?? Math.max(0, shots.length - 1);
@@ -299,7 +313,7 @@ export function HoleMapPanel({
     };
   }, [active, open, canMap]);
 
-  const commit = (list: Shot[], h: boolean) => onPatch(derive(e, list, h, hp, frame));
+  const commit = (list: Shot[]) => onPatch(derive(e, list, canMap && isHoled(list), hp, frame));
 
   const placeAt = (p: Pt) => {
     if (!origin) return;
@@ -316,8 +330,7 @@ export function HoleMapPanel({
       list.push({ ...blank(), ...shot });
       index = list.length - 1;
     }
-    // un coup ajouté après « dans le trou » : le trou reste terminé, avec un coup de plus
-    onPatch(derive(e, list, holed, hp, frame, { fairway: index === 1 }));
+    onPatch(derive(e, list, isHoled(list), hp, frame, { fairway: index === 1 }));
     setGeoErr(null);
   };
 
@@ -326,25 +339,20 @@ export function HoleMapPanel({
     let list = shots.slice(0, -1);
     if (list.length === 1 && list[0].lat == null && !list[0].club) list = [];
     setSel(null);
-    commit(list, holed && list.length > 0);
-    if (holed && !list.length) onPatch({ shots: null, strokes: null });
+    if (!list.length) onPatch({ shots: null, ...(holed ? { strokes: null, putts: null } : {}) });
+    else if (canMap && !isHoled(list)) onPatch({ ...derive(e, list, false, hp, frame), ...(holed ? { strokes: null, putts: null } : {}) });
+    else commit(list);
   };
 
-
   const setClub = (id: string) => {
+    if (!canMap && sel == null) {
+      // sans carte : chaque club touché ajoute un coup, dans l'ordre joué
+      return commit([...shots, { ...blank(), club: id }]);
+    }
     const list = shots.length ? shots.slice() : [blank()];
     const i = Math.min(current, list.length - 1);
     list[i] = { ...list[i], club: list[i].club === id ? null : id };
-    commit(list, holed);
-  };
-
-  const setHoled = (v: boolean) => {
-    if (v) {
-      const list = shots.length ? shots : [blank()];
-      commit(list, true);
-    } else {
-      onPatch({ strokes: null });
-    }
+    commit(list);
   };
 
   const hereNow = () => {
@@ -368,7 +376,7 @@ export function HoleMapPanel({
 
   const curShot = shots[current];
   const summary = shots.length
-    ? `${shots.length} coup${shots.length > 1 ? 's' : ''}${holed ? ' · dans le trou' : ''}`
+    ? `${shots.length} coup${shots.length > 1 ? 's' : ''}`
     : canMap
       ? 'Placez vos coups'
       : 'Notez vos clubs';
@@ -390,13 +398,6 @@ export function HoleMapPanel({
           ) : null}
 
           <div className="smp-actions">
-            <label className={`smp-holed${holed ? ' is-on' : ''}`}>
-              <input type="checkbox" checked={holed} onChange={(ev) => setHoled(ev.target.checked)} />
-              <span className="smp-box" aria-hidden="true">
-                <Icon name="check" size={14} strokeWidth={3} />
-              </span>
-              Dans le trou
-            </label>
             {canMap && (
               <button type="button" className="smp-here" onClick={hereNow} disabled={locating}>
                 <Icon name="locate" size={15} strokeWidth={2.2} />
@@ -407,7 +408,7 @@ export function HoleMapPanel({
           {geoErr && <p className="sm-err">{geoErr}</p>}
 
           <div className="smp-clubs-head">
-            Club du {current === 0 ? 'départ' : `coup ${current + 1}`}
+            {canMap || sel != null ? `Club du ${current === 0 ? 'départ' : `coup ${current + 1}`}` : 'Touchez le club de chaque coup, dans l’ordre'}
             {sel != null && (
               <button type="button" className="text-btn" onClick={() => setSel(null)}>
                 Terminé
@@ -437,13 +438,15 @@ export function HoleMapPanel({
 export function ShotList({ e, hp, onPatch, onSelect }: { e: HoleEntry; hp: HolePlan | null; onPatch: (p: Partial<HoleEntry>) => void; onSelect?: (i: number) => void }) {
   const shots = e.shots ?? [];
   const frame = useMemo(() => (hp ? makeFrame(hp) : null), [hp]);
-  const holed = e.strokes != null && shots.length > 0 && e.strokes === shots.length;
+  const canMap = !!(frame && hp?.plan.origin);
+  const holed = canMap && isHoled(shots);
   const points = useMemo(() => (frame && hp ? shotPoints(shots, hp.plan.origin, frame.tee) : shots.map(() => null)), [shots, hp, frame]);
   if (!shots.length) return null;
   const removeLast = () => {
     let list = shots.slice(0, -1);
     if (list.length === 1 && list[0].lat == null && !list[0].club) list = [];
-    onPatch({ ...derive(e, list, holed && list.length > 0, hp, frame), ...(holed && !list.length ? { strokes: null } : {}) });
+    if (!list.length) return onPatch({ shots: null, ...(holed ? { strokes: null, putts: null } : {}) });
+    onPatch({ ...derive(e, list, canMap && isHoled(list), hp, frame), ...(holed && !isHoled(list) ? { strokes: null, putts: null } : {}) });
   };
   return (
     <div className="sl">

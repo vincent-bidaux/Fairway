@@ -1,4 +1,4 @@
-import { CLUBS, girOf, type ClubStat, type Shot, type HoleEntry, type RangeStats, type RoundStats, type DrillCategory, type WellbeingDim, type WellbeingStats } from '../../shared/practice';
+import { CLUBS, girOf, type ClubStat, type Shot, type ShotRecord, type HoleEntry, type RangeStats, type RoundStats, type DrillCategory, type WellbeingDim, type WellbeingStats } from '../../shared/practice';
 
 export interface RoundRow {
   id: string;
@@ -205,21 +205,42 @@ export function rangeStats(rows: RangeRow[]): RangeStats {
   };
 }
 
-/** Distances par club : chaque coup avec un club et une distance mesurée (en mètres). */
-export function clubStats(holes: Array<{ shots?: Shot[] | null }>): ClubStat[] {
-  const by = new Map<string, number[]>();
-  for (const h of holes) {
-    for (const s of h.shots ?? []) {
-      if (!s.club || s.dist == null || s.dist <= 0) continue;
-      const l = by.get(s.club) ?? [];
-      l.push(s.dist);
-      by.set(s.club, l);
+/** Distances et usage par club, sur les coups notés avec un club (la distance sert quand elle est connue). */
+export function clubStats(rounds: Array<{ played_at: string; golf_name: string | null; holes: Array<{ hole: number; shots?: Shot[] | null }> }>): ClubStat[] {
+  const by = new Map<string, { used: number; shots: ShotRecord[] }>();
+  for (const r of rounds) {
+    for (const h of r.holes) {
+      for (const s of h.shots ?? []) {
+        if (!s.club) continue;
+        const e = by.get(s.club) ?? { used: 0, shots: [] };
+        e.used++;
+        if (s.dist != null && s.dist > 0) e.shots.push({ dist: s.dist, date: r.played_at.slice(0, 10), golf: r.golf_name, hole: h.hole });
+        by.set(s.club, e);
+      }
     }
   }
+  const q = (l: number[], f: number) => {
+    if (!l.length) return 0;
+    const x = (l.length - 1) * f, lo = Math.floor(x), hi = Math.ceil(x);
+    return Math.round(l[lo] + (l[hi] - l[lo]) * (x - lo));
+  };
   return CLUBS.filter((c) => by.has(c.id)).map((c) => {
-    const l = by.get(c.id)!.slice().sort((a, b) => a - b);
-    const mid = Math.floor(l.length / 2);
-    const median = l.length % 2 ? l[mid] : (l[mid - 1] + l[mid]) / 2;
-    return { club: c.id, n: l.length, avg: Math.round(l.reduce((a, b) => a + b, 0) / l.length), min: l[0], max: l[l.length - 1], median: Math.round(median) };
+    const e = by.get(c.id)!;
+    const sorted = e.shots.slice().sort((a, b) => a.dist - b.dist);
+    const l = sorted.map((x) => x.dist);
+    return {
+      club: c.id,
+      used: e.used,
+      n: l.length,
+      avg: l.length ? Math.round(l.reduce((a, b) => a + b, 0) / l.length) : 0,
+      min: l[0] ?? 0,
+      max: l[l.length - 1] ?? 0,
+      median: q(l, 0.5),
+      p25: q(l, 0.25),
+      p75: q(l, 0.75),
+      dists: l.length > 300 ? l.filter((_, i) => i % Math.ceil(l.length / 300) === 0) : l,
+      longest: sorted[sorted.length - 1] ?? null,
+      shortest: sorted[0] ?? null,
+    };
   });
 }

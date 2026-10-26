@@ -6,7 +6,7 @@ import type { StatMetric } from '../ui';
 import { ContextBars, contextInsight, hasContext, hasWellbeing, roundLevel } from './ContextCard';
 import { CONTEXT_LABELS, CONTEXT_TITLES, ContextBadge, contextColor, type ContextKind } from './contextIcons';
 import type { Profile } from './api';
-import { BarChart, DotRange, Legend, Ring, Sparkline, StackedBar, type Segment } from './charts';
+import { BarChart, DotRange, Donut, Legend, Ring, Sparkline, StackedBar, type Segment } from './charts';
 import { birdieCaption, duration, fmtDateShort, nf, pctText, plural, practiceBuckets, rel } from './statsFormat';
 import './practice.css';
 
@@ -119,7 +119,7 @@ function WellbeingSummary({ cur, prev }: { cur: WellbeingStats; prev: WellbeingS
                 <span className="wb-label">{CONTEXT_LABELS[k][level - 1]}</span>
                 <span className="wb-avg">moy. {nf(d.avg!)}</span>
                 <Delta cur={d.avg} prev={prev?.[k]?.avg} better="up" digits={1} label="" />
-                <StackedBar segments={segs} height={5} gap={1.5} ariaLabel={`${CONTEXT_TITLES[k]} : ${segs.map((s) => `${s.label} ${s.value}`).join(', ')}`} />
+                <Donut segments={segs} size={44} thickness={9} ariaLabel={`${CONTEXT_TITLES[k]} : ${segs.map((s) => `${s.label} ${s.value}`).join(', ')}`} />
               </>
             ) : (
               <span className="wb-none" aria-label={`${CONTEXT_TITLES[k]} : non renseignée`}>

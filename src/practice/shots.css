@@ -292,6 +292,10 @@
   text-transform: uppercase;
   color: var(--label2);
 }
+.sm-shot--tee circle {
+  fill: var(--g-badge);
+  opacity: 0.85;
+}
 .sm-shot.is-last circle {
   stroke: var(--g-pin);
 }

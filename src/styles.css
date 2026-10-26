@@ -2479,6 +2479,12 @@ input[type='range']::-moz-range-thumb {
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--label);
 }
 
+/* trou choisi pendant la saisie : il garde la couleur de son score, seul l'anneau le distingue */
+.hg--entry .hg-btn.is-cur .hg-dot[class*='res-'] {
+  background: var(--rc);
+  color: var(--rc-fg);
+}
+
 .hg--entry .hg-btn.is-cur .hg-dot:not([class*='res-']) {
   background: var(--fill-strong);
   color: var(--label);

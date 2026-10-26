@@ -9,9 +9,10 @@ import { useUi } from '../../ui';
 import { useAccount, useDataVersion } from '../account';
 import { getProfile, getStats, type Profile } from '../api';
 import { ContextBars, contextInsight, hasContext, hasWellbeing, roundLevel } from '../ContextCard';
+import { CLUB_BY_ID } from '../../../shared/practice';
 import { CONTEXT_LABELS, CONTEXT_TITLES, ContextBadge, contextColor, type ContextKind } from '../contextIcons';
-import { BarChart, DotRange, Legend, LineChart, Ring, StackedBar, type LinePoint } from '../charts';
-import { ClubRows, Delta, MIN_ROUNDS, distSegments, fairwaySegments } from '../Dashboard';
+import { BarChart, DotRange, DotStrip, Donut, Legend, LineChart, Ring, StackedBar, type LinePoint, type Segment } from '../charts';
+import { Delta, MIN_ROUNDS, distSegments, fairwaySegments } from '../Dashboard';
 import { PERIODS, birdieCaption, duration, plural, practiceBuckets, fmtDateShort, fmtDateShortYear, nf, parseLocal, pctText, readPeriod, rel, writePeriod } from '../statsFormat';
 import '../practice.css';
 
@@ -112,7 +113,7 @@ const META: Record<StatMetric, Meta> = {
     color: 'var(--teal)',
     explain: [
       'Distance de chaque coup placé sur la carte du trou pendant la saisie d’une partie, jusqu’au coup suivant ou jusqu’au drapeau pour le dernier.',
-      'Le point donne la distance médiane (la moitié de vos coups vont plus loin, l’autre moitié moins loin), la barre l’écart entre votre coup le plus court et le plus long.',
+      'Chaque point est un coup. Le trait donne la distance médiane (la moitié de vos coups vont plus loin, l’autre moitié moins loin) et la bande la moitié centrale de vos coups : votre distance fiable. Les coups très en dessous sont souvent topés ou grattés.',
       'Les distances sont mesurées sur la carte : touchez l’endroit où la balle s’est arrêtée, ou utilisez votre position sur le parcours.',
     ],
   },
@@ -511,21 +512,8 @@ function Body({ metric, stats, profile, period }: { metric: StatMetric; stats: S
     case 'drills':
       return <DrillsBody stats={stats} color={color} />;
 
-    case 'clubs': {
-      const list = (stats.clubs ?? []).filter((c) => c.club !== 'P');
-      return (
-        <Card>
-          {list.length ? (
-            <>
-              <ClubRows clubs={list} />
-              <p className="sd-note">{plural(list.reduce((a, c) => a + c.n, 0), 'coup mesuré', 'coups mesurés')} sur la période.</p>
-            </>
-          ) : (
-            <Notice>Placez vos coups sur la carte du trou et notez vos clubs pendant la saisie d’une partie pour voir vos distances.</Notice>
-          )}
-        </Card>
-      );
-    }
+    case 'clubs':
+      return <ClubsBody stats={stats} />;
   }
 }
 
@@ -544,7 +532,6 @@ function WellbeingCard({ kind, cur, prev }: { kind: ContextKind; cur: WellbeingD
   }
   const level = roundLevel(cur.avg);
   const data: LinePoint[] = cur.series.map((s) => ({ t: ts(s.date), y: s.level, label: `${labels[s.level - 1]} · ${s.kind === 'round' ? 'partie' : 'practice'}` }));
-  const max = Math.max(1, ...cur.dist);
   return (
     <Card>
       <h3 className="sd-card-title">{title}</h3>
@@ -581,18 +568,25 @@ function WellbeingCard({ kind, cur, prev }: { kind: ContextKind; cur: WellbeingD
           )}
         />
       )}
-      <ul className="wbd-dist" aria-label={`Répartition : ${title}`}>
-        {cur.dist.map((count, i) => (
-          <li key={i} className={`wbd-dist-row${count === 0 ? ' is-zero' : ''}`}>
-            <ContextBadge kind={kind} level={i + 1} size={28} />
-            <span className="wbd-dist-name">{labels[i]}</span>
-            <span className="wbd-dist-track" role="img" aria-label={`${labels[i]} : ${plural(count, 'séance')}`}>
-              <span className="wbd-dist-fill" style={{ width: `${(count / max) * 100}%`, background: contextColor(kind, i + 1) }} />
-            </span>
-            <span className="wbd-dist-n">{count}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="wbd-pie">
+        <Donut
+          segments={cur.dist.map((count, i) => ({ key: String(i + 1), label: labels[i], value: count, color: contextColor(kind, i + 1) }))}
+          size={120}
+          thickness={22}
+          ariaLabel={`Répartition : ${title}. ${cur.dist.map((c, i) => `${labels[i]} ${c}`).join(', ')}`}
+        >
+          <ContextBadge kind={kind} level={level} size={36} />
+        </Donut>
+        <ul className="wbd-legend">
+          {cur.dist.map((count, i) => (
+            <li key={i} className={count === 0 ? 'is-zero' : undefined}>
+              <i style={{ background: contextColor(kind, i + 1) }} />
+              <span>{labels[i]}</span>
+              <b>{cur.n ? Math.round((count / cur.n) * 100) : 0}&nbsp;%</b>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Card>
   );
 }
@@ -736,6 +730,145 @@ function DrillsBody({ stats, color }: { stats: StatsResponse; color: string }) {
           return <Row key={x.label} label={x.label} sub={`${x.points.length} séance${x.points.length > 1 ? 's' : ''}`} value={`${l.rate} %`} />;
         })}
       </Group>
+    </>
+  );
+}
+
+
+// ---------------------------------------------------------------- distances par club
+const CLUB_COLORS = ['var(--teal)', 'var(--blue)', 'var(--indigo)', 'var(--purple)', 'var(--pink)', 'var(--orange)', 'var(--green, var(--tint))'];
+
+function ClubsBody({ stats }: { stats: StatsResponse }) {
+  const all = stats.clubs ?? [];
+  const measured = all.filter((c) => c.club !== 'P' && c.n > 0);
+  if (!all.length) {
+    return (
+      <Card>
+        <Notice>Placez vos coups sur la carte du trou et notez vos clubs pendant la saisie d’une partie pour voir l’usage de vos clubs et vos distances.</Notice>
+      </Card>
+    );
+  }
+  // usage : les 6 clubs les plus joués, le reste regroupé
+  const byUse = all.slice().sort((a, b) => b.used - a.used);
+  const totalUsed = all.reduce((a, c) => a + c.used, 0);
+  const top = byUse.slice(0, 6);
+  const rest = byUse.slice(6).reduce((a, c) => a + c.used, 0);
+  const segs: Segment[] = [
+    ...top.map((c, i) => ({ key: c.club, label: CLUB_BY_ID[c.club]?.label ?? c.club, value: c.used, color: CLUB_COLORS[i] })),
+    ...(rest ? [{ key: 'other', label: 'Autres clubs', value: rest, color: 'var(--gray)' }] : []),
+  ];
+  const scaleMax = Math.max(50, Math.ceil(Math.max(...measured.map((c) => c.max), 0) / 50) * 50);
+  const ticks = Array.from({ length: scaleMax / 50 + 1 }, (_, i) => i * 50);
+  const longest = measured.reduce<{ c: string; r: NonNullable<(typeof measured)[number]['longest']> } | null>(
+    (best, c) => (c.longest && (!best || c.longest.dist > best.r.dist) ? { c: c.club, r: c.longest } : best),
+    null,
+  );
+  // coups manqués : bois et hybrides à moins de 75 % de la distance habituelle
+  const misses = measured
+    .filter((c) => ['wood', 'hybrid'].includes(CLUB_BY_ID[c.club]?.kind ?? '') && c.n >= 5)
+    .map((c) => ({ c, limit: Math.round(c.median * 0.75), n: c.dists.filter((d) => d < c.median * 0.75).length }))
+    .filter((x) => x.n > 0);
+  const where = (r: { date: string; golf: string | null; hole: number }) => [fmtDateShort(r.date), r.golf, `trou ${r.hole}`].filter(Boolean).join(' · ');
+
+  return (
+    <>
+      <Card>
+        <h3 className="sd-card-title">Usage des clubs</h3>
+        <div className="cu">
+          <Donut segments={segs} size={132} thickness={24} ariaLabel={`Usage des clubs : ${segs.map((x) => `${x.label} ${Math.round((x.value / totalUsed) * 100)} %`).join(', ')}`}>
+            <b className="cu-total">{totalUsed.toLocaleString('fr-FR')}</b>
+            <small className="cu-unit">coups</small>
+          </Donut>
+          <ul className="cu-legend">
+            {segs.map((x) => (
+              <li key={x.key}>
+                <i style={{ background: x.color }} />
+                <span>{x.label}</span>
+                <b>{Math.round((x.value / totalUsed) * 100)}&nbsp;%</b>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Card>
+
+      {measured.length > 0 && (
+        <Card>
+          <h3 className="sd-card-title">Distances</h3>
+          <div className="cd">
+            <div className="cd-row cd-scale" aria-hidden="true">
+              <span />
+              <span className="cd-ticks">
+                {ticks.map((t) => (
+                  <span key={t} style={{ left: `${(t / scaleMax) * 100}%` }}>
+                    {t}
+                  </span>
+                ))}
+              </span>
+              <span />
+            </div>
+            {measured.map((c) => (
+              <div key={c.club} className="cd-row">
+                <span className="cd-name">{CLUB_BY_ID[c.club]?.short ?? c.club}</span>
+                <DotStrip
+                  values={c.dists}
+                  max={scaleMax}
+                  p25={c.p25}
+                  p75={c.p75}
+                  median={c.median}
+                  ariaLabel={`${CLUB_BY_ID[c.club]?.label} : ${c.n} coups, médiane ${c.median} m, la moitié entre ${c.p25} et ${c.p75} m, de ${c.min} à ${c.max} m`}
+                />
+                <span className="cd-val">
+                  {c.median}
+                  <small> m</small>
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="sd-note">Chaque point est un coup. La bande couvre la moitié centrale de vos coups, le trait votre distance habituelle (médiane), en mètres.</p>
+        </Card>
+      )}
+
+      {measured.length > 0 && (
+        <Card>
+          <h3 className="sd-card-title">Les extrêmes</h3>
+          {longest && (
+            <div className="cx-hero">
+              <span className="cx-k">Votre plus long coup</span>
+              <b className="cx-v">
+                {longest.r.dist}&nbsp;m <small>{CLUB_BY_ID[longest.c]?.label}</small>
+              </b>
+              <span className="cx-w">{where(longest.r)}</span>
+            </div>
+          )}
+          <table className="cx-table">
+            <thead>
+              <tr>
+                <th>Club</th>
+                <th>Plus court</th>
+                <th>Plus long</th>
+              </tr>
+            </thead>
+            <tbody>
+              {measured.map((c) => (
+                <tr key={c.club}>
+                  <th scope="row">{CLUB_BY_ID[c.club]?.label ?? c.club}</th>
+                  <td title={c.shortest ? where(c.shortest) : undefined}>{c.min}&nbsp;m</td>
+                  <td title={c.longest ? where(c.longest) : undefined}>{c.max}&nbsp;m</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {misses.length > 0 && (
+            <div className="cx-miss">
+              {misses.map((x) => (
+                <p key={x.c.club}>
+                  <b>{plural(x.n, 'coup', 'coups')}</b> de {CLUB_BY_ID[x.c.club]?.label.toLowerCase()} sur {x.c.n} sous {x.limit}&nbsp;m, soit les trois quarts de votre distance habituelle : souvent un coup topé ou gratté.
+                </p>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
     </>
   );
 }

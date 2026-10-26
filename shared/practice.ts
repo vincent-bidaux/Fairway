@@ -217,16 +217,33 @@ export interface WellbeingStats {
   weather: WellbeingDim;
 }
 
-/** Distances par club (coups placés sur la carte ou dont la distance est connue). */
+/** Un coup remarquable (le plus long, le plus court d'un club). */
+export interface ShotRecord {
+  dist: number;
+  date: string;
+  golf: string | null;
+  hole: number;
+}
+
+/** Distances et usage par club. */
 export interface ClubStat {
   club: string;
-  /** Nombre de coups mesurés. */
+  /** Coups joués avec ce club (distance connue ou non). */
+  used: number;
+  /** Coups mesurés (distance connue). */
   n: number;
   avg: number;
   min: number;
   max: number;
   /** Distance « habituelle » : médiane des coups. */
   median: number;
+  /** Quartiles : la moitié des coups tombe entre p25 et p75. */
+  p25: number;
+  p75: number;
+  /** Toutes les distances mesurées, triées (300 au plus). */
+  dists: number[];
+  longest: ShotRecord | null;
+  shortest: ShotRecord | null;
 }
 
 export interface StatsResponse {

@@ -1153,3 +1153,192 @@
   font-size: 13px;
   color: var(--label2);
 }
+
+/* --- Détail : usage et distances par club --------------------------------- */
+.cu {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.cu-total {
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.cu-unit {
+  font-size: 12px;
+  color: var(--label2);
+}
+.cu-legend {
+  flex: 1;
+  min-width: 150px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 14px;
+}
+.cu-legend li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+.cu-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.cu-legend b {
+  font-variant-numeric: tabular-nums;
+}
+.cd {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cd-row {
+  display: grid;
+  grid-template-columns: 30px 1fr 52px;
+  align-items: center;
+  gap: 10px;
+}
+.cd-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+.cd-val {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.cd-val small {
+  font-weight: 500;
+  color: var(--label2);
+}
+.cd-scale {
+  height: 16px;
+}
+.cd-ticks {
+  position: relative;
+  height: 16px;
+  font-size: 11px;
+  color: var(--label2);
+  font-variant-numeric: tabular-nums;
+}
+.cd-ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+.cd-ticks span:first-child {
+  transform: none;
+}
+.cd-ticks span:last-child {
+  transform: translateX(-100%);
+}
+.cx-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--teal) 12%, transparent);
+}
+.cx-k {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--label2);
+}
+.cx-v {
+  font-size: 28px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.cx-v small {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--label2);
+}
+.cx-w {
+  font-size: 13px;
+  color: var(--label2);
+}
+.cx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.cx-table th,
+.cx-table td {
+  padding: 7px 4px;
+  text-align: right;
+  border-top: 0.5px solid var(--sep);
+}
+.cx-table th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+.cx-table thead th {
+  border-top: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--label2);
+  text-transform: uppercase;
+}
+.cx-miss {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.cx-miss p {
+  margin: 0;
+}
+
+/* --- Détail humeur / forme / météo : répartition en anneau ---------------- */
+.wbd-pie {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.wbd-legend {
+  flex: 1;
+  min-width: 150px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+.wbd-legend li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+.wbd-legend li.is-zero {
+  color: var(--label3);
+}
+.wbd-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.wbd-legend b {
+  font-variant-numeric: tabular-nums;
+}
+.wb-col .donut {
+  margin-top: 4px;
+}

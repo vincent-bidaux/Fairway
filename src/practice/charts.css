@@ -184,3 +184,53 @@
     flex-grow: 0.001;
   }
 }
+
+/* --- camembert (anneau) --------------------------------------------------- */
+.donut {
+  position: relative;
+  flex: none;
+}
+.donut svg {
+  display: block;
+}
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.1;
+}
+
+/* --- nuage de points sur une échelle ------------------------------------- */
+.dstrip {
+  position: relative;
+  display: block;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--fill);
+}
+.dstrip-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 6px;
+}
+.dstrip-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  opacity: 0.55;
+}
+.dstrip-med {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+}

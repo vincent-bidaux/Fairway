@@ -474,3 +474,83 @@ export function DotRange({ value, min, max, color = 'var(--tint)', ariaLabel }: 
     </div>
   );
 }
+
+/** Camembert en anneau : parts d'un tout, avec un libellé au centre. */
+export function Donut({
+  segments,
+  size = 120,
+  thickness = 22,
+  children,
+  ariaLabel,
+}: {
+  segments: Segment[];
+  size?: number;
+  thickness?: number;
+  children?: ReactNode;
+  ariaLabel: string;
+}) {
+  const total = segments.reduce((a, s) => a + Math.max(0, s.value), 0);
+  const r = (size - thickness) / 2;
+  const c = 2 * Math.PI * r;
+  const gap = segments.filter((s) => s.value > 0).length > 1 ? Math.min(2.5, c / 120) : 0;
+  let acc = 0;
+  return (
+    <div className="donut" style={{ width: size, height: size }} role="img" aria-label={ariaLabel}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true" focusable="false">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--fill)" strokeWidth={thickness} />
+        {total > 0 &&
+          segments.map((s) => {
+            if (s.value <= 0) return null;
+            const len = (s.value / total) * c;
+            const el = (
+              <circle
+                key={s.key}
+                cx={size / 2}
+                cy={size / 2}
+                r={r}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={thickness}
+                strokeDasharray={`${Math.max(0.01, len - gap)} ${c}`}
+                strokeDashoffset={-acc}
+                transform={`rotate(-90 ${size / 2} ${size / 2})`}
+              />
+            );
+            acc += len;
+            return el;
+          })}
+      </svg>
+      {children && <div className="donut-center">{children}</div>}
+    </div>
+  );
+}
+
+/** Nuage de points sur une échelle : chaque coup est un point, la bande grise la moitié centrale, le trait la médiane. */
+export function DotStrip({
+  values,
+  max,
+  p25,
+  p75,
+  median,
+  color = 'var(--teal)',
+  ariaLabel,
+}: {
+  values: number[];
+  max: number;
+  p25: number;
+  p75: number;
+  median: number;
+  color?: string;
+  ariaLabel: string;
+}) {
+  const x = (v: number) => `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
+  return (
+    <span className="dstrip" role="img" aria-label={ariaLabel}>
+      <span className="dstrip-band" style={{ left: x(p25), width: `calc(${x(p75)} - ${x(p25)})`, background: `color-mix(in srgb, ${color} 22%, transparent)` }} />
+      {values.map((v, i) => (
+        <span key={i} className="dstrip-dot" style={{ left: x(v), background: color, top: `${30 + ((i * 37) % 40)}%` }} />
+      ))}
+      <span className="dstrip-med" style={{ left: x(median), background: color }} />
+    </span>
+  );
+}

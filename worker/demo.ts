@@ -6,6 +6,7 @@ import demoProfile from '../db/seed/demo-profile.json';
 import type { Drill, HoleEntry } from '../shared/practice';
 import { createAuth, DEMO_EMAIL, DEMO_PASSWORD, DEMO_USERNAME } from './auth';
 import type { Env } from './env';
+import { demoShots } from './demoShots';
 
 export const DEMO_USER_ID = 'demo-user';
 export const isDemo = (uid: string) => uid === DEMO_USER_ID;
@@ -95,10 +96,11 @@ export async function ensureDemo(env: Env, origin: string, opts: { reset?: boole
         ),
     );
     for (const h of s.holes_data ?? []) {
+      const shots = demoShots(s.id, h.hole, h.par, h.strokes, h.putts, h.penalties);
       stmts.push(
         db
-          .prepare(`INSERT INTO round_holes (session_id, hole, par, strokes, putts, fairway, gir, penalties, up_down, sand) VALUES (?,?,?,?,?,?,?,?,?,?)`)
-          .bind(s.id, h.hole, h.par, h.strokes, h.putts, h.fairway, h.gir, h.penalties, h.up_down, h.sand ?? null),
+          .prepare(`INSERT INTO round_holes (session_id, hole, par, strokes, putts, fairway, gir, penalties, up_down, sand, shots) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
+          .bind(s.id, h.hole, h.par, h.strokes, h.putts, h.fairway, h.gir, h.penalties, h.up_down, h.sand ?? null, shots.length ? JSON.stringify(shots) : null),
       );
     }
     for (const d of s.drills ?? []) {
