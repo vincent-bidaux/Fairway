@@ -1,8 +1,9 @@
 // Trou stylisé vu de dessus, généré de façon déterministe (golf + numéro de trou), avec la trajectoire des coups du joueur.
 import { useId } from 'react';
-import type { Fairway } from '../../shared/practice';
+import type { Fairway, Shot } from '../../shared/practice';
 import type { PlanLayer, Ring, Shape } from '../../shared/plan';
 import type { HolePlan } from './holePlan';
+import { holeGreen, holePin, holeTee, onGreen, shotPoints } from './shotGeo';
 import './highlights.css';
 
 type P = [number, number];
@@ -61,6 +62,8 @@ export interface HoleDiagramProps {
   ace?: boolean;
   label: string;
   real?: HolePlan | null;
+  /** Coups réellement placés pendant la saisie : le trajet dessiné est alors celui joué. */
+  shots?: Shot[] | null;
 }
 
 const LAYERS: PlanLayer[] = ['rough', 'scrub', 'wood', 'water', 'fairway', 'driving_range', 'tee', 'bunker', 'green'];
@@ -88,6 +91,9 @@ const arc = (a: P, b: P, lift: number) => {
   return `M${a[0].toFixed(1)},${a[1].toFixed(1)}Q${mx.toFixed(1)},${my.toFixed(1)} ${b[0].toFixed(1)},${b[1].toFixed(1)}`;
 };
 
+/** Flèche de l'arc : marquée pour les longs coups, discrète pour les petits. */
+const lift = (a: P, b: P, i: number, ace: boolean) => (ace ? 22 : Math.min(14 + (i === 0 ? 8 : 0), Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.3));
+
 /** Trajectoire des coups, atterrissages, putts, trou et drapeau (coordonnées de la boîte 320×168). */
 function Overlay({ trail, shots, hole, puttDots, ace, noPutt }: { trail: P[]; shots: P[]; hole: P; puttDots: P[]; ace: boolean; noPutt: boolean }) {
   const burst = ace
@@ -100,10 +106,10 @@ function Overlay({ trail, shots, hole, puttDots, ace, noPutt }: { trail: P[]; sh
     <>
         <g className="hole-trail" fill="none" strokeLinecap="round">
           {trail.slice(1).map((p, i) => (
-            <path key={i} d={arc(trail[i], p, ace ? 22 : 14 + (i === 0 ? 8 : 0))} stroke="#0e3d22" strokeOpacity="0.35" strokeWidth="4.5" strokeDasharray="0.1 6.5" />
+            <path key={i} d={arc(trail[i], p, lift(trail[i], p, i, ace))} stroke="#0e3d22" strokeOpacity="0.35" strokeWidth="4.5" strokeDasharray="0.1 6.5" />
           ))}
           {trail.slice(1).map((p, i) => (
-            <path key={`t${i}`} d={arc(trail[i], p, ace ? 22 : 14 + (i === 0 ? 8 : 0))} stroke="#fff" strokeWidth="3" strokeDasharray="0.1 6.5" />
+            <path key={`t${i}`} d={arc(trail[i], p, lift(trail[i], p, i, ace))} stroke="#fff" strokeWidth="3" strokeDasharray="0.1 6.5" />
           ))}
           {puttDots.length > 0 && <path d={line([shots[shots.length - 1], ...puttDots])} stroke="#fff" strokeWidth="2" strokeDasharray="0.1 4" />}
         </g>
@@ -184,6 +190,19 @@ function buildShots({ r, center, tee, greenC, hole, par, strokes, putts, fairway
   return { shots, trail, puttDots, noPutt };
 }
 
+/**
+ * Trajet réellement joué : arcs jusqu'à la première balle sur le green, puis putts en pointillés jusqu'au trou.
+ * Sans balle sur le green (chip rentré), le dernier arc finit dans le trou.
+ */
+function fromPlayed(pp: P[], real: HolePlan, toDiag: (q: P) => P, hole: P) {
+  const green = holeGreen(real.plan, real.hole);
+  const pin = holePin(real.hole);
+  const d = pp.map(toDiag);
+  const g = pp.findIndex((q, i) => i > 0 && onGreen(q, green, pin));
+  if (g > 0) return { trail: d.slice(0, g + 1), shots: d.slice(1, g + 1), puttDots: [...d.slice(g + 1), hole], noPutt: false };
+  return { trail: [...d, hole], shots: [...d.slice(1), hole], puttDots: [] as P[], noPutt: true };
+}
+
 const pointInRing = (p: P, ring: Ring) => {
   let inside = false;
   for (let i = 0, j = ring.length - 2; i < ring.length; j = i, i += 2) {
@@ -193,8 +212,16 @@ const pointInRing = (p: P, ring: Ring) => {
   return inside;
 };
 
-function RealHole({ par, strokes, putts, fairway, ace, label, seed, real }: HoleDiagramProps & { real: HolePlan }) {
+/** Positions jouées (repère du plan), si tous les coups ont été placés sur la carte. */
+function playedPoints(real: HolePlan, shots: Shot[] | null | undefined): Array<[number, number]> | null {
+  if (!shots || shots.length < 2 || !real.plan.origin) return null;
+  const pp = shotPoints(shots, real.plan.origin, holeTee(real.hole));
+  return pp.every((q) => q) ? (pp as Array<[number, number]>) : null;
+}
+
+function RealHole({ par, strokes, putts, fairway, ace, label, seed, real, shots: played }: HoleDiagramProps & { real: HolePlan }) {
   const { plan, hole: ph } = real;
+  const playedPts = playedPoints(real, played);
   const r = rng(seed * 7919 + 5);
   const line: P[] = [];
   for (let i = 0; i + 1 < ph.line.length; i += 2) line.push([ph.line[i], ph.line[i + 1]]);
@@ -205,7 +232,8 @@ function RealHole({ par, strokes, putts, fairway, ace, label, seed, real }: Hole
   const c = Math.cos(theta), sn = Math.sin(theta);
   const Rot = (q: P): P => [q[0] * c - q[1] * sn, q[0] * sn + q[1] * c];
   const rl = line.map(Rot);
-  const xs = rl.map((q) => q[0]), ys = rl.map((q) => q[1]);
+  const rp = playedPts ? playedPts.map(Rot) : [];
+  const xs = [...rl, ...rp].map((q) => q[0]), ys = [...rl, ...rp].map((q) => q[1]);
   const pad = 32;
   let x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
   const aspect = W / H;
@@ -233,7 +261,8 @@ function RealHole({ par, strokes, putts, fairway, ace, label, seed, real }: Hole
   }
   const hole: P = [greenC[0], greenC[1]];
   const fwWidth = 28 * s;
-  const { shots, trail, puttDots, noPutt } = buildShots({ r, center, tee, greenC, hole, par, strokes, putts, fairway, ace: !!ace, fwWidth, greenRx: Math.max(10, greenR) });
+  const sim = buildShots({ r, center, tee, greenC, hole, par, strokes, putts, fairway, ace: !!ace, fwWidth, greenRx: Math.max(10, greenR) });
+  const { shots, trail, puttDots, noPutt } = playedPts ? fromPlayed(playedPts, real, (q) => M(Rot(q)), hole) : sim;
 
   // surfaces proches du trou seulement
   const cx = (x0 + x1) / 2, cy2 = (y0 + y1) / 2;

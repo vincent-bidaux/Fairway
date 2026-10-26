@@ -9,7 +9,11 @@ export type Zone =
   | { mode: 'city'; name: string; postcode: string | null; lat: number; lng: number; radius: number }
   | { mode: 'depts'; depts: DepartmentCode[] };
 
+export type Theme = 'system' | 'light' | 'dark';
+
 export interface Prefs {
+  /** Apparence : suit le système par défaut. */
+  theme: Theme;
   zone: Zone | null;
   lastRadius: number;
   favorites: number[];
@@ -23,6 +27,7 @@ export interface Prefs {
 const KEY = 'fairway:prefs:v1';
 
 const defaults: Prefs = {
+  theme: 'system',
   zone: null,
   lastRadius: 30,
   favorites: [],
@@ -40,6 +45,7 @@ function load(): Prefs {
     return {
       ...defaults,
       ...p,
+      theme: p.theme === 'light' || p.theme === 'dark' ? p.theme : 'system',
       favorites: Array.isArray(p.favorites) ? p.favorites.filter((n) => typeof n === 'number') : [],
       types: Array.isArray(p.types) ? p.types : [],
       q: '',
@@ -50,6 +56,20 @@ function load(): Prefs {
 }
 
 let state: Prefs = load();
+
+const THEME_COLOR = { light: '#F2F2F7', dark: '#000000' };
+/** Pose `data-theme` sur <html> (absent = système) et accorde la couleur de la barre du navigateur. */
+export function applyTheme(theme: Theme): void {
+  if (typeof document === 'undefined') return;
+  const el = document.documentElement;
+  if (theme === 'system') delete el.dataset.theme;
+  else el.dataset.theme = theme;
+  document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => {
+    const sys = (m.media || '').includes('dark') ? 'dark' : 'light';
+    m.content = THEME_COLOR[theme === 'system' ? sys : theme];
+  });
+}
+applyTheme(state.theme);
 const listeners = new Set<() => void>();
 
 function save() {
@@ -63,8 +83,10 @@ function save() {
 }
 
 export function setPrefs(patch: Partial<Prefs>): void {
+  const themeChanged = patch.theme != null && patch.theme !== state.theme;
   state = { ...state, ...patch };
   save();
+  if (themeChanged) applyTheme(state.theme);
   listeners.forEach((l) => l());
 }
 

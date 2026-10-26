@@ -6,7 +6,8 @@ import demoProfile from '../db/seed/demo-profile.json';
 import type { Drill, HoleEntry } from '../shared/practice';
 import { createAuth, DEMO_EMAIL, DEMO_PASSWORD, DEMO_USERNAME } from './auth';
 import type { Env } from './env';
-import { demoShots } from './demoShots';
+import { demoShots, placeDemoShots } from './demoShots';
+import type { CoursePlan } from '../shared/plan';
 
 export const DEMO_USER_ID = 'demo-user';
 export const isDemo = (uid: string) => uid === DEMO_USER_ID;
@@ -75,6 +76,16 @@ export async function ensureDemo(env: Env, origin: string, opts: { reset?: boole
 
   const golfs = await db.prepare(`SELECT id, slug FROM golfs`).all<{ id: number; slug: string }>();
   const golfId = new Map(golfs.results.map((g) => [g.slug, g.id]));
+  // plans OSM des golfs de la démo, pour poser les coups sur la carte
+  const plans = new Map<number, CoursePlan>();
+  const planRows = await db.prepare(`SELECT golf_id, plan FROM course_plans WHERE plan IS NOT NULL`).all<{ golf_id: number; plan: string }>();
+  for (const r of planRows.results) {
+    try {
+      plans.set(r.golf_id, JSON.parse(r.plan) as CoursePlan);
+    } catch {
+      /* plan illisible : coups sans position */
+    }
+  }
   const sessions = demoSessions as DemoSession[];
   const last = sessions.reduce((m, s) => (s.played_at > m ? s.played_at : m), '');
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
@@ -96,7 +107,8 @@ export async function ensureDemo(env: Env, origin: string, opts: { reset?: boole
         ),
     );
     for (const h of s.holes_data ?? []) {
-      const shots = demoShots(s.id, h.hole, h.par, h.strokes, h.putts, h.penalties);
+      const gid = golfId.get(s.golf_slug);
+      const shots = placeDemoShots(demoShots(s.id, h.hole, h.par, h.strokes, h.putts, h.penalties), gid != null ? plans.get(gid) : null, s.id, h.hole, s.course, h.fairway);
       stmts.push(
         db
           .prepare(`INSERT INTO round_holes (session_id, hole, par, strokes, putts, fairway, gir, penalties, up_down, sand, shots) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)

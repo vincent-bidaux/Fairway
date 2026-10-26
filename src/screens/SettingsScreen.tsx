@@ -1,9 +1,9 @@
 import { Artwork } from '../components/Artwork';
-import { Group, Row } from '../components/Controls';
+import { Group, Row, Segmented } from '../components/Controls';
 import { Icon } from '../components/Icon';
 import { Screen } from '../components/Screen';
 import { zoneLabel } from '../lib';
-import { setPrefs, usePrefs } from '../store';
+import { setPrefs, usePrefs, type Theme } from '../store';
 import { useUi } from '../ui';
 import { refreshAccount, signOut, useAccount } from '../practice/account';
 import { deleteAccount, exportUrl, resetDemo } from '../practice/api';
@@ -11,7 +11,7 @@ import { deleteAccount, exportUrl, resetDemo } from '../practice/api';
 export const APP_VERSION = '0.1.0';
 
 export function SettingsScreen() {
-  const { zone, adminToken } = usePrefs();
+  const { zone, adminToken, theme } = usePrefs();
   const ui = useUi();
   const account = useAccount();
 
@@ -44,6 +44,21 @@ export function SettingsScreen() {
           chevron
           onClick={() => ui.openZone()}
         />
+      </Group>
+
+      <Group title="Apparence" footer="« Système » suit le réglage clair ou sombre de votre téléphone.">
+        <div className="row set-theme">
+          <Segmented<Theme>
+            label="Apparence"
+            value={theme}
+            onChange={(v) => setPrefs({ theme: v })}
+            options={[
+              { value: 'system', label: 'Système' },
+              { value: 'light', label: 'Clair' },
+              { value: 'dark', label: 'Sombre' },
+            ]}
+          />
+        </div>
       </Group>
 
       <Group

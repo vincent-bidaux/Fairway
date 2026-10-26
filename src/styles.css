@@ -2562,3 +2562,8 @@ input[type='range']::-moz-range-thumb {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 .cw-green:active { transform: scale(0.95); }
+
+/* Apparence forcée (Réglages) : les blocs « prefers-color-scheme » sont réécrits au build, voir vite.config.ts */
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] { color-scheme: dark; }
+.set-theme .seg { flex: 1; }

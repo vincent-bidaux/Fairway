@@ -5,6 +5,7 @@ import { AwardBadge, KIND_LABEL } from './AwardBadge';
 import { TrophyGlyph } from './glyphs';
 import { HoleDiagram } from './HoleDiagram';
 import { useHolePlan } from './holePlan';
+import { loopOfCourse } from './shotGeo';
 import { golfLabel, initials, rel } from './statsFormat';
 import './highlights.css';
 
@@ -45,7 +46,7 @@ export interface CardPlayer {
 }
 
 export function HighlightCard({ h, player, onOpen, interactive = true }: { h: Highlight; player: CardPlayer; onOpen?: () => void; interactive?: boolean }) {
-  const real = useHolePlan(h.course === '' ? h.golf_id : null, h.hole);
+  const real = useHolePlan(h.golf_id, h.hole, true, loopOfCourse(h.course));
   const title = highlightTitle(h);
   const recap = highlightRecap(h);
   const ctx = roundContext(h);
@@ -105,6 +106,7 @@ export function HighlightCard({ h, player, onOpen, interactive = true }: { h: Hi
           fairway={h.fairway}
           ace={h.kind === 'ace'}
           real={real}
+          shots={h.shots}
           label={`Schéma du trou ${h.hole}, par ${h.par}, ${h.strokes} coup${h.strokes > 1 ? 's' : ''}`}
         />
       </span>

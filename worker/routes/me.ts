@@ -428,7 +428,7 @@ meApi.delete('/index/:date', async (c) => {
 meApi.get('/highlights', async (c) => {
   const limit = Math.min(Math.max(Number(c.req.query('limit') ?? 50) || 50, 1), 500);
   const rows = await c.env.DB.prepare(
-    `SELECT h.session_id, h.hole, h.par, h.strokes, h.putts, h.fairway, h.gir, gh.stroke_index,
+    `SELECT h.session_id, h.hole, h.par, h.strokes, h.putts, h.fairway, h.gir, h.shots, gh.stroke_index,
             s.played_at, s.golf_id, g.name AS golf_name, g.city AS golf_city, s.course, s.event_title, s.holes, s.weather,
             (SELECT SUM(x.strokes) FROM round_holes x WHERE x.session_id = s.id) AS round_strokes,
             (SELECT SUM(x.strokes - x.par) FROM round_holes x WHERE x.session_id = s.id AND x.strokes IS NOT NULL) AS round_rel
@@ -440,6 +440,6 @@ meApi.get('/highlights', async (c) => {
      ORDER BY s.played_at DESC, h.hole DESC LIMIT ${limit}`,
   )
     .bind(c.get('userId'))
-    .all<Omit<Highlight, 'kind'>>();
-  return c.json(rows.results.map((r) => ({ ...r, kind: highlightKind(r.par, r.strokes) })));
+    .all<Omit<Highlight, 'kind' | 'shots'> & { shots: string | null }>();
+  return c.json(rows.results.map((r) => ({ ...r, shots: parseShots(r.shots), kind: highlightKind(r.par, r.strokes) })));
 });

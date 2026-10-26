@@ -392,7 +392,33 @@ function PlayedLabels({ labels, u }: { labels: Placed[]; u: number }) {
   );
 }
 
-const pathD = (p: Pt[]) => p.map((q, i) => `${i ? 'L' : 'M'}${q[0]} ${q[1]}`).join('');
+/** Sous cette longueur (putts, petits coups), le trajet reste droit. */
+const CURVE_MIN = 25;
+/**
+ * Trajet de balle en petites courbes : chaque coup est un arc dont la flèche vaut ~12 % de sa longueur,
+ * toujours du même côté de l'écran (à l'opposé des étiquettes). Les putts restent droits.
+ */
+export function curveD(p: Pt[]): string {
+  if (!p.length) return '';
+  let d = `M${p[0][0]} ${p[0][1]}`;
+  for (let i = 1; i < p.length; i++) {
+    const a = p[i - 1], b = p[i];
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy);
+    if (len < CURVE_MIN) {
+      d += `L${b[0]} ${b[1]}`;
+      continue;
+    }
+    let nx = -dy / len, ny = dx / len;
+    // même convention que les étiquettes (côté « haut » ou droit), inversée
+    if (ny > 1e-6 || (Math.abs(ny) <= 1e-6 && nx < 0)) { nx = -nx; ny = -ny; }
+    const bow = Math.min(len * 0.12, 40);
+    const cx = (a[0] + b[0]) / 2 - nx * bow * 2, cy = (a[1] + b[1]) / 2 - ny * bow * 2;
+    d += `Q${cx.toFixed(1)} ${cy.toFixed(1)} ${b[0]} ${b[1]}`;
+  }
+  return d;
+}
+const pathD = curveD;
 
 interface Props {
   plan: CoursePlan;

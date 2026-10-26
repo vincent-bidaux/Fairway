@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { geoToPlan, planToGeo, type GeoPoint } from '../../shared/plan';
 import { CLUB_BY_ID, DEFAULT_BAG, type Fairway, type HoleEntry, type Shot } from '../../shared/practice';
-import { holeFrame, PlanBase, pts, ringD, useZoomPan } from '../components/CourseWidget';
+import { curveD, holeFrame, PlanBase, pts, ringD, useZoomPan } from '../components/CourseWidget';
 import { Icon } from '../components/Icon';
 import { useDataVersion } from './account';
 import { getProfile } from './api';
@@ -146,13 +146,12 @@ function MapStage({
   // Près du green, chaque nouveau coup recadre sur la balle et le green ; loin, on voit tout le trou.
   const lastKey = last ? `${last.i}:${last.p[0].toFixed(1)}:${last.p[1].toFixed(1)}` : '';
   useEffect(() => {
-    if (!active) return;
-    if (!last || holed) return;
+    if (!active || !last) return;
     const lp = points[last.i]!;
     const d = dist(lp, frame.pin);
     if (d <= APPROACH_M) zp.zoomTo(boxAround([last.p, ...gCorners], GREEN_MARGIN, 60));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastKey, active, holed]);
+  }, [lastKey, active]);
 
   const meR = me ? frame.rot(me) : null;
   const toPin = me ? dist(me, frame.pin) : null;
@@ -173,8 +172,8 @@ function MapStage({
           <PlanBase plan={hp.plan} />
           <path className="sm-hole" d={ringD(hp.hole.line, false)} vectorEffect="non-scaling-stroke" />
         </g>
-        {placed.length > 1 && <path className="sm-path" d={'M' + placed.map((x) => x.p.join(' ')).join('L')} vectorEffect="non-scaling-stroke" />}
-        {last && <path className={`sm-path${holed ? '' : ' sm-path--rest'}`} d={`M${last.p.join(' ')}L${pin.join(' ')}`} vectorEffect="non-scaling-stroke" />}
+        {placed.length > 1 && <path className="sm-path" d={curveD(placed.map((x) => x.p))} vectorEffect="non-scaling-stroke" />}
+        {last && <path className={`sm-path${holed ? '' : ' sm-path--rest'}`} d={holed ? curveD([last.p, pin]) : `M${last.p.join(' ')}L${pin.join(' ')}`} vectorEffect="non-scaling-stroke" />}
         <circle cx={pin[0]} cy={pin[1]} r={6 * u} strokeWidth={2 * u} className="sm-pin" />
         {placed.map(({ p, i }) => (
           <g key={i} className={`sm-shot${i === current ? ' is-sel' : ''}${last && i === last.i && i > 0 ? ' is-last' : ''}`}>
@@ -231,11 +230,9 @@ function MapStage({
           </button>
         )}
       </div>
-      {!holed && (
-        <div className="sm-hint" aria-hidden="true">
-          {last && last.i > 0 ? `Touchez pour le coup ${current + 1} · touchez le ${last.i + 1} pour l’effacer` : `Touchez où est la balle pour le coup ${current + 1}`}
-        </div>
-      )}
+      <div className="sm-hint" aria-hidden="true">
+        {last && last.i > 0 ? `Touchez pour le coup ${last.i + 2} · touchez le ${last.i + 1} pour l’effacer` : `Touchez où est la balle pour le coup ${current + 1}`}
+      </div>
     </div>
   );
 }

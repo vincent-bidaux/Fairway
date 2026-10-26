@@ -123,5 +123,5 @@ export const sampleSessions: PlaySession[] = [
 ];
 
 export const sampleHighlights: Highlight[] = [
-  { session_id: 'h1', hole: 7, par: 4, strokes: 3, putts: 1, fairway: 'hit', gir: 1, stroke_index: 5, kind: 'birdie', played_at: `${iso(12)}T10:00:00`, golf_id: 0, golf_name: 'Golf de Démonstration', golf_city: 'La Rochelle', course: '', event_title: 'Trophée des Vendanges', holes: 18, round_strokes: 91, round_rel: 19, weather: 4 },
+  { session_id: 'h1', hole: 7, par: 4, strokes: 3, putts: 1, fairway: 'hit', gir: 1, stroke_index: 5, kind: 'birdie', played_at: `${iso(12)}T10:00:00`, golf_id: 0, golf_name: 'Golf de Démonstration', golf_city: 'La Rochelle', course: '', event_title: 'Trophée des Vendanges', holes: 18, round_strokes: 91, round_rel: 19, weather: 4, shots: null },
 ];

@@ -177,6 +177,8 @@ export interface Highlight {
   round_strokes: number;
   round_rel: number;
   weather: number | null;
+  /** Coups placés sur la carte pendant la saisie (null si non renseignés). */
+  shots: Shot[] | null;
 }
 
 export function highlightKind(par: number, strokes: number): HighlightKind | null {
