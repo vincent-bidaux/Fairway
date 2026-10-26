@@ -229,6 +229,7 @@ function buildPlan(golf: GolfRow, courses: OsmElement[], elements: OsmElement[])
   const loops = splitLoops(holes);
   const base = {
     v: 1 as const,
+    origin: { lat: +lat0.toFixed(7), lon: +lon0.toFixed(7) },
     slug: golf.slug,
     name: golf.name,
     osm: courses.map(ref),
@@ -271,10 +272,45 @@ export async function ensurePlansTable(env: Env) {
   );
 }
 
+/**
+ * Plans extraits avant l'ajout du point de référence GPS : une seule requête Overpass légère (bornes des éléments
+ * OSM d'origine, sans géométrie) suffit à le retrouver, car le plan est centré sur le milieu de ces bornes.
+ */
+export async function backfillOrigins(env: Env, limit = 200): Promise<number> {
+  const { results } = await env.DB.prepare(
+    `SELECT golf_id, osm FROM course_plans WHERE plan IS NOT NULL AND osm IS NOT NULL AND json_extract(plan, '$.origin') IS NULL LIMIT ?`,
+  )
+    .bind(limit)
+    .all<{ golf_id: number; osm: string }>();
+  if (!results.length) return 0;
+  const refs = new Set(results.flatMap((r) => r.osm.split(' ').filter(Boolean)));
+  const sel = [...refs].map((r) => { const [t, id] = r.split('/'); return `${t === 'relation' ? 'rel' : 'way'}(${id});`; }).join('');
+  const els = await overpass(`[out:json][timeout:60];(${sel});out ids bb;`);
+  const bounds = new Map(els.filter((e) => e.bounds).map((e) => [ref(e), e.bounds!]));
+  const stmts: D1PreparedStatement[] = [];
+  for (const r of results) {
+    const bs = r.osm.split(' ').filter(Boolean).map((x) => bounds.get(x));
+    if (!bs.length || bs.some((b) => !b)) continue;
+    const minLat = Math.min(...bs.map((b) => b!.minlat)), maxLat = Math.max(...bs.map((b) => b!.maxlat));
+    const minLon = Math.min(...bs.map((b) => b!.minlon)), maxLon = Math.max(...bs.map((b) => b!.maxlon));
+    const origin = { lat: +((minLat + maxLat) / 2).toFixed(7), lon: +((minLon + maxLon) / 2).toFixed(7) };
+    stmts.push(env.DB.prepare(`UPDATE course_plans SET plan = json_set(plan, '$.origin', json(?)) WHERE golf_id = ?`).bind(JSON.stringify(origin), r.golf_id));
+  }
+  if (stmts.length) await env.DB.batch(stmts);
+  return stmts.length;
+}
+
 /** Refreshes the plans of the golfs that are due (never checked, or older than 30 days). */
 export async function refreshPlans(env: Env, opts: { limit?: number; slugs?: string[]; force?: boolean } = {}): Promise<PlanResult[]> {
   const db = env.DB;
   await ensurePlansTable(env);
+  // GPS origin of plans extracted before 26/10/2026 (one light request, then nothing to do)
+  try {
+    const n = await backfillOrigins(env);
+    if (n) console.log('plans: origin added to', n);
+  } catch (e) {
+    console.error('plans: origin backfill', (e as Error).message);
+  }
   const all = (
     await db.prepare(`SELECT id, slug, name, lat, lng, holes FROM golfs WHERE active = 1 AND lat IS NOT NULL AND lng IS NOT NULL`).all<GolfRow>()
   ).results;
