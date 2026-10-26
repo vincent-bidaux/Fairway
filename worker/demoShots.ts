@@ -116,7 +116,7 @@ const loopOf = (course: string | null | undefined) => {
  * longueur), avec un écart latéral (et le côté du fairway manqué pour le drive) ; le dernier finit sur le green
  * à la distance du premier putt, puis chaque putt rapproche la balle du drapeau. Sans plan exploitable : inchangé.
  */
-export function placeDemoShots(shots: Shot[], plan: CoursePlan | null | undefined, sessionId: string, hole: number, course: string | null | undefined, fairway: Fairway | null | undefined): Shot[] {
+export function placeDemoShots(shots: Shot[], plan: CoursePlan | null | undefined, sessionId: string, hole: number, par: number, course: string | null | undefined, fairway: Fairway | null | undefined): Shot[] {
   if (!shots.length || !plan?.origin) return shots;
   const ph = plan.holes.find((h) => h.ref === hole && h.loop === loopOf(course));
   if (!ph || ph.line.length < 4) return shots;
@@ -136,7 +136,9 @@ export function placeDemoShots(shots: Shot[], plan: CoursePlan | null | undefine
   const cum: number[] = [];
   let acc = 0;
   for (let k = 0; k < full; k++) { acc += shots[k].dist ?? 0; cum.push(acc); }
-  const scale = acc > 0 ? Math.max(0, L - firstPutt) / acc : 0;
+  const scale = acc > 0 ? Math.max(0, L - firstPutt) / acc : 1;
+  // trou de la démo trop différent du plan (par, longueur) : on ne dessine pas un trajet absurde
+  if ((ph.par != null && ph.par !== par) || scale < 0.7 || scale > 1.4) return shots;
   for (let k = 0; k < full - 1; k++) {
     const { p, dir } = alongLine(line, cum[k] * scale);
     const left: P = [dir[1], -dir[0]];

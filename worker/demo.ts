@@ -108,7 +108,7 @@ export async function ensureDemo(env: Env, origin: string, opts: { reset?: boole
     );
     for (const h of s.holes_data ?? []) {
       const gid = golfId.get(s.golf_slug);
-      const shots = placeDemoShots(demoShots(s.id, h.hole, h.par, h.strokes, h.putts, h.penalties), gid != null ? plans.get(gid) : null, s.id, h.hole, s.course, h.fairway);
+      const shots = placeDemoShots(demoShots(s.id, h.hole, h.par, h.strokes, h.putts, h.penalties), gid != null ? plans.get(gid) : null, s.id, h.hole, h.par, s.course, h.fairway);
       stmts.push(
         db
           .prepare(`INSERT INTO round_holes (session_id, hole, par, strokes, putts, fairway, gir, penalties, up_down, sand, shots) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
