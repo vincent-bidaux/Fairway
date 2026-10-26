@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { HoleEntry, PlaySession, RoundStats } from '../../../shared/practice';
 import { girOf } from '../../../shared/practice';
 import { Group, Row, Spinner } from '../../components/Controls';
+import { CourseWidget, type PlayedRound } from '../../components/CourseWidget';
 import { Icon } from '../../components/Icon';
 import { BackButton, Screen } from '../../components/Screen';
 import { ErrorState } from '../../components/States';
@@ -10,8 +11,10 @@ import { useUi } from '../../ui';
 import { useDataVersion, touchData } from '../account';
 import { deleteSession, getSession, getStats } from '../api';
 import { ConfirmSheet } from '../ConfirmSheet';
+import { useGolfPlan } from '../holePlan';
 import { fmtDuration, focusLabel } from '../PracticeForm';
 import { fmtRel, Scorecard, summarize } from '../scorecard';
+import { loopOfCourse } from '../shotGeo';
 import { sessionTitle, teeLabel } from '../SessionInfo';
 import { ContextBadge } from '../contextIcons';
 import '../session.css';
@@ -135,6 +138,16 @@ export function SessionDetail({ id }: { id: string }) {
   const nums = useMemo(() => numbers(entries), [entries]);
   const back = <BackButton onClick={ui.back} label="Retour" />;
 
+  // plan du golf (parties seulement) et ce qui a été joué dessus
+  const plan = useGolfPlan(s?.golf_id ?? null, s?.kind === 'round');
+  const played = useMemo<PlayedRound | null>(() => {
+    if (!s || s.kind !== 'round' || !plan) return null;
+    const holes = entries
+      .filter((e) => e.strokes != null || (e.shots?.length ?? 0) > 0)
+      .map((e) => ({ ref: e.hole, shots: e.shots ?? [], holed: e.strokes != null }));
+    return holes.length ? { loop: loopOfCourse(s.course), holes } : null;
+  }, [s, plan, entries]);
+
   if (!s) {
     return (
       <Screen title="Séance" large={false} left={back}>
@@ -246,6 +259,8 @@ export function SessionDetail({ id }: { id: string }) {
           {s.mood && <ContextBadge kind="mood" level={s.mood} size={40} label />}
         </div>
       )}
+
+          {plan && played && <CourseWidget plan={plan} lat={plan.origin?.lat} lng={plan.origin?.lon} played={played} />}
 
           <Group title="Carte de score">
             <div className="row row--block sc-wrap">

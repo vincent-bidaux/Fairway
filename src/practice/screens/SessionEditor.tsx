@@ -60,7 +60,7 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
     const base: PlaySession = { ...session };
     if (base.mood == null && base.kind === 'range' && base.feeling) base.mood = base.feeling;
     if (base.kind === 'round') {
-      const holes = base.holes === 9 ? 9 : 18;
+      const holes = base.holes && base.holes >= 1 && base.holes <= 18 ? base.holes : 18;
       base.holes = holes;
       base.hole_entries = buildEntries(holes, base.start_hole || 1, base.hole_entries ?? []);
     }
@@ -166,8 +166,10 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
   const start = async () => {
     if (!canStart) return;
     if (kind === 'round') {
-      const holes: 9 | 18 = s.holes === 9 ? 9 : 18;
-      setS((x) => ({ ...x, holes, hole_entries: buildEntries(holes, holes === 9 ? x.start_hole : 1) }));
+      const holes = s.holes && s.holes >= 1 && s.holes <= 18 ? s.holes : 18;
+      // une boucle secondaire part toujours de son trou 1 ; sur le parcours principal, 9 trous peuvent partir du 10
+      const start = s.course === '' && holes === 9 ? s.start_hole : 1;
+      setS((x) => ({ ...x, holes, start_hole: start, hole_entries: buildEntries(holes, start) }));
     } else if (s.golf_id == null) {
       setS((x) => ({ ...x, place: x.place?.trim() || null }));
     }

@@ -131,7 +131,7 @@ meApi.put('/sessions/:id', async (c) => {
 
   const golfId = int(b.golf_id, 1, 1e9);
   const course = str(b.course, 60) ?? '';
-  const holes = b.kind === 'round' ? (b.holes === 9 ? 9 : 18) : null;
+  const holes = b.kind === 'round' ? (int(b.holes, 1, 18) ?? 18) : null;
   const db = c.env.DB;
   // Compétition liée : on vérifie qu'elle existe et on recopie son titre.
   let eventId = int(b.event_id, 1, 1e9);

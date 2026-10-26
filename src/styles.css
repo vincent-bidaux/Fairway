@@ -2494,3 +2494,65 @@ input[type='range']::-moz-range-thumb {
 .cw-holes {
   padding: 8px 10px 10px;
 }
+
+
+/* ==== Partie jouée sur le plan ==== */
+/* Trajectoire de la balle : trait blanc sur une ombre sombre discrète, lisible en clair comme en sombre */
+.cw-pl-under,
+.cw-pl-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.cw-pl-under { stroke: rgba(0, 0, 0, 0.35); stroke-width: 5px; }
+.cw-pl-path { stroke: #fff; stroke-width: 2.5px; }
+
+.cw-pl-dot { fill: #fff; stroke: rgba(0, 0, 0, 0.45); pointer-events: none; }
+
+/* Coups numérotés de la vue d'un trou */
+.cw-pl-mk { pointer-events: none; }
+.cw-pl-mk circle { fill: var(--g-badge); stroke: #fff; }
+.cw-pl-mk text {
+  fill: var(--g-badge-fg);
+  font-family: var(--font);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Étiquettes « 212 m Dr » */
+.cw-pl-labs { pointer-events: none; }
+.cw-pl-labs rect {
+  fill: var(--blur-bg);
+  stroke: var(--sep);
+  stroke-width: 0.5px;
+  vector-effect: non-scaling-stroke;
+}
+.cw-pl-labs text {
+  fill: var(--label);
+  font-family: var(--font);
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bouton « Green » à côté des boutons de zoom */
+.cw-green {
+  position: absolute;
+  top: 10px;
+  right: 56px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 17px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tint);
+  background: var(--blur-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+.cw-green:active { transform: scale(0.95); }

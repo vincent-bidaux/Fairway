@@ -9,6 +9,8 @@ import { Field, Group, Row, Segmented } from '../components/Controls';
 import { ContextPicker } from './contextIcons';
 import { Icon } from '../components/Icon';
 import { GolfPicker } from './GolfPicker';
+import { useGolfPlan } from './holePlan';
+import { courseOfLoop, loopOfCourse } from './shotGeo';
 import './session.css';
 
 export const TEES = [
@@ -23,7 +25,7 @@ export function teeLabel(t: string | null): string | null {
 }
 
 /** Entrées complètes (une par trou joué, dans l'ordre de jeu) à partir des trous déjà saisis. */
-export function buildEntries(holes: 9 | 18, start: number, existing: HoleEntry[] = [], known: Record<number, number> = {}): HoleEntry[] {
+export function buildEntries(holes: number, start: number, existing: HoleEntry[] = [], known: Record<number, number> = {}): HoleEntry[] {
   const out: HoleEntry[] = [];
   for (let k = 0; k < holes; k++) {
     const hole = ((start - 1 + k) % 18) + 1;
@@ -101,7 +103,7 @@ export function PlaceDate({ s, onChange }: PlaceDateProps) {
         allowOther={isRange}
         otherSelected={other}
         onOther={() => onChange({ golf_id: null, golf_name: null, golf_city: null, place: s.place ?? '' }, null)}
-        onPick={(g) => onChange(g.id === s.golf_id ? {} : { golf_id: g.id, golf_name: g.name, golf_city: g.city, place: null, event_id: null, event_title: null }, g)}
+        onPick={(g) => onChange(g.id === s.golf_id ? {} : { golf_id: g.id, golf_name: g.name, golf_city: g.city, place: null, event_id: null, event_title: null, course: '' }, g)}
         selectedEventId={s.event_id}
         onPickEvent={
           isRange
@@ -114,6 +116,7 @@ export function PlaceDate({ s, onChange }: PlaceDateProps) {
                     golf_name: e.golfName,
                     golf_city: e.golfCity,
                     place: null,
+                    ...(e.golfId !== s.golf_id ? { course: '' } : {}),
                     event_id: e.id,
                     event_title: e.title,
                     played_at: `${e.startDate}T${e.startTime ?? s.played_at.slice(11, 16) ?? '09:00'}`,
@@ -133,12 +136,54 @@ interface RoundOptionsProps {
   showStart?: boolean;
 }
 
+const km = (m: number) => `${(m / 1000).toFixed(1).replace('.', ',')} km`;
+
 export function RoundOptions({ s, golfHoles, onChange, showStart = true }: RoundOptionsProps) {
   const holes = s.holes ?? 18;
-  const canStart = showStart && holes === 9 && (golfHoles ?? 0) >= 18;
+  const plan = useGolfPlan(s.golf_id);
+  const loops = plan?.loops ?? [];
+  const loop = loopOfCourse(s.course);
+  const onMain = loop === 0;
+  const canStart = showStart && onMain && holes === 9 && (golfHoles ?? 0) >= 18;
+  const radio = (on: boolean) => (
+    <span className={`check${on ? ' is-on' : ''}`}>
+      <Icon name="check" size={18} strokeWidth={2.6} />
+    </span>
+  );
   return (
     <>
-      <Group title="Parcours">
+      {loops.length > 1 && (
+        <Group title="Parcours joué" footer="Les parcours du plan du golf. Le parcours principal peut se jouer en 9 ou 18 trous.">
+          {loops.map((l, i) => {
+            const on = i === loop;
+            const desc = [`${l.holes} trous`, l.par ? `par ${l.par}` : null, km(l.len)].filter(Boolean).join(' · ');
+            return (
+              <button
+                key={i}
+                type="button"
+                className="row row--tap"
+                role="radio"
+                aria-checked={on}
+                onClick={() =>
+                  onChange(
+                    i === 0
+                      ? { course: '', holes: l.holes >= 18 ? 18 : l.holes, start_hole: 1 }
+                      : { course: courseOfLoop(i), holes: Math.min(18, l.holes), start_hole: 1 },
+                  )
+                }
+              >
+                <span className="row-main">
+                  <span className="row-label">{i === 0 ? 'Parcours principal' : `Boucle ${i + 1}`}</span>
+                  <span className="row-sub">{desc}</span>
+                </span>
+                {radio(on)}
+              </button>
+            );
+          })}
+        </Group>
+      )}
+      {onMain && (
+      <Group title={loops.length > 1 ? 'Trous' : 'Parcours'}>
         <div className="row row--block si-seg">
           <Segmented<'9' | '18'>
             label="Nombre de trous"
@@ -164,6 +209,7 @@ export function RoundOptions({ s, golfHoles, onChange, showStart = true }: Round
           </div>
         )}
       </Group>
+      )}
       <Group title="Repère de départ" footer="Facultatif.">
         <div className="row row--block">
           <div className="tee-chips" role="radiogroup" aria-label="Repère de départ">

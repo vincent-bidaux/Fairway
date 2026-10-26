@@ -1,11 +1,13 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { CoursePlan, PlanHole, PlanLayer, PlanLevel, Ring, Shape } from '../../shared/plan';
+import { CLUB_BY_ID, type Shot } from '../../shared/practice';
+import { dist, greenBox, holeGreen, holePin, holeTee, shotPoints } from '../practice/shotGeo';
 import { HoleGrid } from './HoleGrid';
 import { Icon } from './Icon';
 import { Sheet } from './Sheet';
 
 const ORDER: PlanLayer[] = ['rough', 'scrub', 'wood', 'water', 'fairway', 'driving_range', 'tee', 'bunker', 'green'];
-const MAX_ZOOM = 8;
+const MAX_ZOOM = 14;
 /** Stage shape, shared by the course view and the hole view so the widget never changes size. */
 const MIN_ASPECT = 0.78;
 const MAX_ASPECT = 1.2;
@@ -147,6 +149,28 @@ export function useZoomPan(base: Box, onSwipe?: (dir: 1 | -1) => void) {
     setView({ k, cx, cy });
   }, []);
 
+  // Glissement animé vers une vue (zoom piloté par l'app : green, dernier coup…)
+  const anim = useRef(0);
+  const glide = useCallback(
+    (k: number, cx: number, cy: number) => {
+      cancelAnimationFrame(anim.current);
+      const reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const from = live.current.view;
+      if (reduce) return set(k, cx, cy);
+      const t0 = performance.now();
+      const step = (t: number) => {
+        const p = Math.min(1, (t - t0) / 320);
+        const e = 1 - (1 - p) ** 3;
+        // interpolate the zoom geometrically so the motion feels even
+        set(from.k * (k / from.k) ** e, from.cx + (cx - from.cx) * e, from.cy + (cy - from.cy) * e);
+        if (p < 1) anim.current = requestAnimationFrame(step);
+      };
+      anim.current = requestAnimationFrame(step);
+    },
+    [set],
+  );
+  useEffect(() => () => cancelAnimationFrame(anim.current), []);
+
   const local = (e: { clientX: number; clientY: number }): Pt => {
     const r = stage.current!.getBoundingClientRect();
     return [e.clientX - r.left, e.clientY - r.top];
@@ -246,7 +270,16 @@ export function useZoomPan(base: Box, onSwipe?: (dir: 1 | -1) => void) {
     u: f.u,
     zoomed: view.k > 1.01,
     zoomBy: (m: number) => zoomAt(view.k * m, [size.w / 2, size.h / 2]),
-    reset: () => set(1, base.x + base.w / 2, base.y + base.h / 2),
+    /** Zoom autour d'un point du dessin, qui devient le centre de la vue. */
+    zoomAround: (m: number, c: Pt) => glide(clamp(view.k * m, 1, MAX_ZOOM), c[0], c[1]),
+    /** Cadre la vue sur une zone du dessin (animé). */
+    zoomTo: (b: Box) => {
+      const k = clamp(Math.min(base.w / b.w, base.h / b.h), 1, MAX_ZOOM);
+      glide(k, b.x + b.w / 2, b.y + b.h / 2);
+    },
+    /** Facteur de zoom actuel (1 = vue entière). */
+    k: view.k,
+    reset: () => glide(1, base.x + base.w / 2, base.y + base.h / 2),
     wasDrag: () => moved.current,
     /** Point écran (clientX/clientY) → coordonnées du dessin (repère du viewBox). */
     toWorld: (clientX: number, clientY: number): Pt => {
@@ -256,24 +289,145 @@ export function useZoomPan(base: Box, onSwipe?: (dir: 1 | -1) => void) {
   };
 }
 
+// ---------------------------------------------------------------- partie jouée sur le plan
+/** Ce qui a été joué : la boucle et, pour chaque trou, les coups (dans l'ordre de jeu). */
+export interface PlayedRound {
+  loop: number;
+  holes: Array<{ ref: number; shots: Shot[]; holed: boolean }>;
+}
+
+/** Un coup entre deux positions, avec l'étiquette « 212 m Dr » (repère du plan). */
+interface PlayedSeg {
+  a: Pt;
+  b: Pt;
+  d: number;
+  text: string;
+}
+interface PlayedHole {
+  hole: PlanHole;
+  holed: boolean;
+  /** Positions des coups (plan). */
+  spots: Pt[];
+  /** Tracé de la balle : les positions, puis le drapeau si le trou est terminé. */
+  path: Pt[];
+  segs: PlayedSeg[];
+}
+interface Placed {
+  key: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  text: string;
+}
+
+/** Putts et petits coups : pas d'étiquette sous cette distance. */
+const MIN_LABEL_M = 25;
+/** Sur la vue d'ensemble, seuls les longs coups portent une étiquette. */
+const COURSE_LABEL_M = 120;
+const LAB_H = 20;
+const labW = (text: string) => text.length * 7 + 12;
+
+function playedHole(plan: CoursePlan, hole: PlanHole, shots: Shot[], holed: boolean): PlayedHole {
+  const pin = holePin(hole);
+  const pp = shotPoints(shots, plan.origin, holeTee(hole));
+  const spots: Pt[] = [];
+  const segs: PlayedSeg[] = [];
+  pp.forEach((p, i) => {
+    if (!p) return;
+    spots.push(p);
+    const next = i + 1 < pp.length ? pp[i + 1] : holed ? pin : null;
+    if (!next) return;
+    const d = Math.round(shots[i].dist ?? dist(p, next));
+    const club = shots[i].club ? CLUB_BY_ID[shots[i].club!]?.short : null;
+    segs.push({ a: p, b: next, d, text: `${d} m${club ? ` ${club}` : ''}` });
+  });
+  const path = holed && spots.length ? [...spots, pin] : spots;
+  return { hole, holed, spots, path, segs };
+}
+
+const rotator = (deg: number) => {
+  const t = (deg * Math.PI) / 180;
+  const c = Math.cos(t), s = Math.sin(t);
+  return (q: Pt): Pt => [q[0] * c - q[1] * s, q[0] * s + q[1] * c];
+};
+
+/**
+ * Place les étiquettes de coups (coordonnées de la vue) : au milieu du segment, décalées perpendiculairement
+ * pour ne pas masquer le trait. La taille est constante à l'écran (× u). On traite les plus longs coups d'abord
+ * et on abandonne toute étiquette qui en chevaucherait une déjà retenue.
+ */
+function layoutLabels(segs: PlayedSeg[], u: number, min: number): Placed[] {
+  const out: Placed[] = [];
+  const pad = 2 * u;
+  const cands = segs.filter((s) => s.d >= min).sort((a, b) => b.d - a.d);
+  cands.forEach((s, i) => {
+    const w = labW(s.text) * u, h = LAB_H * u;
+    const dx = s.b[0] - s.a[0], dy = s.b[1] - s.a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    let nx = -dy / len, ny = dx / len;
+    // le côté « haut » de l'écran ; trait vertical : côté droit
+    if (ny > 1e-6 || (Math.abs(ny) <= 1e-6 && nx < 0)) { nx = -nx; ny = -ny; }
+    const off = (w / 2) * Math.abs(nx) + (h / 2) * Math.abs(ny) + 3 * u;
+    const cx = (s.a[0] + s.b[0]) / 2 + nx * off, cy = (s.a[1] + s.b[1]) / 2 + ny * off;
+    const x = cx - w / 2, y = cy - h / 2;
+    const hit = out.some((o) => x < o.x + o.w + pad && x + w + pad > o.x && y < o.y + o.h + pad && y + h + pad > o.y);
+    if (!hit) out.push({ key: `l${i}`, x, y, w, h, text: s.text });
+  });
+  return out;
+}
+
+function PlayedLabels({ labels, u }: { labels: Placed[]; u: number }) {
+  return (
+    <g className="cw-pl-labs">
+      {labels.map((l) => (
+        <g key={l.key}>
+          <rect x={l.x} y={l.y} width={l.w} height={l.h} rx={l.h / 2} />
+          <text x={l.x + l.w / 2} y={l.y + l.h / 2} fontSize={12 * u}>
+            {l.text}
+          </text>
+        </g>
+      ))}
+    </g>
+  );
+}
+
+const pathD = (p: Pt[]) => p.map((q, i) => `${i ? 'L' : 'M'}${q[0]} ${q[1]}`).join('');
+
 interface Props {
   plan: CoursePlan;
   lat?: number | null;
   lng?: number | null;
+  /** Partie jouée : verrouille la boucle, ne liste que les trous joués et dessine la trajectoire de la balle. */
+  played?: PlayedRound;
 }
 
 /** Widget plan du parcours : vue d'ensemble cliquable, puis un écran par trou (départ en bas, drapeau en haut). */
-export function CourseWidget({ plan, lat, lng }: Props) {
+export function CourseWidget({ plan, lat, lng, played }: Props) {
   const loops = plan.loops.length ? plan.loops : [];
-  const [loop, setLoop] = useState(0);
+  const [loopSel, setLoop] = useState(0);
+  const loop = played ? played.loop : loopSel;
   const [hole, setHole] = useState<number | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
 
-  const loopHoles = useMemo(
+  // tous les trous de la boucle (vue d'ensemble)
+  const loopAll = useMemo(
     () => plan.holes.filter((h) => h.loop === loop && h.ref != null).sort((a, b) => (a.ref ?? 0) - (b.ref ?? 0)),
     [plan, loop],
   );
+  // trous jouables via la règle : tous, ou seulement ceux de la partie dans l'ordre de jeu
+  const playedHoles = useMemo(() => {
+    if (!played) return null;
+    const out: PlayedHole[] = [];
+    for (const ph of played.holes) {
+      const h = loopAll.find((x) => x.ref === ph.ref);
+      if (h) out.push(playedHole(plan, h, ph.shots, ph.holed));
+    }
+    return out;
+  }, [played, plan, loopAll]);
+  const loopHoles = useMemo(() => (playedHoles ? playedHoles.map((p) => p.hole) : loopAll), [playedHoles, loopAll]);
   const current = hole != null ? loopHoles[hole] : undefined;
+  const curPlayed = playedHoles && hole != null ? playedHoles[hole] : undefined;
   const cBox = useMemo(() => courseBox(plan), [plan]);
   const hf = useMemo(() => (current ? holeFrame(current, cBox.w / cBox.h) : null), [current, cBox]);
   const base = hf ? hf.box : cBox;
@@ -292,7 +446,7 @@ export function CourseWidget({ plan, lat, lng }: Props) {
 
   const level = plan.quality.level;
   const loopInfo = loops[loop];
-  const title = current ? `Trou n° ${current.ref}` : 'Plan du parcours';
+  const title = current ? `Trou n° ${current.ref}` : played ? 'Votre partie' : 'Plan du parcours';
   const sub = current
     ? [current.par ? `Par ${current.par}` : null, current.hcp ? `Index ${current.hcp}` : null, `${current.len} m`].filter(Boolean).join(' · ')
     : loopInfo
@@ -302,10 +456,44 @@ export function CourseWidget({ plan, lat, lng }: Props) {
   // header + loop tabs + « Parcours » + rows of holes (9 per row): keeps the whole widget within the screen
   const chrome = 60 + (loops.length > 1 ? 46 : 0) + 16 + Math.max(1, Math.ceil(loopHoles.length / 9)) * 36;
   const aspect = `${cBox.w} / ${cBox.h}`;
-  const others = plan.holes.filter((h) => h.loop !== loop);
+  const others = played ? [] : plan.holes.filter((h) => h.loop !== loop);
+
+  // --- partie jouée : tracés, étiquettes et boutons de zoom propres à la vue courante
+  const rot = useMemo(() => rotator(hf ? hf.deg : 0), [hf]);
+  const holeView = useMemo(() => {
+    if (!curPlayed) return null;
+    const spots = curPlayed.spots.map(rot);
+    return {
+      spots,
+      path: curPlayed.path.map(rot),
+      segs: curPlayed.segs.map((s) => ({ ...s, a: rot(s.a), b: rot(s.b) })),
+      last: spots.length ? spots[spots.length - 1] : null,
+    };
+  }, [curPlayed, rot]);
+  const courseSegs = useMemo(() => (playedHoles ?? []).flatMap((p) => p.segs), [playedHoles]);
+  // dépend de u : les étiquettes se recalculent à chaque changement de zoom
+  const labels = useMemo(
+    () => (holeView ? layoutLabels(holeView.segs, u, MIN_LABEL_M) : playedHoles && !current ? layoutLabels(courseSegs, u, Math.max(MIN_LABEL_M, COURSE_LABEL_M)) : []),
+    [holeView, playedHoles, current, courseSegs, u],
+  );
+  const plusZoom = () => (holeView?.last ? zp.zoomAround(1.6, holeView.last) : zp.zoomBy(1.6));
+  const zoomGreen = () => {
+    if (!current || !hf) return;
+    const b = greenBox(holeGreen(plan, current), holePin(current));
+    const m = 12;
+    const cs = [rot([b.x - m, b.y - m]), rot([b.x + b.w + m, b.y - m]), rot([b.x - m, b.y + b.h + m]), rot([b.x + b.w + m, b.y + b.h + m])];
+    const xs = cs.map((q) => q[0]), ys = cs.map((q) => q[1]);
+    const x0 = Math.min(...xs), y0 = Math.min(...ys);
+    zp.zoomTo({ x: x0, y: y0, w: Math.max(...xs) - x0, h: Math.max(...ys) - y0 });
+  };
 
   const pick = (h: PlanHole) => {
     if (zp.wasDrag()) return;
+    if (played) {
+      const i = loopHoles.indexOf(h);
+      if (i >= 0) setHole(i);
+      return;
+    }
     if (h.loop !== loop && h.loop >= 0) {
       const lh = plan.holes.filter((x) => x.loop === h.loop && x.ref != null).sort((a, b) => (a.ref ?? 0) - (b.ref ?? 0));
       setLoop(h.loop);
@@ -316,7 +504,7 @@ export function CourseWidget({ plan, lat, lng }: Props) {
   };
 
   return (
-    <section className="cw" aria-label="Plan du parcours" style={{ '--cw-chrome': `${chrome}px` } as CSSProperties}>
+    <section className={`cw${played ? ' cw--played' : ''}`} aria-label={played ? 'Votre partie sur le plan du parcours' : 'Plan du parcours'} style={{ '--cw-chrome': `${chrome}px` } as CSSProperties}>
       <header className={`cw-head${current ? ' has-back' : ''}`}>
         {current && (
           <button type="button" className="cw-back" aria-label="Retour au plan du parcours" onClick={() => setHole(null)}>
@@ -337,7 +525,7 @@ export function CourseWidget({ plan, lat, lng }: Props) {
         </button>
       </header>
 
-      {loops.length > 1 && (
+      {loops.length > 1 && !played && (
         <div className="cw-loops" role="group" aria-label="Boucles">
           {loops.map((l, i) => (
             <button
@@ -386,6 +574,21 @@ export function CourseWidget({ plan, lat, lng }: Props) {
               ))}
               <circle cx={hf.tee[0]} cy={hf.tee[1]} r={6 * u} strokeWidth={2 * u} className="cw-teept" />
               <circle cx={hf.pin[0]} cy={hf.pin[1]} r={6 * u} strokeWidth={2 * u} className="cw-pin" />
+              {holeView && holeView.path.length > 1 && (
+                <>
+                  <path className="cw-pl-under" d={pathD(holeView.path)} vectorEffect="non-scaling-stroke" />
+                  <path className="cw-pl-path" d={pathD(holeView.path)} vectorEffect="non-scaling-stroke" />
+                </>
+              )}
+              {holeView && <PlayedLabels labels={labels} u={u} />}
+              {holeView?.spots.map((q, i) => (
+                <g key={`s${i}`} className="cw-pl-mk">
+                  <circle cx={q[0]} cy={q[1]} r={9 * u} strokeWidth={1.5 * u} />
+                  <text x={q[0]} y={q[1]} fontSize={10.5 * u}>
+                    {i + 1}
+                  </text>
+                </g>
+              ))}
             </>
           ) : (
             <>
@@ -393,11 +596,21 @@ export function CourseWidget({ plan, lat, lng }: Props) {
               {others.length > 0 && (
                 <path className="cw-line cw-line--other" d={others.map((h) => ringD(h.line, false)).join('')} vectorEffect="non-scaling-stroke" />
               )}
-              <path className="cw-line" d={loopHoles.map((h) => ringD(h.line, false)).join('')} vectorEffect="non-scaling-stroke" />
-              {loopHoles.map((h, i) => {
+              <path className="cw-line" d={loopAll.map((h) => ringD(h.line, false)).join('')} vectorEffect="non-scaling-stroke" />
+              {loopAll.map((h, i) => {
                 const n = h.line.length;
                 return <circle key={`p${i}`} cx={h.line[n - 2]} cy={h.line[n - 1]} r={3 * u} className="cw-pin cw-pin--small" />;
               })}
+              {playedHoles && (
+                <>
+                  <path className="cw-pl-under" d={playedHoles.map((p) => (p.path.length > 1 ? pathD(p.path) : '')).join('')} vectorEffect="non-scaling-stroke" />
+                  <path className="cw-pl-path" d={playedHoles.map((p) => (p.path.length > 1 ? pathD(p.path) : '')).join('')} vectorEffect="non-scaling-stroke" />
+                  {playedHoles.map((p, i) =>
+                    p.spots.map((q, j) => <circle key={`d${i}-${j}`} cx={q[0]} cy={q[1]} r={2.6 * u} strokeWidth={1 * u} className="cw-pl-dot" />),
+                  )}
+                  <PlayedLabels labels={labels} u={u} />
+                </>
+              )}
               {others
                 .filter((h) => h.ref != null)
                 .map((h, i) => (
@@ -408,10 +621,10 @@ export function CourseWidget({ plan, lat, lng }: Props) {
                     </text>
                   </g>
                 ))}
-              {loopHoles.map((h, i) => (
+              {loopAll.map((h, i) => (
                 <g
                   key={`n${i}`}
-                  className="cw-num"
+                  className={`cw-num${played && !loopHoles.includes(h) ? ' cw-num--other' : ''}`}
                   role="button"
                   tabIndex={-1}
                   aria-label={`Trou ${h.ref}`}
@@ -428,13 +641,18 @@ export function CourseWidget({ plan, lat, lng }: Props) {
         </svg>
 
         <div className="cw-zoom">
-          <button type="button" aria-label="Zoomer" onClick={() => zp.zoomBy(1.6)}>
+          <button type="button" aria-label="Zoomer" onClick={plusZoom}>
             <Icon name="plus" size={18} strokeWidth={2.2} />
           </button>
           <button type="button" aria-label="Dézoomer" onClick={() => zp.zoomBy(1 / 1.6)} disabled={!zp.zoomed}>
             <span className="cw-minus" aria-hidden="true" />
           </button>
         </div>
+        {played && current && (
+          <button type="button" className="cw-green" aria-label="Zoomer sur le green" onClick={zoomGreen}>
+            Green
+          </button>
+        )}
         {zp.zoomed && (
           <button type="button" className="cw-reset" onClick={zp.reset}>
             Recentrer

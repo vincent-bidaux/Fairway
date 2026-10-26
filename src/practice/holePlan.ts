@@ -1,5 +1,5 @@
 // Plan réel d'un trou (OSM) quand le golf en a un : recherche golf → slug → plan.
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { CoursePlan, PlanHole } from '../../shared/plan';
 import type { Golf } from '../../shared/types';
 import { getGolfs } from '../api';
@@ -23,24 +23,32 @@ export interface HolePlan {
   hole: PlanHole;
 }
 
-/** Plan du trou `hole` (parcours principal) du golf, ou null. */
-export function useHolePlan(golfId: number | null, hole: number, enabled = true): HolePlan | null {
-  const [res, setRes] = useState<HolePlan | null>(null);
+/** Plan complet du golf (null s'il n'en a pas, ou si ses trous ne sont pas tracés). */
+export function useGolfPlan(golfId: number | null, enabled = true): CoursePlan | null {
+  const [res, setRes] = useState<CoursePlan | null>(null);
   useEffect(() => {
+    setRes(null);
     if (!enabled || golfId == null) return;
     let alive = true;
     golfSlugs()
       .then(async (m) => {
         const g = m.get(golfId);
         if (!g?.planLevel || g.planLevel === 'inexistant') return null;
-        const plan = await loadPlan(g.slug);
-        const h = plan?.holes.find((x) => x.loop === 0 && x.ref === hole);
-        return plan && h && h.line.length >= 4 ? { plan, hole: h } : null;
+        return loadPlan(g.slug);
       })
       .then((r) => alive && setRes(r));
     return () => {
       alive = false;
     };
-  }, [golfId, hole, enabled]);
+  }, [golfId, enabled]);
   return res;
+}
+
+/** Plan du trou `hole` de la boucle `loop` (0 = parcours principal), ou null. */
+export function useHolePlan(golfId: number | null, hole: number, enabled = true, loop = 0): HolePlan | null {
+  const plan = useGolfPlan(golfId, enabled);
+  return useMemo(() => {
+    const h = plan?.holes.find((x) => x.loop === loop && x.ref === hole);
+    return plan && h && h.line.length >= 4 ? { plan, hole: h } : null;
+  }, [plan, hole, loop]);
 }

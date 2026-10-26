@@ -48,13 +48,13 @@ export const CLUBS: Club[] = [
   { id: '3H', label: 'Hybride 3', short: 'H3', kind: 'hybrid' },
   { id: '4H', label: 'Hybride 4', short: 'H4', kind: 'hybrid' },
   { id: '5H', label: 'Hybride 5', short: 'H5', kind: 'hybrid' },
-  { id: '3i', label: 'Fer 3', short: '3', kind: 'iron' },
-  { id: '4i', label: 'Fer 4', short: '4', kind: 'iron' },
-  { id: '5i', label: 'Fer 5', short: '5', kind: 'iron' },
-  { id: '6i', label: 'Fer 6', short: '6', kind: 'iron' },
-  { id: '7i', label: 'Fer 7', short: '7', kind: 'iron' },
-  { id: '8i', label: 'Fer 8', short: '8', kind: 'iron' },
-  { id: '9i', label: 'Fer 9', short: '9', kind: 'iron' },
+  { id: '3i', label: 'Fer 3', short: 'F3', kind: 'iron' },
+  { id: '4i', label: 'Fer 4', short: 'F4', kind: 'iron' },
+  { id: '5i', label: 'Fer 5', short: 'F5', kind: 'iron' },
+  { id: '6i', label: 'Fer 6', short: 'F6', kind: 'iron' },
+  { id: '7i', label: 'Fer 7', short: 'F7', kind: 'iron' },
+  { id: '8i', label: 'Fer 8', short: 'F8', kind: 'iron' },
+  { id: '9i', label: 'Fer 9', short: 'F9', kind: 'iron' },
   { id: 'PW', label: 'Pitching wedge', short: 'PW', kind: 'wedge' },
   { id: 'GW', label: 'Gap wedge', short: 'GW', kind: 'wedge' },
   { id: 'SW', label: 'Sand wedge', short: 'SW', kind: 'wedge' },
@@ -100,7 +100,8 @@ export interface PlaySession {
   course: string;
   place: string | null;
   played_at: string; // YYYY-MM-DDTHH:mm:ss, heure locale
-  holes: 9 | 18 | null;
+  /** Nombre de trous joués (9 ou 18, ou celui d'une boucle du plan : 4, 6, 7…). */
+  holes: number | null;
   start_hole: number;
   tee: string | null;
   duration_min: number | null;

@@ -1,51 +1,5 @@
 /* Coups sur la carte du trou (saisie d'une partie) */
 
-/* --- aperçu dans le panneau du trou ------------------------------------- */
-.sm-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: calc(100% - 2 * var(--gutter));
-  margin: 14px var(--gutter) 4px;
-  padding: 8px 12px 8px 8px;
-  border-radius: 14px;
-  background: var(--bg2);
-  text-align: left;
-}
-.sm-card--list {
-  padding: 12px 12px 12px 16px;
-}
-.sm-card:active {
-  transform: scale(0.99);
-}
-.sm-mini {
-  flex: none;
-  width: 84px;
-  height: 104px;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.sm-card-text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.sm-card-title {
-  font-size: 16px;
-  font-weight: 600;
-}
-.sm-card-sub {
-  font-size: 13px;
-  color: var(--label2);
-  line-height: 1.35;
-}
-.sm-card-chev {
-  flex: none;
-  color: var(--label3);
-}
-
 /* --- dessin --------------------------------------------------------------- */
 .sm-bg {
   fill: var(--g-bg);
@@ -111,102 +65,16 @@
   to { transform: scale(1.4); opacity: 0; }
 }
 
-/* --- éditeur -------------------------------------------------------------- */
-.sm-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0 var(--gutter) 12px;
-}
-.sm-stage {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  max-height: 52dvh;
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--g-bg);
-  touch-action: pan-y;
-  user-select: none;
-  -webkit-user-select: none;
-  cursor: crosshair;
-}
-.sm-stage.is-zoomed {
-  touch-action: none;
-}
-.sm-svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.sm-hint {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  max-width: calc(100% - 20px);
-  padding: 5px 10px;
-  border-radius: 999px;
-  font-size: 13px;
-  color: var(--label);
-  background: var(--blur-bg);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  pointer-events: none;
-}
-.sm-topin {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  display: flex;
-  flex-direction: column;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 22px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  color: var(--label);
-  background: var(--blur-bg);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  pointer-events: none;
-}
-.sm-topin small {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--label2);
-}
-.sm-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.sm-here {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.sm-err,
-.sm-note {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
-  color: var(--label2);
-}
-.sm-note {
-  padding: 0 var(--gutter) 12px;
-}
-
 .sm-list {
   display: flex;
   flex-direction: column;
-  margin: 0 var(--gutter) 12px;
+  margin: 0;
   border-radius: 12px;
   overflow: hidden;
   background: var(--bg2);
+}
+.sm-row {
+  position: relative;
 }
 .sm-row + .sm-row {
   border-top: 0.5px solid var(--sep);
@@ -266,12 +134,17 @@
 }
 .sm-clubs {
   display: flex;
-  flex-wrap: wrap;
   gap: 6px;
-  padding: 0 14px 12px 54px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px var(--gutter) 4px;
+}
+.sm-clubs::-webkit-scrollbar {
+  display: none;
 }
 .sm-club {
-  min-width: 40px;
+  flex: none;
+  min-width: 42px;
   height: 34px;
   padding: 0 10px;
   border-radius: 17px;
@@ -285,9 +158,260 @@
   background: var(--tint);
   color: var(--on-tint);
 }
-.sm-add {
-  align-self: flex-start;
+
+
+/* --- panneau carte (en haut du trou, repliable) ------------------------- */
+.smp {
+  margin: 6px var(--gutter) 0;
+  border-radius: 16px;
+  background: var(--bg2);
+  overflow: hidden;
+}
+.smp-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  text-align: left;
+}
+.smp-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+.smp-sum {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-size: 14px;
+  color: var(--label2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.smp-chev {
+  flex: none;
+  color: var(--label3);
+  transform: rotate(90deg);
+  transition: transform 0.2s;
+}
+.smp.is-open .smp-chev {
+  transform: rotate(-90deg);
+}
+.smp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 12px;
+}
+.smp .sm-stage {
+  width: 100%;
+  aspect-ratio: 0.85;
+  max-height: min(46dvh, 460px);
+  border-radius: 0;
+}
+.sm-stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--g-bg);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: crosshair;
+}
+.sm-stage.is-zoomed {
+  touch-action: none;
+}
+.sm-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.sm-tools {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.sm-tools .sm-zoom {
+  position: static;
+}
+.sm-green-btn {
+  min-width: 38px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tint);
+  background: var(--blur-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+.sm-hint {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  max-width: calc(100% - 20px);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--label);
+  background: var(--blur-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+.sm-topin {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: var(--label);
+  background: var(--blur-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+.sm-topin small {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--label2);
+}
+.sm-shot.is-last circle {
+  stroke: var(--g-pin);
+}
+.smp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 var(--gutter);
+}
+.smp-holed {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 16px 0 10px;
+  border-radius: 22px;
+  background: var(--fill);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.smp-holed input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.smp-box {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 2px solid var(--label3);
+  color: transparent;
+}
+.smp-holed.is-on {
+  background: color-mix(in srgb, var(--tint) 16%, transparent);
+  color: var(--tint);
+}
+.smp-holed.is-on .smp-box {
+  border-color: var(--tint);
+  background: var(--tint);
+  color: var(--on-tint);
+}
+.smp-holed:has(input:focus-visible) {
+  box-shadow: 0 0 0 2px var(--tint);
+}
+.smp-here {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   min-height: 44px;
   padding: 0 14px;
+  border-radius: 22px;
+  background: var(--fill);
+  color: var(--tint);
+  font-size: 15px;
   font-weight: 600;
+}
+.smp-clubs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+  padding: 0 var(--gutter);
+  font-size: 13px;
+  color: var(--label2);
+  text-transform: uppercase;
+}
+.smp-clubs-head .text-btn {
+  text-transform: none;
+  font-weight: 600;
+}
+.sm-note--inline {
+  padding: 0 var(--gutter);
+}
+.sm-err {
+  padding: 0 var(--gutter);
+}
+
+/* --- liste des coups (fin du trou) --------------------------------------- */
+.sl {
+  margin: 18px var(--gutter) 0;
+}
+.sl-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 4px 6px;
+  font-size: 13px;
+  color: var(--label2);
+  text-transform: uppercase;
+}
+.sl-clear {
+  text-transform: none;
+  color: var(--red);
+  font-size: 14px;
+}
+.sl-foot {
+  margin: 8px 4px 0;
+  font-size: 13px;
+  color: var(--label2);
+}
+.sm-del {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  margin-top: -16px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--red);
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+}
+.sm-row:last-child .sm-dist {
+  margin-right: 36px;
 }

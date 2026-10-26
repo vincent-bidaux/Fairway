@@ -1,6 +1,6 @@
 // Saisie d'une partie, trou par trou : bandeau de progression, panneaux glissants, règle des scores, puces, carte.
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
-import type { Fairway, HoleEntry, PlaySession, Shot } from '../../shared/practice';
+import type { Fairway, HoleEntry, PlaySession } from '../../shared/practice';
 import { girOf } from '../../shared/practice';
 import type { Golf } from '../../shared/types';
 import { Group, Switch } from '../components/Controls';
@@ -14,7 +14,8 @@ import { BeforeGroup, CompetitionGroup, PlaceDate, RoundOptions, sessionTitle } 
 import { ContextPicker } from './contextIcons';
 import { ScoreRuler } from './ScoreRuler';
 import { useHolePlan } from './holePlan';
-import { ShotPreview, ShotSheet, useBag } from './ShotMap';
+import { HoleMapPanel, ShotList } from './ShotMap';
+import { loopOfCourse } from './shotGeo';
 import { ariaScore, fmtRel, resKey, Scorecard, summarize } from './scorecard';
 import './session.css';
 
@@ -81,6 +82,10 @@ export function ChipRow<T extends string | number>({
 interface HoleViewProps {
   e: HoleEntry;
   golfId: number | null;
+  /** Boucle du plan jouée (0 = parcours principal). */
+  loop: number;
+  /** Trou affiché à l'écran. */
+  active: boolean;
   locked: boolean;
   penTouched: boolean;
   onScore: (n: number) => void;
@@ -90,8 +95,10 @@ interface HoleViewProps {
   onChipTouch: () => void;
 }
 
-const HoleView = memo(function HoleView({ e, golfId, locked, penTouched, onScore, onPar, onUnlock, onPatch, onChipTouch }: HoleViewProps) {
+const HoleView = memo(function HoleView({ e, golfId, loop, active, locked, penTouched, onScore, onPar, onUnlock, onPatch, onChipTouch }: HoleViewProps) {
   const gir = girOf(e);
+  const hp = useHolePlan(golfId, e.hole, true, loop);
+  const [sel, setSel] = useState<number | null>(null);
   const patch = (p: Partial<HoleEntry>, pen?: boolean) => {
     onChipTouch();
     onPatch(p, pen);
@@ -103,6 +110,7 @@ const HoleView = memo(function HoleView({ e, golfId, locked, penTouched, onScore
         <h2>Trou n° {e.hole}</h2>
         <span className="hv-par">Par {e.par}</span>
       </div>
+      <HoleMapPanel e={e} hp={hp} active={active} sel={sel} setSel={setSel} onPatch={(p) => onPatch(p)} />
       <ScoreRuler key={`${e.hole}`} par={e.par} value={e.strokes} onSelect={onScore} parLocked={locked} onParChange={onPar} onUnlock={onUnlock} />
       <div className="hv-chips">
         <ChipRow<number>
@@ -162,23 +170,10 @@ const HoleView = memo(function HoleView({ e, golfId, locked, penTouched, onScore
           />
         )}
       </div>
-      <HoleShots e={e} golfId={golfId} onSave={(shots) => onPatch({ shots })} />
+      <ShotList e={e} hp={hp} onPatch={(p) => onPatch(p)} onSelect={setSel} />
     </div>
   );
 });
-
-// ------------------------------------------------------------------ coups sur la carte
-function HoleShots({ e, golfId, onSave }: { e: HoleEntry; golfId: number | null; onSave: (shots: Shot[] | null) => void }) {
-  const hp = useHolePlan(golfId, e.hole);
-  const bag = useBag();
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <ShotPreview e={e} hp={hp} onOpen={() => setOpen(true)} />
-      <ShotSheet open={open} onClose={() => setOpen(false)} e={e} hp={hp} bag={bag} onSave={onSave} />
-    </>
-  );
-}
 
 // ------------------------------------------------------------------ bandeau
 function HoleStrip({ entries, cur, onGo }: { entries: HoleEntry[]; cur: number; onGo: (i: number) => void }) {
@@ -384,6 +379,8 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
                 <HoleView
                   e={e}
                   golfId={s.golf_id}
+                  loop={loopOfCourse(s.course)}
+                  active={i === cur}
                   locked={known[e.hole] != null && !unlocked.includes(e.hole)}
                   penTouched={penTouched.includes(e.hole)}
                   onScore={(v) => onScore(i, v)}
