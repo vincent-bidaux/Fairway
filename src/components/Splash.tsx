@@ -248,21 +248,22 @@ export type SplashAudience = 'loading' | 'guest' | 'demo' | 'member';
 /**
  * Splash screen.
  * - Joueur avec son compte : comme avant (fermeture seule au premier lancement, ou au toucher).
- * - Visiteur ou compte Demo : l'écran reste affiché avec le message « programme testeurs » ; seuls ses boutons le ferment.
+ * - Visiteur (connecté d'office au compte Demo) : l'écran reste affiché avec le message « programme testeurs » ;
+ *   seuls ses boutons le ferment.
  * - Reopened from « ‹ Fairway »: stays until the user taps it.
  */
 export function Splash({
   runId,
   onDone,
   audience = 'member',
-  onDemo,
   onSignup,
+  onLogin,
 }: {
   runId: number;
   onDone: () => void;
   audience?: SplashAudience;
-  onDemo?: () => void;
   onSignup?: () => void;
+  onLogin?: () => void;
 }) {
   const [out, setOut] = useState(false);
   const [hint, setHint] = useState(false);
@@ -360,11 +361,11 @@ export function Splash({
           <button type="button" className="splash-btn splash-btn--primary" data-track="splash:signup" onClick={() => close(onSignup)}>
             Créer mon compte
           </button>
-          <button type="button" className="splash-btn" data-track="splash:demo" onClick={() => close(onDemo)}>
-            {audience === 'demo' ? 'Continuer avec le compte Demo' : 'Explorer le compte Demo'}
+          <button type="button" className="splash-btn" data-track="splash:login" onClick={() => close(onLogin)}>
+            Se connecter
           </button>
           <button type="button" className="splash-btn splash-btn--plain" data-track="splash:later" onClick={() => close()}>
-            Parcourir l’app
+            Découvrir l’app avec le compte Demo
           </button>
         </div>
       )}

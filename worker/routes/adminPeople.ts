@@ -348,11 +348,11 @@ adminPeopleApi.get('/overview', async (c) => {
       .bind(...inPeriod.params),
     db
       .prepare(
-        `SELECT (SELECT COUNT(*) FROM devices WHERE user_id IS NULL) AS total,
+        `SELECT (SELECT COUNT(*) FROM devices WHERE user_id IS NULL OR user_id = ?1) AS total,
            (SELECT COUNT(DISTINCT a.device_id) FROM activity a JOIN devices d ON d.device_id = a.device_id
-             WHERE d.user_id IS NULL AND a.ts >= ?) AS active`,
+             WHERE (d.user_id IS NULL OR d.user_id = ?1) AND a.ts >= ?2) AS active`,
       )
-      .bind(since),
+      .bind(DEMO_USER_ID, since),
   ]);
   const p = (people.results[0] ?? {}) as Row;
   const t = (totals.results[0] ?? {}) as Row;
@@ -385,7 +385,10 @@ adminPeopleApi.get('/overview', async (c) => {
 adminPeopleApi.get('/people', async (c) => {
   const env = c.env;
   const people = await peopleRows(env);
-  const { results } = await env.DB.prepare(`SELECT * FROM devices WHERE user_id IS NULL ORDER BY last_seen DESC LIMIT 300`).all<Row>();
+  // Visiteurs : appareils sans compte ou restés sur le compte Demo (connecté d'office).
+  const { results } = await env.DB.prepare(`SELECT * FROM devices WHERE user_id IS NULL OR user_id = ? ORDER BY last_seen DESC LIMIT 300`)
+    .bind(DEMO_USER_ID)
+    .all<Row>();
   const usage = await usageBy(env, 'device_id', results.map((r) => String(r.device_id)));
   const body: AdminPeople = {
     people,

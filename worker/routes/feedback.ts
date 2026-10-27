@@ -248,8 +248,9 @@ adminFeedbackApi.get('/tests', async (c) => {
 
   // Retours
   const { results: fb } = await db
-    .prepare(`SELECT id, user_id, author, kind, body, created_at, read_at FROM feedback WHERE user_id NOT IN (${ph(excluded.length)}) ORDER BY created_at, id LIMIT 20000`)
-    .bind(...excluded)
+    // Tous les retours, y compris ceux des comptes admin (pour tester soi-même), sauf le compte Demo qui ne peut pas en envoyer.
+    .prepare(`SELECT id, user_id, author, kind, body, created_at, read_at FROM feedback WHERE user_id != ? ORDER BY created_at, id LIMIT 20000`)
+    .bind(DEMO_USER_ID)
     .all<Row>();
   const byKind = Object.fromEntries(FEEDBACK_KIND_IDS.map((k) => [k, 0])) as Record<FeedbackKind, number>;
   const byUser = new Map<string, Row[]>();
@@ -261,7 +262,20 @@ adminFeedbackApi.get('/tests', async (c) => {
     if (!byUser.has(k)) byUser.set(k, []);
     byUser.get(k)!.push(r);
   }
-  const names = new Map(list.map((t) => [t.userId, t]));
+  const names = new Map<string, { name: string; email: string; hasPhoto: boolean }>(list.map((t) => [t.userId, t]));
+  // Auteurs hors testeurs (comptes admin) : nom et e-mail.
+  const others = [...byUser.keys()].filter((u) => !names.has(u));
+  if (others.length) {
+    const { results } = await db
+      .prepare(
+        `SELECT u.id, u.email, COALESCE(NULLIF(p.display_name, ''), NULLIF(TRIM(COALESCE(p.first_name,'') || ' ' || COALESCE(p.last_name,'')), ''), NULLIF(u.name, ''), u.email) AS name,
+           p.photo IS NOT NULL AS has_photo
+         FROM "user" u LEFT JOIN player_profiles p ON p.user_id = u.id WHERE u.id IN (${ph(others.length)})`,
+      )
+      .bind(...others)
+      .all<Row>();
+    for (const r of results) names.set(String(r.id), { name: `${r.name} (admin)`, email: String(r.email), hasPhoto: num(r.has_photo) === 1 });
+  }
   const threads: FeedbackThread[] = [];
   for (const [uid, msgs] of byUser) {
     // Délai de réponse : premier retour sans réponse → réponse suivante de l'admin.
@@ -307,7 +321,7 @@ adminFeedbackApi.get('/tests', async (c) => {
   const complete = list.filter((t) => t.profileFields === IDENTITY.length).length;
   const funnel: FunnelStep[] = [
     { id: 'devices', label: 'Ont ouvert l’app (appareils)', count: num((devs.results[0] as Row)?.n) },
-    { id: 'demo', label: 'Ont essayé le compte Demo', count: num((demoDevs.results[0] as Row)?.n) },
+    { id: 'demo', label: 'Ont utilisé le compte Demo', count: num((demoDevs.results[0] as Row)?.n) },
     { id: 'account', label: 'Ont créé leur compte', count: list.length },
     { id: 'profile', label: 'Ont complété leur profil', count: complete },
     { id: 'session', label: 'Ont saisi une séance', count: list.filter((t) => t.sessions > 0).length },
@@ -329,7 +343,7 @@ adminFeedbackApi.get('/tests', async (c) => {
     funnel,
     splash: {
       views: num((splashViews.results[0] as Row)?.n),
-      demo: taps.get('splash:demo') ?? 0,
+      login: taps.get('splash:login') ?? 0,
       signup: taps.get('splash:signup') ?? 0,
       later: taps.get('splash:later') ?? 0,
     },

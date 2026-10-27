@@ -171,9 +171,9 @@ export function AdminTests() {
             footer="Touchers sur la période. Les pourcentages sont calculés sur le nombre d’affichages du message."
           >
             <Row label="Affichages" value={nf(d.splash.views)} />
-            <Row label="Explorer la démo" value={`${nf(d.splash.demo)} · ${pct(d.splash.demo, d.splash.views)}`} />
             <Row label="Créer mon compte" value={`${nf(d.splash.signup)} · ${pct(d.splash.signup, d.splash.views)}`} />
-            <Row label="Plus tard" value={`${nf(d.splash.later)} · ${pct(d.splash.later, d.splash.views)}`} />
+            <Row label="Se connecter" value={`${nf(d.splash.login)} · ${pct(d.splash.login, d.splash.views)}`} />
+            <Row label="Découvrir l’app (démo)" value={`${nf(d.splash.later)} · ${pct(d.splash.later, d.splash.views)}`} />
           </Group>
 
           <Group

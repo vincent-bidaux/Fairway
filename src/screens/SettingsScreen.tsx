@@ -66,7 +66,7 @@ export function SettingsScreen() {
         footer={
           account.status === 'in'
             ? account.me.demo
-              ? 'Compte de démo partagé : il est remis à zéro chaque nuit.'
+              ? 'Vous êtes sur le compte Demo, partagé par tous les visiteurs et remis à zéro chaque nuit. Créez votre compte pour garder vos parties et envoyer vos retours.'
               : 'Votre compte sert uniquement à enregistrer vos parties et vos stats.'
             : 'Un compte n’est utile que pour l’onglet Mes parties. Le reste de l’app fonctionne sans compte.'
         }
@@ -92,7 +92,17 @@ export function SettingsScreen() {
                 }}
               />
             )}
-            <Row label="Se déconnecter" onClick={() => void signOut().then(() => ui.toast('Déconnecté'))} />
+            {account.me.demo ? (
+              <Row
+                icon={<Icon name="person" size={16} />}
+                iconColor="var(--tint)"
+                label="Créer mon compte ou me connecter"
+                chevron
+                onClick={() => ui.openLogin()}
+              />
+            ) : (
+              <Row label="Se déconnecter" onClick={() => void signOut().then(() => ui.toast('Déconnecté, retour au compte Demo'))} />
+            )}
             {!account.me.demo && <Row label="Supprimer mon compte" destructive onClick={() => void onDelete()} />}
           </>
         ) : (

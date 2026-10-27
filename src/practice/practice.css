@@ -1342,3 +1342,32 @@
 .wb-col .donut {
   margin-top: 4px;
 }
+
+/* Bandeau « compte Demo » (démo connectée d'office pour les visiteurs) */
+.pr-demo-banner {
+  margin: 4px 16px 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--tint) 12%, var(--bg2));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 25%, transparent);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--label);
+}
+.pr-demo-banner p {
+  margin: 0 0 10px;
+}
+.pr-demo-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pr-demo-banner-link {
+  border: 0;
+  padding: 6px 0;
+  background: none;
+  color: var(--tint);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}

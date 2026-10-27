@@ -32,8 +32,7 @@ import { setScreen, startTracking } from './track';
 import { AdminTests } from './admin/AdminTests';
 import { AdminThread } from './admin/AdminThread';
 import { FeedbackScreen } from './feedback/FeedbackScreen';
-import { refreshAccount, signOut, useAccount } from './practice/account';
-import { signInDemo } from './practice/api';
+import { refreshAccount, useAccount } from './practice/account';
 import type { SplashAudience } from './components/Splash';
 
 export function App() {
@@ -171,17 +170,11 @@ export function App() {
           onDone={() => setSplash(null)}
           onSignup={() => {
             selectTab('parties');
-            // Depuis le compte Demo (partagé), on en sort avant de créer son propre compte.
-            if (audience === 'demo') void signOut().finally(() => setLogin({ open: true }));
-            else setLogin({ open: true });
+            setLogin({ open: true });
           }}
-          onDemo={() => {
+          onLogin={() => {
             selectTab('parties');
-            if (audience === 'demo') return;
-            void signInDemo()
-              .then(() => refreshAccount())
-              .then(() => toast('Bienvenue sur le compte Demo'))
-              .catch(() => setLogin({ open: true, demo: true }));
+            setLogin({ open: true });
           }}
         />
       )}

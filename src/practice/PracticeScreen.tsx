@@ -170,6 +170,22 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
 
   return (
     <Screen title={PARTIES_LABEL} eyebrow right={plus}>
+      {me.demo && (
+        <div className="pr-demo-banner" role="note">
+          <p>
+            <strong>Compte Demo.</strong> Partagé par tous les visiteurs et remis à zéro chaque nuit : explorez, puis créez votre compte pour
+            garder vos parties.
+          </p>
+          <div className="pr-demo-banner-actions">
+            <button type="button" className="btn btn--small" data-track="demo-banner:signup" onClick={() => ui.openLogin()}>
+              Créer mon compte
+            </button>
+            <button type="button" className="pr-demo-banner-link" data-track="demo-banner:login" onClick={() => ui.openLogin()}>
+              Se connecter
+            </button>
+          </div>
+        </div>
+      )}
       <PlayerCard
         profile={data.profile}
         fallbackName={me.demo ? 'Demo' : me.user.name}

@@ -99,7 +99,7 @@ export interface TestsDashboard {
   /** Appareils → démo → compte → profil complet → séance → retour. */
   funnel: FunnelStep[];
   /** Touchers sur les boutons du message testeur de l'écran d'accueil, sur la période. */
-  splash: { views: number; demo: number; signup: number; later: number };
+  splash: { views: number; signup: number; login: number; later: number };
   feedback: {
     total: number;
     inPeriod: number;
