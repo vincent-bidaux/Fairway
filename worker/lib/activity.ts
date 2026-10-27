@@ -4,7 +4,12 @@ import { createAuth } from '../auth';
 import type { Env } from '../env';
 
 /** Comptes admin (en plus de la variable ADMIN_EMAILS, séparée par des virgules). */
-const ADMIN_EMAILS = ['vincent.bidaux@gmail.com'];
+export const ADMIN_EMAILS = ['vincent.bidaux@gmail.com'];
+
+/** Adresses des admins (notifications de nouveaux retours). */
+export function adminEmails(env: Env): string[] {
+  return [...new Set([...ADMIN_EMAILS, ...(env.ADMIN_EMAILS ?? '').split(',')].map((e) => e.trim().toLowerCase()).filter(Boolean))];
+}
 
 export function isAdminEmail(env: Env, email: string | null | undefined): boolean {
   if (!email) return false;

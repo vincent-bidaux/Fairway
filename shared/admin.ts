@@ -1,3 +1,5 @@
+import type { FeedbackMessage } from './feedback';
+
 // Contrat de la zone admin « testeurs » (worker/routes/adminPeople.ts ↔ src/admin/*).
 
 export type ActivityType = 'open' | 'view' | 'tap' | 'input' | 'api' | 'error';
@@ -153,6 +155,7 @@ export interface PlayRow {
 
 export interface PersonDetail {
   person: PersonRow;
+  feedback: FeedbackMessage[]; // fil des retours, du plus ancien au plus récent
   profile: Record<string, unknown> | null; // player_profiles complet (photo en data URL, sac…)
   indexHistory: { asOf: string; index: number }[];
   providers: string[]; // email-otp, credential…

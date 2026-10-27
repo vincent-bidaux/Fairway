@@ -6,6 +6,7 @@ import type { Env } from '../env';
 import { clubStats, rangeStats, roundStats, wellbeingStats, type RangeRow, type RoundRow } from '../lib/stats';
 import { ensureDemo, isDemo } from '../demo';
 import { isAdminEmail, recordApi } from '../lib/activity';
+import { addUserFeedback, ensureFeedbackSchema, markRepliesRead, threadOf, unreadReplies } from './feedback';
 
 type Vars = { userId: string; userName: string; userEmail: string };
 export const meApi = new Hono<{ Bindings: Env; Variables: Vars }>();
@@ -35,7 +36,8 @@ meApi.get('/', async (c) => {
     .bind(uid)
     .all<{ kind: string; n: number }>();
   const counts = Object.fromEntries(n.results.map((r) => [r.kind, r.n]));
-  return c.json({ user: u, demo: isDemo(uid), admin: isAdminEmail(c.env, c.get('userEmail')), rounds: counts.round ?? 0, ranges: counts.range ?? 0 });
+  const feedbackUnread = await unreadReplies(c.env, uid).catch(() => 0);
+  return c.json({ user: u, demo: isDemo(uid), admin: isAdminEmail(c.env, c.get('userEmail')), feedbackUnread, rounds: counts.round ?? 0, ranges: counts.range ?? 0 });
 });
 
 // ---------------------------------------------------------------- séances
@@ -358,12 +360,31 @@ meApi.post('/demo/reset', async (c) => {
   return c.json(await ensureDemo(c.env, new URL(c.req.url).origin, { reset: true }));
 });
 
+// ---------------------------------------------------------------- retours (programme testeurs)
+meApi.get('/feedback', async (c) => {
+  const uid = c.get('userId');
+  const messages = await threadOf(c.env, uid, false);
+  return c.json({ messages, unread: messages.filter((m) => m.author === 'admin' && !m.readAt).length });
+});
+
+meApi.post('/feedback', async (c) => {
+  const b = await c.req.json<Record<string, unknown>>().catch(() => ({}) as Record<string, unknown>);
+  const r = await addUserFeedback(c.env, c.req.raw, c.get('userId'), b, (p) => c.executionCtx.waitUntil(p));
+  return 'error' in r ? c.json({ error: r.error }, r.status) : c.json(r, 201);
+});
+
+meApi.post('/feedback/read', async (c) => {
+  await markRepliesRead(c.env, c.get('userId'));
+  return c.json({ ok: true });
+});
+
 // ---------------------------------------------------------------- profil joueur (carte)
 meApi.get('/profile', async (c) => {
   const uid = c.get('userId');
+  await ensureFeedbackSchema(c.env);
   const p = await c.env.DB.prepare(
     `SELECT p.display_name, p.photo, p.home_golf_id, g.name AS home_golf_name, g.city AS home_golf_city, p.city, p.birth_year,
-            p.handedness, p.licence, p.started_year, p.bag
+            p.handedness, p.licence, p.started_year, p.bag, p.first_name, p.last_name
      FROM player_profiles p LEFT JOIN golfs g ON g.id = p.home_golf_id WHERE p.user_id = ?`,
   )
     .bind(uid)
@@ -395,22 +416,26 @@ meApi.put('/bag', async (c) => {
 
 meApi.put('/profile', async (c) => {
   const uid = c.get('userId');
+  await ensureFeedbackSchema(c.env);
   const b = await c.req.json<Record<string, unknown>>().catch(() => ({}) as Record<string, unknown>);
   const photo = typeof b.photo === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(b.photo) && b.photo.length < 400_000 ? b.photo : null;
   const thisYear = new Date().getFullYear();
   await c.env.DB.prepare(
-    `INSERT INTO player_profiles (user_id, display_name, photo, home_golf_id, city, birth_year, handedness, licence, started_year)
-     VALUES (?,?,?,?,?,?,?,?,?)
+    `INSERT INTO player_profiles (user_id, display_name, photo, home_golf_id, city, birth_year, handedness, licence, started_year, first_name, last_name)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?)
      ON CONFLICT(user_id) DO UPDATE SET display_name=excluded.display_name, photo=excluded.photo, home_golf_id=excluded.home_golf_id,
        city=excluded.city, birth_year=excluded.birth_year, handedness=excluded.handedness, licence=excluded.licence,
-       started_year=excluded.started_year, updated_at=datetime('now')`,
+       started_year=excluded.started_year, first_name=excluded.first_name, last_name=excluded.last_name, updated_at=datetime('now')`,
   )
     .bind(
       uid, str(b.display_name, 60), photo, int(b.home_golf_id, 1, 1e9), str(b.city, 80), int(b.birth_year, 1900, thisYear),
       b.handedness === 'left' || b.handedness === 'right' ? b.handedness : null, str(b.licence, 20), int(b.started_year, 1900, thisYear),
+      str(b.first_name, 60), str(b.last_name, 60),
     )
     .run();
-  if (str(b.display_name, 60)) await c.env.DB.prepare(`UPDATE "user" SET name = ? WHERE id = ?`).bind(str(b.display_name, 60), uid).run();
+  // Nom du compte : pseudo, sinon « Prénom Nom ».
+  const accountName = str(b.display_name, 60) ?? ([str(b.first_name, 60), str(b.last_name, 60)].filter(Boolean).join(' ') || null);
+  if (accountName) await c.env.DB.prepare(`UPDATE "user" SET name = ? WHERE id = ?`).bind(accountName, uid).run();
   return c.json({ ok: true });
 });
 

@@ -58,6 +58,8 @@ export interface Me {
   demo: boolean;
   /** Compte administrateur : lien « Administration » dans les Réglages. */
   admin?: boolean;
+  /** Réponses de l'admin à ses retours, pas encore lues (pastille Réglages). */
+  feedbackUnread?: number;
   rounds: number;
   ranges: number;
 }
@@ -67,7 +69,10 @@ export const resetDemo = () => call('/api/me/demo/reset', 'POST');
 export const exportUrl = '/api/me/export';
 
 export interface Profile {
+  /** Pseudo affiché sur la carte joueur. */
   display_name: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
   photo: string | null;
   home_golf_id: number | null;
   home_golf_name?: string | null;

@@ -242,22 +242,42 @@ function SplashArt({ size, onFlagHit, replay }: { size: number; onFlagHit: () =>
   );
 }
 
+/** Qui regarde l'écran d'accueil : compte en cours de vérification, visiteur, compte Demo, ou joueur avec son compte. */
+export type SplashAudience = 'loading' | 'guest' | 'demo' | 'member';
+
 /**
  * Splash screen.
- * - First launch (runId 0): closes on its own after AUTO_CLOSE_MS, or on tap.
+ * - Joueur avec son compte : comme avant (fermeture seule au premier lancement, ou au toucher).
+ * - Visiteur ou compte Demo : l'écran reste affiché avec le message « programme testeurs » ; seuls ses boutons le ferment.
  * - Reopened from « ‹ Fairway »: stays until the user taps it.
  */
-export function Splash({ runId, onDone }: { runId: number; onDone: () => void }) {
+export function Splash({
+  runId,
+  onDone,
+  audience = 'member',
+  onDemo,
+  onSignup,
+}: {
+  runId: number;
+  onDone: () => void;
+  audience?: SplashAudience;
+  onDemo?: () => void;
+  onSignup?: () => void;
+}) {
   const [out, setOut] = useState(false);
   const [hint, setHint] = useState(false);
   const [replay, setReplay] = useState(0);
   const [stay, setStay] = useState(runId > 0);
   const autoClose = useRef<number[]>([]);
+  const guest = audience === 'guest' || audience === 'demo';
 
-  const close = () => {
+  const close = (then?: () => void) => {
     if (out) return;
     setOut(true);
-    window.setTimeout(onDone, FADE_MS);
+    window.setTimeout(() => {
+      onDone();
+      then?.();
+    }, FADE_MS);
   };
 
   useEffect(() => {
@@ -266,23 +286,31 @@ export function Splash({ runId, onDone }: { runId: number; onDone: () => void })
     setReplay(0);
     setStay(runId > 0);
     const hintTimer = window.setTimeout(() => setHint(true), 2600);
-    autoClose.current =
-      runId > 0 ? [] : [window.setTimeout(() => setOut(true), AUTO_CLOSE_MS), window.setTimeout(onDone, AUTO_CLOSE_MS + FADE_MS)];
-    return () => {
-      window.clearTimeout(hintTimer);
-      autoClose.current.forEach((t) => window.clearTimeout(t));
-    };
+    return () => window.clearTimeout(hintTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runId]);
 
+  // Fermeture automatique : premier lancement d'un joueur connecté seulement (on attend de savoir qui regarde).
+  useEffect(() => {
+    autoClose.current.forEach((t) => window.clearTimeout(t));
+    autoClose.current =
+      runId > 0 || audience !== 'member' ? [] : [window.setTimeout(() => setOut(true), AUTO_CLOSE_MS), window.setTimeout(onDone, AUTO_CLOSE_MS + FADE_MS)];
+    return () => autoClose.current.forEach((t) => window.clearTimeout(t));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runId, audience]);
+
+  const tapBackground = () => {
+    if (!guest && audience !== 'loading') close();
+  };
+
   return (
     <div
-      className={`splash${out ? ' is-out' : ''}`}
-      role="button"
-      tabIndex={0}
-      aria-label="Fairway. Trouvez les prochaines compétitions de golf autour de vous. Touchez pour continuer."
-      onClick={close}
-      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && close()}
+      className={`splash${out ? ' is-out' : ''}${guest ? ' is-guest' : ''}`}
+      role={guest ? 'dialog' : 'button'}
+      tabIndex={guest ? -1 : 0}
+      aria-label={guest ? 'Fairway, programme testeurs' : 'Fairway. Trouvez les prochaines compétitions de golf autour de vous. Touchez pour continuer.'}
+      onClick={tapBackground}
+      onKeyDown={(e) => !guest && (e.key === 'Enter' || e.key === ' ') && close()}
     >
       <div className="splash-inner" key={runId}>
         {/* Tap on the icon replays the ball shot (flag stays); tap anywhere else closes. */}
@@ -305,9 +333,43 @@ export function Splash({ runId, onDone }: { runId: number; onDone: () => void })
         </button>
         <h1 className="splash-title">FAIRWAY</h1>
         <p className="splash-tag">Trouvez les prochaines compétitions de golf autour de vous.</p>
+
+        {guest && (
+          <section className="splash-card" aria-label="Programme testeurs" onClick={(e) => e.stopPropagation()}>
+            <p className="splash-card-eyebrow">Programme testeurs</p>
+            <p>
+              <strong>Fairway est en développement, et vous pouvez en être testeur.</strong>
+            </p>
+            <p>
+              Parcourez l’app, servez-vous-en, explorez ce que le compte Demo peut vous montrer, et créez un compte pour vous-même.
+            </p>
+            <p>
+              Ensuite, utilisez <strong>Réglages › Retours / Feedbacks</strong> pour poser vos questions, dire ce que vous aimez, ce que
+              vous utilisez, ce que vous aimez moins et ce que vous n’utilisez pas.
+            </p>
+            <p className="splash-card-gift">
+              À l’issue de la période de développement et de tests, les testeurs actifs bénéficieront d’un <strong>compte gratuit à vie</strong>{' '}
+              (hors coûts IA s’il y en a).
+            </p>
+          </section>
+        )}
       </div>
+      {/* Boutons du message testeur : toujours visibles en bas, même sur un petit écran. */}
+      {guest && (
+        <div className="splash-dock" onClick={(e) => e.stopPropagation()}>
+          <button type="button" className="splash-btn splash-btn--primary" data-track="splash:signup" onClick={() => close(onSignup)}>
+            Créer mon compte
+          </button>
+          <button type="button" className="splash-btn" data-track="splash:demo" onClick={() => close(onDemo)}>
+            {audience === 'demo' ? 'Continuer avec le compte Demo' : 'Explorer le compte Demo'}
+          </button>
+          <button type="button" className="splash-btn splash-btn--plain" data-track="splash:later" onClick={() => close()}>
+            Parcourir l’app
+          </button>
+        </div>
+      )}
       {/* Pinned to the bottom (absolute) so the icon and title never move when it appears. */}
-      {stay && <p className={`splash-hint${hint ? ' is-on' : ''}`}>Touchez l'écran pour continuer</p>}
+      {stay && !guest && <p className={`splash-hint${hint ? ' is-on' : ''}`}>Touchez l'écran pour continuer</p>}
     </div>
   );
 }

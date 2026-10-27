@@ -19,11 +19,13 @@ import type {
 import { DEMO_USER_ID, isDemo } from '../demo';
 import type { Env } from '../env';
 import { ensureActivitySchema, isAdminEmail } from '../lib/activity';
+import { ensureFeedbackSchema, threadOf } from './feedback';
 
 export const adminPeopleApi = new Hono<{ Bindings: Env }>();
 
 adminPeopleApi.use('*', async (c, next) => {
   await ensureActivitySchema(c.env);
+  await ensureFeedbackSchema(c.env);
   await next();
 });
 
@@ -32,14 +34,14 @@ const num = (v: unknown) => (typeof v === 'number' ? v : v == null ? 0 : Number(
 const str = (v: unknown) => (v == null ? null : String(v));
 
 /** Décalage Europe/Paris pour regrouper par jour en SQL (« +1 hours » ou « +2 hours »). */
-function parisOffset(at = new Date()): string {
+export function parisOffset(at = new Date()): string {
   const p = new Date(at.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
   const u = new Date(at.toLocaleString('en-US', { timeZone: 'UTC' }));
   return `+${Math.round((p.getTime() - u.getTime()) / 36e5)} hours`;
 }
 
-const sinceIso = (days: number) => new Date(Date.now() - days * 864e5).toISOString();
-const ph = (n: number) => Array.from({ length: n }, () => '?').join(',');
+export const sinceIso = (days: number) => new Date(Date.now() - days * 864e5).toISOString();
+export const ph = (n: number) => Array.from({ length: n }, () => '?').join(',');
 
 /** Libellés lisibles des écrans regroupés par famille (vue d'ensemble). */
 const FAMILY_LABEL: Record<string, string> = {
@@ -55,13 +57,13 @@ const FAMILY_LABEL: Record<string, string> = {
 const FAMILY_SQL = `CASE WHEN screen LIKE 'tab/%' OR screen LIKE 'sheet/%' OR instr(screen, '/') = 0 THEN screen
   ELSE substr(screen, 1, instr(screen, '/') - 1) END`;
 
-async function adminIds(env: Env): Promise<string[]> {
+export async function adminIds(env: Env): Promise<string[]> {
   const { results } = await env.DB.prepare(`SELECT id, email FROM "user"`).all<{ id: string; email: string }>();
   return results.filter((u) => isAdminEmail(env, u.email)).map((u) => u.id);
 }
 
 /** Clause qui écarte l'activité des comptes admin (et de leurs appareils, même avant connexion). */
-function notAdmin(ids: string[], alias = 'a'): { sql: string; params: string[] } {
+export function notAdmin(ids: string[], alias = 'a'): { sql: string; params: string[] } {
   if (!ids.length) return { sql: '1 = 1', params: [] };
   return {
     sql: `(${alias}.user_id IS NULL OR ${alias}.user_id NOT IN (${ph(ids.length)}))
@@ -85,7 +87,7 @@ function usageOf(r: Row | undefined): Usage {
 }
 
 /** Usage groupé par `col` (user_id ou device_id), pour les clés données (toutes si null). */
-async function usageBy(env: Env, col: 'user_id' | 'device_id', keys: string[] | null): Promise<Map<string, Usage>> {
+export async function usageBy(env: Env, col: 'user_id' | 'device_id', keys: string[] | null): Promise<Map<string, Usage>> {
   const off = parisOffset();
   const where = keys ? `a.${col} IN (${ph(keys.length)})` : `a.${col} IS NOT NULL`;
   if (keys && !keys.length) return new Map();
@@ -413,7 +415,8 @@ adminPeopleApi.get('/people/:id', async (c) => {
   const devUsage = await usageBy(env, 'device_id', devRows.map((r) => String(r.device_id)));
   const mine = { sql: 'a.user_id = ?', params: [id] };
   const now = new Date().toISOString();
-  const [dailyPts, screens, taps, inputs, plays, activity] = await Promise.all([
+  const [feedback, dailyPts, screens, taps, inputs, plays, activity] = await Promise.all([
+    threadOf(env, id, true),
     daily(env, 60, mine),
     ranked(env, 'screens', mine, 40),
     ranked(env, 'taps', mine, 40),
@@ -423,6 +426,7 @@ adminPeopleApi.get('/people/:id', async (c) => {
   ]);
   const body: PersonDetail = {
     person,
+    feedback,
     profile: (profile.results[0] as Row | undefined) ?? null,
     indexHistory: (idx.results as Row[]).map((r) => ({ asOf: String(r.as_of), index: num(r.hcp_index) })),
     providers: (providers.results as Row[]).map((r) => String(r.providerId)),

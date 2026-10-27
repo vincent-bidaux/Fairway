@@ -42,7 +42,8 @@ export function PlayerCard({
   onOpenIndex: () => void;
   interactive?: boolean;
 }) {
-  const name = profile?.display_name?.trim() || fallbackName || 'Joueur';
+  const realName = [profile?.first_name, profile?.last_name].map((x) => x?.trim()).filter(Boolean).join(' ');
+  const name = profile?.display_name?.trim() || realName || fallbackName || 'Joueur';
   const history = profile?.index_history ?? [];
   const last = history[history.length - 1];
   const prev = history.length > 1 ? history[history.length - 2] : null;

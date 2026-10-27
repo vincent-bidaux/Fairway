@@ -13,7 +13,18 @@ const TABS: Array<{ id: TabId; label: string; icon: IconName }> = [
   { id: 'settings', label: 'Réglages', icon: 'gear' },
 ];
 
-export function TabBar({ active, onChange, favCount }: { active: TabId; onChange: (t: TabId) => void; favCount: number }) {
+export function TabBar({
+  active,
+  onChange,
+  favCount,
+  settingsBadge = 0,
+}: {
+  active: TabId;
+  onChange: (t: TabId) => void;
+  favCount: number;
+  /** Réponses non lues dans Réglages > Retours. */
+  settingsBadge?: number;
+}) {
   return (
     <nav className="tabbar" role="tablist" aria-label="Navigation principale">
       {TABS.map((t) => (
@@ -30,6 +41,7 @@ export function TabBar({ active, onChange, favCount }: { active: TabId; onChange
           <span className="tab-icon">
             <Icon name={t.icon} size={25} strokeWidth={active === t.id ? 2.2 : 1.7} fill={t.id === 'favorites' && active === t.id} />
             {t.id === 'favorites' && favCount > 0 && <span className="tab-badge">{favCount}</span>}
+            {t.id === 'settings' && settingsBadge > 0 && <span className="tab-badge tab-badge--alert">{settingsBadge}</span>}
           </span>
           <span className="tab-label">{t.label}</span>
         </button>

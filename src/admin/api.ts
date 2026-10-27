@@ -1,5 +1,6 @@
 // Appels de la zone admin « testeurs » (auth par cookie de session).
 import type { AdminOverview, AdminPeople, DeviceDetail, PersonDetail } from '../../shared/admin';
+import type { TestsDashboard } from '../../shared/feedback';
 import { ApiError } from '../api';
 
 async function get<T>(path: string, signal?: AbortSignal): Promise<T> {
@@ -40,6 +41,10 @@ export function getPerson(id: string, signal?: AbortSignal): Promise<PersonDetai
 
 export function getDevice(id: string, signal?: AbortSignal): Promise<DeviceDetail> {
   return get<DeviceDetail>(`/api/admin/devices/${encodeURIComponent(id)}`, signal);
+}
+
+export function getTests(days: number, signal?: AbortSignal): Promise<TestsDashboard> {
+  return get<TestsDashboard>(`/api/admin/tests?days=${days}`, signal);
 }
 
 /** 401 / 403 : le compte n'est pas administrateur (ou n'est pas connecté). */

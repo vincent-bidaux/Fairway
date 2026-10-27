@@ -29,6 +29,12 @@ import { SessionsList } from './practice/screens/SessionsList';
 import { StatDetail } from './practice/screens/StatDetail';
 import { HighlightsList } from './practice/screens/HighlightsList';
 import { setScreen, startTracking } from './track';
+import { AdminTests } from './admin/AdminTests';
+import { AdminThread } from './admin/AdminThread';
+import { FeedbackScreen } from './feedback/FeedbackScreen';
+import { refreshAccount, signOut, useAccount } from './practice/account';
+import { signInDemo } from './practice/api';
+import type { SplashAudience } from './components/Splash';
 
 export function App() {
   const { favorites } = usePrefs();
@@ -42,6 +48,11 @@ export function App() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [login, setLogin] = useState<{ open: boolean; demo?: boolean }>({ open: false });
   const toastTimer = useRef<number | undefined>(undefined);
+  const account = useAccount();
+  // Écran d'accueil : visiteurs et compte Demo voient le message « programme testeurs ».
+  const audience: SplashAudience =
+    account.status === 'loading' ? 'loading' : account.status === 'in' ? (account.me.demo ? 'demo' : 'member') : 'guest';
+  const feedbackUnread = account.status === 'in' ? (account.me.feedbackUnread ?? 0) : 0;
 
   // Parties saisies hors ligne : renvoyées au démarrage (puis au retour du réseau).
   useEffect(() => {
@@ -50,14 +61,20 @@ export function App() {
 
   // Suivi d'activité (zone admin) : écran affiché = feuille ouverte, sinon page du dessus, sinon onglet.
   useEffect(() => startTracking(), []);
+  // Retour au premier plan : compte rafraîchi (pastille des réponses aux retours).
+  useEffect(() => {
+    const onVisible = () => document.visibilityState === 'visible' && void refreshAccount();
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, []);
   useEffect(() => {
     const top = stack[stack.length - 1];
-    if (splash) setScreen('splash');
+    if (splash) setScreen(audience === 'guest' || audience === 'demo' ? 'splash/guest' : 'splash');
     else if (login.open) setScreen('sheet/login');
     else if (zoneSheet.open) setScreen('sheet/zone');
     else if (top) setScreen(...routeScreen(top));
     else setScreen(`tab/${tab}`);
-  }, [tab, stack, splash, login.open, zoneSheet.open]);
+  }, [tab, stack, splash, login.open, zoneSheet.open, audience]);
 
   useEffect(() => {
     let alive = true;
@@ -120,7 +137,7 @@ export function App() {
         {panel('favorites', <FavoritesScreen active={tab === 'favorites'} />)}
         {panel('parties', <PracticeScreen active={tab === 'parties' && stack.length === 0} />)}
         {panel('settings', <SettingsScreen />)}
-        <TabBar active={tab} onChange={selectTab} favCount={favorites.length + golfFavs.length} />
+        <TabBar active={tab} onChange={selectTab} favCount={favorites.length + golfFavs.length} settingsBadge={feedbackUnread} />
 
         {stack.map((r, i) => (
           <Page key={i}>
@@ -130,6 +147,9 @@ export function App() {
             {r.type === 'admin-home' && <AdminHome />}
             {r.type === 'admin-person' && <AdminPerson id={r.id} />}
             {r.type === 'admin-device' && <AdminDevice id={r.id} />}
+            {r.type === 'admin-tests' && <AdminTests />}
+            {r.type === 'admin-thread' && <AdminThread id={r.id} />}
+            {r.type === 'feedback' && <FeedbackScreen />}
             {r.type === 'session' && <SessionDetail id={r.id} />}
             {r.type === 'session-editor' && <SessionEditor kind={r.kind} session={r.session} />}
             {r.type === 'profile' && <ProfileEdit />}
@@ -144,7 +164,27 @@ export function App() {
         </div>
       </div>
 
-      {splash && <Splash runId={splash.run} onDone={() => setSplash(null)} />}
+      {splash && (
+        <Splash
+          runId={splash.run}
+          audience={audience}
+          onDone={() => setSplash(null)}
+          onSignup={() => {
+            selectTab('parties');
+            // Depuis le compte Demo (partagé), on en sort avant de créer son propre compte.
+            if (audience === 'demo') void signOut().finally(() => setLogin({ open: true }));
+            else setLogin({ open: true });
+          }}
+          onDemo={() => {
+            selectTab('parties');
+            if (audience === 'demo') return;
+            void signInDemo()
+              .then(() => refreshAccount())
+              .then(() => toast('Bienvenue sur le compte Demo'))
+              .catch(() => setLogin({ open: true, demo: true }));
+          }}
+        />
+      )}
 
       <LoginSheet open={login.open} demo={login.demo} onClose={() => setLogin({ open: false })} />
 
@@ -177,6 +217,8 @@ function routeScreen(r: Route): [string, string | null] {
       return [`admin-person/${r.id}`, null];
     case 'admin-device':
       return [`admin-device/${r.id}`, null];
+    case 'admin-thread':
+      return [`admin-thread/${r.id}`, null];
     default:
       return [r.type, null];
   }

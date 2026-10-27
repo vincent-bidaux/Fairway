@@ -8,6 +8,7 @@ import { todayParis } from '../lib/dates';
 import { ensurePlansTable, refreshPlans } from '../plans/osm';
 import { isAdminEmail, sessionUser } from '../lib/activity';
 import { adminPeopleApi } from './adminPeople';
+import { adminFeedbackApi } from './feedback';
 
 export const adminApi = new Hono<{ Bindings: Env }>();
 
@@ -23,6 +24,7 @@ adminApi.use('*', async (c, next) => {
 });
 
 adminApi.route('/', adminPeopleApi);
+adminApi.route('/', adminFeedbackApi);
 
 adminApi.get('/status', async (c) => {
   const db = c.env.DB;

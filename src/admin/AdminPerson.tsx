@@ -1,6 +1,7 @@
 // Fiche d'un testeur : identité, infos de profil, usage, volume ajouté, séances, appareils et journal.
 import { useState } from 'react';
 import type { PersonDetail, PlayRow } from '../../shared/admin';
+import { FEEDBACK_KINDS } from '../../shared/feedback';
 import { CLUB_BY_ID } from '../../shared/practice';
 import { Badge, Group, Row, Spinner } from '../components/Controls';
 import { BackButton, NavIconButton, Screen } from '../components/Screen';
@@ -20,7 +21,9 @@ const PROVIDERS: Record<string, string> = {
 };
 
 const PROFILE_LABELS: Record<string, string> = {
-  display_name: 'Nom affiché',
+  display_name: 'Pseudo',
+  first_name: 'Prénom',
+  last_name: 'Nom',
   city: 'Ville',
   birth_year: 'Année de naissance',
   handedness: 'Latéralité',
@@ -29,9 +32,11 @@ const PROFILE_LABELS: Record<string, string> = {
   home_golf_id: "Golf d'attache",
   bag: 'Sac',
 };
-const PROFILE_ORDER = Object.keys(PROFILE_LABELS);
+// Champs d'identité testeur : affichés dans le groupe « Identité », pas répétés dans « Infos ».
+const IDENTITY_KEYS = new Set(['display_name', 'first_name', 'last_name', 'licence', 'city', 'home_golf_id']);
+const PROFILE_ORDER = Object.keys(PROFILE_LABELS).filter((k) => !IDENTITY_KEYS.has(k));
 // Champs déjà traités ailleurs ou sans intérêt à l'affichage.
-const PROFILE_HIDDEN = new Set(['user_id', 'photo', 'home_golf_name', 'home_golf_city', 'created_at', 'updated_at']);
+const PROFILE_HIDDEN = new Set(['user_id', 'photo', 'first_name', 'last_name', 'home_golf_name', 'home_golf_city', 'created_at', 'updated_at']);
 
 const isEmpty = (v: unknown) => v == null || v === '' || (Array.isArray(v) && v.length === 0);
 
@@ -62,7 +67,7 @@ function handedness(v: unknown): string {
 function ProfileRows({ profile }: { profile: Record<string, unknown> | null }) {
   if (!profile) return <div className="row row--muted">Aucun profil renseigné.</div>;
   const year = new Date().getFullYear();
-  const keys = [...PROFILE_ORDER, ...Object.keys(profile).filter((k) => !PROFILE_ORDER.includes(k) && !PROFILE_HIDDEN.has(k))];
+  const keys = [...PROFILE_ORDER, ...Object.keys(profile).filter((k) => !PROFILE_ORDER.includes(k) && !IDENTITY_KEYS.has(k) && !PROFILE_HIDDEN.has(k))];
   const rows: JSX.Element[] = [];
   for (const k of keys) {
     const v = profile[k];
@@ -93,6 +98,85 @@ function ProfileRows({ profile }: { profile: Record<string, unknown> | null }) {
   const updated = profile.updated_at;
   if (typeof updated === 'string' && updated) rows.push(<Row key="updated_at" label="Profil modifié" value={fmtStamp(updated)} />);
   return rows.length ? <>{rows}</> : <div className="row row--muted">Profil vide.</div>;
+}
+
+const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? v.trim() : null);
+
+function identityOf(d: PersonDetail) {
+  const pr = d.profile ?? {};
+  const homeName = str(pr.home_golf_name);
+  const homeCity = str(pr.home_golf_city);
+  const homeId = pr.home_golf_id != null && pr.home_golf_id !== '' ? String(pr.home_golf_id) : null;
+  return {
+    pseudo: str(pr.display_name),
+    firstName: str(pr.first_name),
+    lastName: str(pr.last_name),
+    licence: str(pr.licence),
+    city: str(pr.city),
+    homeGolf: homeName ? [homeName, homeCity].filter(Boolean).join(' · ') : homeId ? `#${homeId}` : null,
+    photo: str(pr.photo),
+  };
+}
+
+const Missing = () => <span className="adm-muted">—</span>;
+
+function IdentityGroup({ d }: { d: PersonDetail }) {
+  const id = identityOf(d);
+  const filled = [id.pseudo, id.firstName, id.lastName, id.licence, id.city, id.homeGolf, id.photo].filter(Boolean).length;
+  const val = (v: string | null) => v ?? <Missing />;
+  return (
+    <Group title="Identité" footer={<span className="adm-complete">Profil complet {filled}/7</span>}>
+      <Row label="Pseudo" value={val(id.pseudo)} />
+      <Row label="Prénom" value={val(id.firstName)} />
+      <Row label="Nom" value={val(id.lastName)} />
+      <Row label="E-mail" value={d.person.email} />
+      <Row label="N° de licence" value={val(id.licence)} />
+      <Row label="Ville" value={val(id.city)} />
+      <Row label="Golf de rattachement" value={val(id.homeGolf)} />
+      <Row label="Photo" value={id.photo ? 'Oui' : <Missing />} />
+    </Group>
+  );
+}
+
+function FeedbackGroup({ d, onOpen }: { d: PersonDetail; onOpen: () => void }) {
+  const msgs = d.feedback;
+  if (msgs.length === 0) {
+    return (
+      <Group title="Retours">
+        <Row label="Écrire au testeur" sub="Aucun retour pour l’instant" chevron onClick={onOpen} />
+      </Group>
+    );
+  }
+  const unread = msgs.filter((m) => m.author === 'user' && !m.readAt).length;
+  const last = msgs.slice(-3).reverse();
+  return (
+    <Group title={`Retours (${msgs.length})`}>
+      {last.map((m) => {
+        const kind = m.kind ? FEEDBACK_KINDS.find((k) => k.id === m.kind) : null;
+        return (
+          <div className="row adm-msg" key={m.id}>
+            <div className="adm-msg-head">
+              {m.author === 'admin' ? (
+                <Badge tone="gray">Vous</Badge>
+              ) : (
+                <span className="badge adm-kind" style={{ ['--c' as string]: kind?.color ?? 'var(--gray)' }}>
+                  {kind?.label ?? 'Retour'}
+                </span>
+              )}
+              <time dateTime={m.createdAt}>{relTime(m.createdAt)}</time>
+            </div>
+            <div className="adm-msg-body">{m.body}</div>
+          </div>
+        );
+      })}
+      <Row
+        label="Ouvrir la conversation"
+        value={unread > 0 ? <span className="adm-pill" aria-label={`${unread} non lu${unread > 1 ? 's' : ''}`}>{unread}</span> : undefined}
+        chevron
+        onClick={onOpen}
+      />
+    </Group>
+  );
 }
 
 function signed(n: number): string {
@@ -178,7 +262,9 @@ export function AdminPerson({ id }: { id: string }) {
 
   const p = d.person;
   const name = personName(p);
-  const photo = typeof d.profile?.photo === 'string' && d.profile.photo ? d.profile.photo : null;
+  const ident = identityOf(d);
+  const photo = ident.photo;
+  const fullName = [ident.firstName, ident.lastName].filter(Boolean).join(' ');
   const idx = latestIndex(d.indexHistory);
   const history = [...d.indexHistory].sort((a, b) => (parseIso(b.asOf)?.getTime() ?? 0) - (parseIso(a.asOf)?.getTime() ?? 0));
   const plays = allPlays ? d.plays : d.plays.slice(0, PLAYS_LIMIT);
@@ -193,14 +279,18 @@ export function AdminPerson({ id }: { id: string }) {
         <Avatar photo={photo} name={name} size={64} />
         <div className="adm-head-main">
           <strong>{name}</strong>
+          {fullName && fullName !== name && <span className="adm-fullname">{fullName}</span>}
           <span>{p.email}</span>
           {p.username && <span>@{p.username}</span>}
           <Badges demo={p.demo} admin={p.admin} />
         </div>
       </div>
 
+      <FeedbackGroup d={d} onOpen={() => ui.push({ type: 'admin-thread', id })} />
+
+      <IdentityGroup d={d} />
+
       <Group title="Compte">
-        <Row label="E-mail" value={p.email} />
         {p.username && <Row label="Identifiant" value={p.username} />}
         <Row label="Compte créé le" value={fmtStamp(p.createdAt)} sub={relTime(p.createdAt)} />
         <Row label="E-mail vérifié" value={<span className={p.emailVerified ? 'tone-green' : 'tone-orange'}>{p.emailVerified ? 'Oui' : 'Non'}</span>} />

@@ -1,4 +1,4 @@
-// Modifier la carte joueur : photo, nom, golf d'attache, ville, naissance, main, licence, index.
+// Modifier la carte joueur : photo, prénom, nom, pseudo, golf d'attache, ville, naissance, main, licence, index.
 import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_BAG } from '../../../shared/practice';
 import { Field, Group, Row, Segmented, Spinner } from '../../components/Controls';
@@ -55,6 +55,8 @@ export function ProfileEdit() {
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [name, setName] = useState('');
   const [photo, setPhoto] = useState<string | null>(null);
   const [golfId, setGolfId] = useState<number | null>(null);
@@ -78,6 +80,8 @@ export function ProfileEdit() {
       .then((p) => {
         if (!live) return;
         setLoaded(p);
+        setFirstName(p.first_name ?? '');
+        setLastName(p.last_name ?? '');
         setName(p.display_name ?? '');
         setPhoto(p.photo);
         setGolfId(p.home_golf_id);
@@ -123,6 +127,8 @@ export function ProfileEdit() {
     try {
       await saveProfile({
         display_name: name.trim() || null,
+        first_name: firstName.trim() || null,
+        last_name: lastName.trim() || null,
         photo,
         home_golf_id: golfId,
         city: city.trim() || null,
@@ -164,7 +170,7 @@ export function ProfileEdit() {
   const ordered = [...history].sort((a, b) => b.as_of.localeCompare(a.as_of));
   const current = ordered[0];
   const email = account.status === 'in' ? account.me.user.email : null;
-  const shownName = name.trim() || (account.status === 'in' ? account.me.user.name : '');
+  const shownName = name.trim() || [firstName.trim(), lastName.trim()].filter(Boolean).join(' ') || (account.status === 'in' ? account.me.user.name : '');
 
   return (
     <Screen
@@ -194,8 +200,14 @@ export function ProfileEdit() {
       </div>
 
       <Group>
-        <Field label="Nom affiché">
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Votre nom" autoComplete="name" maxLength={60} />
+        <Field label="Prénom">
+          <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Votre prénom" autoComplete="given-name" maxLength={60} />
+        </Field>
+        <Field label="Nom">
+          <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Votre nom" autoComplete="family-name" maxLength={60} />
+        </Field>
+        <Field label="Pseudo">
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Affiché sur votre carte" autoComplete="nickname" maxLength={60} />
         </Field>
         <Row label="Golf d’attache" value={golfName ?? 'Choisir'} chevron onClick={() => setGolfSheet(true)} />
         <Field label="Ville">

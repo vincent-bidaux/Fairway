@@ -7,7 +7,7 @@ import { BackButton, NavIconButton, Screen } from '../components/Screen';
 import { EmptyState, ErrorState } from '../components/States';
 import { useAsync } from '../hooks';
 import { useUi } from '../ui';
-import { getOverview, getPeople, isForbidden } from './api';
+import { getOverview, getPeople, getTests, isForbidden } from './api';
 import { activityText, deviceLabel, formatDuration, relTime } from './labels';
 import { Badges, DailyChart, MoreRow, RankGroup, Tiles, VolumeGroup, personName, plural } from './parts';
 import './admin.css';
@@ -33,10 +33,13 @@ export function AdminHome() {
   const days = Number(period);
   const overview = useAsync((s) => getOverview(days, s), [days]);
   const people = useAsync((s) => getPeople(s), []);
+  // Résumé des retours : un échec ne doit pas gêner la page (on n'en lit que `data`).
+  const tests = useAsync((s) => getTests(30, s), []);
 
   const reload = () => {
     overview.reload();
     people.reload();
+    tests.reload();
   };
 
   const left = <BackButton onClick={ui.back} />;
@@ -70,6 +73,18 @@ export function AdminHome() {
 
   return (
     <Screen title="Administration" left={left} right={right}>
+      <Group>
+        <Row
+          icon={<Icon name="mail" size={18} />}
+          iconColor="var(--tint)"
+          label="Tests et retours"
+          sub={tests.data ? `${plural(tests.data.testers.total, 'testeur')} · ${plural(tests.data.feedback.total, 'retour')}` : undefined}
+          value={tests.data && tests.data.feedback.unread > 0 ? <span className="adm-pill" aria-label={`${tests.data.feedback.unread} non lus`}>{nf(tests.data.feedback.unread)}</span> : undefined}
+          chevron
+          onClick={() => ui.push({ type: 'admin-tests' })}
+        />
+      </Group>
+
       <div className="sheet-pad sheet-pad--screen">
         <Segmented<Period> label="Période" value={period} onChange={setPeriod} options={PERIODS} />
       </div>

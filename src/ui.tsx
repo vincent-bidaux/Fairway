@@ -11,6 +11,10 @@ export type Route =
   | { type: 'admin-home' }
   | { type: 'admin-person'; id: string }
   | { type: 'admin-device'; id: string }
+  | { type: 'admin-tests' }
+  | { type: 'admin-thread'; id: string }
+  // Programme testeurs : retours du joueur (Réglages > Retours)
+  | { type: 'feedback' }
   // « Mes parties »
   | { type: 'session'; id: string }
   | { type: 'session-editor'; kind?: SessionKind; session?: PlaySession }

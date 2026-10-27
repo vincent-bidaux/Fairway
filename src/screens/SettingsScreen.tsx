@@ -106,6 +106,25 @@ export function SettingsScreen() {
         )}
       </Group>
 
+      <Group
+        title="Retours / Feedbacks"
+        footer="Fairway est en développement : dites ce que vous aimez, ce que vous utilisez, ce que vous aimez moins, posez vos questions. Les testeurs actifs auront un compte gratuit à vie."
+      >
+        <Row
+          icon={<Icon name="mail" size={16} />}
+          iconColor="var(--tint)"
+          label="Retours / Feedbacks"
+          sub={account.status === 'in' && !account.me.demo ? 'Votre fil de discussion avec Vincent' : 'Programme testeurs'}
+          value={
+            account.status === 'in' && (account.me.feedbackUnread ?? 0) > 0 ? (
+              <span className="settings-unread">{account.me.feedbackUnread} nouvelle{(account.me.feedbackUnread ?? 0) > 1 ? 's' : ''}</span>
+            ) : undefined
+          }
+          chevron
+          onClick={() => ui.push({ type: 'feedback' })}
+        />
+      </Group>
+
       <Group title="À propos">
         <Row label="Version" value={APP_VERSION} />
         <Row label="Données" sub="Sites des golfs, ffgolf, ligue Nouvelle-Aquitaine" />

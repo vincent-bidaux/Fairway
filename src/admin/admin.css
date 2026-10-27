@@ -333,3 +333,157 @@
     padding-right: 12px;
   }
 }
+
+/* --- Tests et retours --------------------------------------------------- */
+
+.adm-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 11px;
+  background: var(--tint);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-pill--orange {
+  background: var(--orange);
+}
+
+.adm-kind {
+  --c: var(--gray);
+  color: var(--c);
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+}
+
+
+.adm-kind-row {
+  display: grid;
+  grid-template-columns: minmax(0, 7.5em) minmax(0, 1fr) 2.5em;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-kind-label {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.adm-kind-count {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-kind-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--fill);
+  overflow: hidden;
+}
+
+.adm-kind-bar i {
+  display: block;
+  height: 100%;
+  min-width: 3px;
+  border-radius: 5px;
+  background: var(--c, var(--blue));
+}
+
+.adm-thread {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+}
+
+.adm-thread-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.adm-thread-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-thread-sub {
+  font-size: 14px;
+  color: var(--label2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-thread-time {
+  font-size: 12px;
+  color: var(--label3);
+}
+
+.adm-thread-side {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.adm-funnel-pct {
+  color: var(--label2);
+}
+
+.adm-muted {
+  color: var(--label3);
+}
+
+.adm-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.adm-msg-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--label2);
+}
+
+.adm-msg-head time {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.adm-msg-body {
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.adm-head-main .adm-fullname {
+  color: var(--label);
+  font-size: 15px;
+}
+
+.adm-complete {
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-title-out {
+  margin: 0 var(--gutter) 7px;
+}
