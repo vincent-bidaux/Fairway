@@ -6,16 +6,23 @@ import { discoverSources } from '../crawl/discover';
 import { applySeed } from '../seed';
 import { todayParis } from '../lib/dates';
 import { ensurePlansTable, refreshPlans } from '../plans/osm';
+import { isAdminEmail, sessionUser } from '../lib/activity';
+import { adminPeopleApi } from './adminPeople';
 
 export const adminApi = new Hono<{ Bindings: Env }>();
 
+// Accès : compte admin connecté (cookie de session), ou code admin (en-tête Authorization) comme avant.
 adminApi.use('*', async (c, next) => {
   const expected = c.env.ADMIN_TOKEN;
-  if (!expected) return c.json({ error: 'ADMIN_TOKEN non configuré sur le Worker' }, 503);
   const got = (c.req.header('Authorization') ?? '').replace(/^Bearer\s+/i, '');
-  if (!(await safeEqual(got, expected))) return c.json({ error: 'Code admin invalide' }, 401);
-  await next();
+  if (expected && got && (await safeEqual(got, expected))) return next();
+  const user = await sessionUser(c.env, c.req.raw, c.executionCtx);
+  if (user && isAdminEmail(c.env, user.email)) return next();
+  if (user) return c.json({ error: 'Réservé à l’administrateur' }, 403);
+  return c.json({ error: got ? 'Code admin invalide' : 'Connexion admin requise' }, 401);
 });
+
+adminApi.route('/', adminPeopleApi);
 
 adminApi.get('/status', async (c) => {
   const db = c.env.DB;

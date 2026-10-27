@@ -1,0 +1,335 @@
+/* Zone admin « testeurs » — classes préfixées adm-, variables de src/styles.css (mode sombre inclus). */
+
+.adm-pad {
+  padding: 4px var(--gutter) 18px;
+}
+
+.adm-stale {
+  opacity: 0.55;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.adm-center {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+/* Tuiles */
+.adm-tile strong {
+  overflow-wrap: anywhere;
+}
+
+.adm-tile-sub {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--label2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cartes (graphes, en-tête de fiche) */
+.adm-card {
+  margin: 0 var(--gutter) 22px;
+  padding: 14px 16px 12px;
+  border-radius: 12px;
+  background: var(--bg2);
+  min-width: 0;
+}
+
+.adm-card-title {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--label2);
+}
+
+.adm-card-big {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.adm-card-big b {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-card-big span {
+  font-size: 13px;
+  color: var(--label2);
+}
+
+/* Avatar et en-tête de fiche */
+.adm-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 var(--gutter) 22px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg2);
+}
+
+.adm-head-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.adm-head-main strong {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  overflow-wrap: anywhere;
+}
+
+.adm-head-main span {
+  font-size: 14px;
+  color: var(--label2);
+  overflow-wrap: anywhere;
+}
+
+.adm-avatar {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tint) 18%, transparent);
+  color: var(--tint);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.adm-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.adm-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.adm-head .adm-badges {
+  margin: 4px 0 0;
+}
+
+/* Lignes de liste */
+.adm-name {
+  display: inline;
+}
+
+.adm-counts {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 13px;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.adm-counts b {
+  color: var(--label);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.adm-line {
+  display: block;
+}
+
+.adm-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.adm-more {
+  color: var(--tint);
+  font-weight: 500;
+}
+
+.adm-link {
+  color: var(--tint);
+}
+
+/* Classements */
+.adm-rank {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  --adm-c: var(--blue);
+}
+
+.adm-rank-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.adm-rank-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.adm-rank-val {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--label2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.adm-rank-val b {
+  color: var(--label);
+  font-weight: 600;
+}
+
+.adm-rank-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--fill);
+  overflow: hidden;
+}
+
+.adm-rank-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--adm-c);
+}
+
+/* Journal */
+.adm-visit {
+  padding: 0 0 6px;
+  border-bottom: 0.5px solid var(--sep);
+}
+
+.adm-visit:last-child {
+  border-bottom: 0;
+}
+
+.adm-visit-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px 6px;
+  font-size: 13px;
+  color: var(--label2);
+  background: var(--fill);
+}
+
+.adm-visit-head b {
+  color: var(--label);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-visit-head span {
+  flex-shrink: 0;
+}
+
+.adm-ev {
+  display: grid;
+  grid-template-columns: 40px 10px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 16px 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.adm-ev-time {
+  font-size: 13px;
+  color: var(--label2);
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-ev-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--adm-dot, var(--gray));
+  align-self: center;
+}
+
+.adm-tone-blue {
+  --adm-dot: var(--blue);
+}
+.adm-tone-gray {
+  --adm-dot: var(--gray);
+}
+.adm-tone-green {
+  --adm-dot: var(--tint);
+}
+.adm-tone-purple {
+  --adm-dot: var(--purple);
+}
+.adm-tone-orange {
+  --adm-dot: var(--orange);
+}
+.adm-tone-red {
+  --adm-dot: var(--red);
+}
+
+.adm-ev-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow-wrap: anywhere;
+}
+
+.adm-ev-body small {
+  font-size: 12px;
+  color: var(--label2);
+}
+
+/* Séances */
+.adm-play-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.adm-play-sub small {
+  font-size: 12px;
+  color: var(--label2);
+}
+
+/* User agent brut */
+.adm-ua {
+  padding: 12px 16px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--label2);
+  word-break: break-all;
+}
+
+@media (max-width: 360px) {
+  .adm-ev {
+    grid-template-columns: 36px 8px minmax(0, 1fr);
+    gap: 6px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}

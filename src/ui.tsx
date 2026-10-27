@@ -7,6 +7,10 @@ export type Route =
   | { type: 'event'; id: number; event?: GolfEvent }
   | { type: 'golf'; id: number; golf?: Golf }
   | { type: 'admin' }
+  // Zone admin « testeurs » (compte admin)
+  | { type: 'admin-home' }
+  | { type: 'admin-person'; id: string }
+  | { type: 'admin-device'; id: string }
   // « Mes parties »
   | { type: 'session'; id: string }
   | { type: 'session-editor'; kind?: SessionKind; session?: PlaySession }

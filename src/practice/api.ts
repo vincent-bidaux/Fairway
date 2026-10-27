@@ -1,6 +1,7 @@
 // Client « Mes parties » : comptes (Better Auth) et données du joueur. Cookie de session même origine.
 import type { PlaySession, StatsPeriod, StatsResponse } from '../../shared/practice';
 import { ApiError } from '../api';
+import { trackHeaders } from '../track';
 
 async function call<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
   let res: Response;
@@ -8,7 +9,7 @@ async function call<T>(path: string, method = 'GET', body?: unknown): Promise<T>
     res = await fetch(path, {
       method,
       credentials: 'same-origin',
-      headers: { Accept: 'application/json', ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}) },
+      headers: { Accept: 'application/json', ...trackHeaders(), ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}) },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {
@@ -55,6 +56,8 @@ export const signOut = () => call('/api/auth/sign-out', 'POST', {});
 export interface Me {
   user: { id: string; name: string; email: string; username: string | null; displayUsername: string | null; createdAt: string };
   demo: boolean;
+  /** Compte administrateur : lien « Administration » dans les Réglages. */
+  admin?: boolean;
   rounds: number;
   ranges: number;
 }

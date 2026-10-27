@@ -5,8 +5,9 @@ import { createAuth } from '../auth';
 import type { Env } from '../env';
 import { clubStats, rangeStats, roundStats, wellbeingStats, type RangeRow, type RoundRow } from '../lib/stats';
 import { ensureDemo, isDemo } from '../demo';
+import { isAdminEmail, recordApi } from '../lib/activity';
 
-type Vars = { userId: string; userName: string };
+type Vars = { userId: string; userName: string; userEmail: string };
 export const meApi = new Hono<{ Bindings: Env; Variables: Vars }>();
 
 const UUID_RE = /^[0-9a-f-]{8,40}$/i;
@@ -18,7 +19,12 @@ meApi.use('*', async (c, next) => {
   if (!s) return c.json({ error: 'Connexion requise' }, 401);
   c.set('userId', s.user.id);
   c.set('userName', s.user.name);
+  c.set('userEmail', s.user.email);
   await next();
+  // Journal admin : chaque écriture (séance, profil, sac, index…) est notée côté serveur.
+  if (c.req.method !== 'GET') {
+    c.executionCtx.waitUntil(recordApi(c.env, c.req.raw, s.user.id, c.res.status).catch((e) => console.error('activity api', e)));
+  }
 });
 
 // ---------------------------------------------------------------- profil
@@ -29,7 +35,7 @@ meApi.get('/', async (c) => {
     .bind(uid)
     .all<{ kind: string; n: number }>();
   const counts = Object.fromEntries(n.results.map((r) => [r.kind, r.n]));
-  return c.json({ user: u, demo: isDemo(uid), rounds: counts.round ?? 0, ranges: counts.range ?? 0 });
+  return c.json({ user: u, demo: isDemo(uid), admin: isAdminEmail(c.env, c.get('userEmail')), rounds: counts.round ?? 0, ranges: counts.range ?? 0 });
 });
 
 // ---------------------------------------------------------------- séances

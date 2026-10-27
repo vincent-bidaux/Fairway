@@ -118,6 +118,17 @@ export function SettingsScreen() {
         />
       </Group>
 
+      {account.status === 'in' && account.me.admin ? (
+        <Group title="Administration" footer="Testeurs, activité, volume saisi, et collecte des compétitions.">
+          <Row
+            icon={<Icon name="lock" size={16} />}
+            iconColor="var(--indigo)"
+            label="Administration"
+            chevron
+            onClick={() => ui.push({ type: 'admin-home' })}
+          />
+        </Group>
+      ) : (
       <Group
         title="Administration"
         footer="Réservé à la gestion des sources de données. Le code reste enregistré sur cet appareil uniquement."
@@ -146,6 +157,7 @@ export function SettingsScreen() {
           />
         )}
       </Group>
+      )}
     </Screen>
   );
 }

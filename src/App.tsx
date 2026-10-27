@@ -10,6 +10,9 @@ import { Splash } from './components/Splash';
 import { useGolfFavorites, usePrefs, type ZoneMode } from './store';
 import { UiContext, type Route, type Ui } from './ui';
 import { AdminScreen } from './screens/AdminScreen';
+import { AdminHome } from './admin/AdminHome';
+import { AdminPerson } from './admin/AdminPerson';
+import { AdminDevice } from './admin/AdminDevice';
 import { EventDetail } from './screens/EventDetail';
 import { EventsScreen } from './screens/EventsScreen';
 import { FavoritesScreen } from './screens/FavoritesScreen';
@@ -25,6 +28,7 @@ import { SessionEditor } from './practice/screens/SessionEditor';
 import { SessionsList } from './practice/screens/SessionsList';
 import { StatDetail } from './practice/screens/StatDetail';
 import { HighlightsList } from './practice/screens/HighlightsList';
+import { setScreen, startTracking } from './track';
 
 export function App() {
   const { favorites } = usePrefs();
@@ -43,6 +47,17 @@ export function App() {
   useEffect(() => {
     void flushDrafts();
   }, []);
+
+  // Suivi d'activité (zone admin) : écran affiché = feuille ouverte, sinon page du dessus, sinon onglet.
+  useEffect(() => startTracking(), []);
+  useEffect(() => {
+    const top = stack[stack.length - 1];
+    if (splash) setScreen('splash');
+    else if (login.open) setScreen('sheet/login');
+    else if (zoneSheet.open) setScreen('sheet/zone');
+    else if (top) setScreen(...routeScreen(top));
+    else setScreen(`tab/${tab}`);
+  }, [tab, stack, splash, login.open, zoneSheet.open]);
 
   useEffect(() => {
     let alive = true;
@@ -112,6 +127,9 @@ export function App() {
             {r.type === 'event' && <EventDetail id={r.id} initial={r.event} />}
             {r.type === 'golf' && <GolfDetail id={r.id} initial={r.golf} />}
             {r.type === 'admin' && <AdminScreen />}
+            {r.type === 'admin-home' && <AdminHome />}
+            {r.type === 'admin-person' && <AdminPerson id={r.id} />}
+            {r.type === 'admin-device' && <AdminDevice id={r.id} />}
             {r.type === 'session' && <SessionDetail id={r.id} />}
             {r.type === 'session-editor' && <SessionEditor kind={r.kind} session={r.session} />}
             {r.type === 'profile' && <ProfileEdit />}
@@ -138,4 +156,28 @@ export function App() {
       />
     </UiContext.Provider>
   );
+}
+
+/** Clé et libellé d'une page pour le suivi d'activité. */
+function routeScreen(r: Route): [string, string | null] {
+  switch (r.type) {
+    case 'event':
+      return [`event/${r.id}`, r.event?.title ?? null];
+    case 'golf':
+      return [`golf/${r.id}`, r.golf?.name ?? null];
+    case 'session':
+      return [`session/${r.id}`, null];
+    case 'session-editor':
+      return ['session-editor', r.session ? 'Modification' : r.kind === 'range' ? 'Nouveau practice' : r.kind === 'round' ? 'Nouvelle partie' : 'Nouvelle séance'];
+    case 'stat':
+      return [`stat/${r.metric}`, null];
+    case 'sessions':
+      return ['sessions', null];
+    case 'admin-person':
+      return [`admin-person/${r.id}`, null];
+    case 'admin-device':
+      return [`admin-device/${r.id}`, null];
+    default:
+      return [r.type, null];
+  }
 }

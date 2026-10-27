@@ -9,6 +9,8 @@ import { createAuth } from './auth';
 import { ensureDemo } from './demo';
 import { meApi } from './routes/me';
 import { refreshPlans } from './plans/osm';
+import { ingest, sessionUser } from './lib/activity';
+import type { TrackBatch } from '../shared/admin';
 
 /** Must match the second cron in wrangler.jsonc. */
 const PLANS_CRON = '*/5 * * * *';
@@ -21,6 +23,15 @@ app.onError((err, c) => {
 });
 
 app.get('/api/health', (c) => c.json({ ok: true }));
+
+// Suivi d'activité (zone admin) : lots envoyés par src/track.ts, souvent via navigator.sendBeacon.
+app.post('/api/t', async (c) => {
+  const batch = await c.req.json<TrackBatch>().catch(() => null);
+  if (!batch) return c.body(null, 204);
+  const user = await sessionUser(c.env, c.req.raw, c.executionCtx);
+  c.executionCtx.waitUntil(ingest(c.env, c.req.raw, batch, user?.id ?? null).catch((e) => console.error('track', e)));
+  return c.body(null, 204);
+});
 app.route('/api/admin', adminApi);
 
 // Comptes joueurs (Better Auth) : code par e-mail, compte de démo.
