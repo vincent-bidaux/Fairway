@@ -155,7 +155,7 @@ export function App() {
             {r.type === 'session-editor' && <SessionEditor kind={r.kind} session={r.session} />}
             {r.type === 'profile' && <ProfileEdit />}
             {r.type === 'stat' && <StatDetail metric={r.metric} />}
-            {r.type === 'sessions' && <SessionsList kind={r.kind} />}
+            {r.type === 'sessions' && <SessionsList kind={r.kind} golfId={r.golfId} golfName={r.golfName} />}
             {r.type === 'highlights' && <HighlightsList />}
           </Page>
         ))}

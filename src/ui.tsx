@@ -21,7 +21,7 @@ export type Route =
   | { type: 'session-editor'; kind?: SessionKind; session?: PlaySession }
   | { type: 'profile' }
   | { type: 'stat'; metric: StatMetric }
-  | { type: 'sessions'; kind?: SessionKind }
+  | { type: 'sessions'; kind?: SessionKind; golfId?: number; golfName?: string }
   | { type: 'highlights' };
 
 export type StatMetric = 'score' | 'distribution' | 'byPar' | 'fairways' | 'gir' | 'putts' | 'upDown' | 'penalties' | 'index' | 'practice' | 'drills' | 'context' | 'clubs';

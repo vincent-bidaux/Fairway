@@ -708,6 +708,9 @@
 /* --- Liste des séances ---------------------------------------------------- */
 .sl-seg {
   margin: 0 var(--gutter) 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .sl-month {
   margin: 0 var(--gutter) 18px;

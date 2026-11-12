@@ -1,4 +1,5 @@
-// Onglet « Mes parties » : tableau de bord (connecté) ou aperçu grisé + invitation (non connecté).
+// Onglet « Mes parties » : deux vues, Parties (carte joueur, coups de maître, séances) et Statistiques (tableau de bord),
+// ou aperçu grisé + invitation (non connecté).
 import { useEffect, useRef, useState } from 'react';
 import type { Highlight, PlaySession, StatsPeriod, StatsResponse } from '../../shared/practice';
 import { Group, Row, Segmented, Spinner } from '../components/Controls';
@@ -19,6 +20,16 @@ import { MIN_ROUNDS } from './Dashboard';
 import { PERIODS, plural, readPeriod, roundsByPeriod, writePeriod } from './statsFormat';
 import './practice.css';
 
+type View = 'parties' | 'stats';
+const VIEW_KEY = 'fairway:parties-view';
+const readView = (): View => {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'stats' ? 'stats' : 'parties';
+  } catch {
+    return 'parties';
+  }
+};
+
 const PERIOD_WORDS: Record<StatsPeriod, string> = { '1m': 'le dernier mois', '3m': '3 mois', '6m': '6 mois', '1y': '1 an', all: 'toute la période' };
 
 interface Loaded {
@@ -37,6 +48,15 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [statsBusy, setStatsBusy] = useState(false);
   const [tick, setTick] = useState(0);
+  const [view, setViewState] = useState<View>(readView);
+  const setView = (v: View) => {
+    setViewState(v);
+    try {
+      localStorage.setItem(VIEW_KEY, v);
+    } catch {
+      /* rien */
+    }
+  };
   const statsSeq = useRef(0);
   const signedIn = account.status === 'in';
   const accountId = account.status === 'in' ? account.me.user.id : undefined;
@@ -162,7 +182,7 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
 
   const me = account.me;
   const total = me.rounds + me.ranges;
-  const recent = data.sessions.slice(0, 5);
+  const recent = data.sessions.slice(0, 8);
   // Peu de parties sur la période choisie : proposer la plus courte période qui en a assez.
   const counts = roundsByPeriod(data.sessions);
   const periodRounds = counts[period] ?? 0;
@@ -186,22 +206,40 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
           </div>
         </div>
       )}
-      <PlayerCard
-        profile={data.profile}
-        fallbackName={me.demo ? 'Demo' : me.user.name}
-        counts={{ rounds: me.rounds, ranges: me.ranges }}
-        best={stats.rounds.best ? { strokes: stats.rounds.best.strokes, rel: stats.rounds.best.rel, holes: stats.rounds.best.holes } : null}
-        onOpenProfile={() => ui.push({ type: 'profile' })}
-        onOpenIndex={() => ui.push({ type: 'stat', metric: 'index' })}
-      />
+      <div className="golfs-controls fav-seg">
+        <Segmented<View>
+          label="Vue"
+          value={view}
+          onChange={setView}
+          options={[
+            { value: 'parties', label: 'Parties' },
+            { value: 'stats', label: 'Statistiques' },
+          ]}
+        />
+      </div>
+
+      {view === 'parties' && (
+        <PlayerCard
+          profile={data.profile}
+          fallbackName={me.demo ? 'Demo' : me.user.name}
+          counts={{ rounds: me.rounds, ranges: me.ranges }}
+          best={stats.rounds.best ? { strokes: stats.rounds.best.strokes, rel: stats.rounds.best.rel, holes: stats.rounds.best.holes } : null}
+          onOpenProfile={() => ui.push({ type: 'profile' })}
+          onOpenIndex={() => ui.push({ type: 'stat', metric: 'index' })}
+        />
+      )}
 
       {total === 0 ? (
-        <EmptyState icon="flag" title="Votre carnet est vide" text="Enregistrez votre première partie ou séance de practice pour voir apparaître vos statistiques.">
+        <EmptyState
+          icon={view === 'stats' ? 'chart' : 'flag'}
+          title="Votre carnet est vide"
+          text={view === 'stats' ? 'Vos statistiques apparaîtront après vos premières parties.' : 'Enregistrez votre première partie ou séance de practice.'}
+        >
           <button type="button" className="btn" onClick={() => ui.push({ type: 'session-editor' })}>
             Nouvelle séance
           </button>
         </EmptyState>
-      ) : (
+      ) : view === 'parties' ? (
         <>
           {data.highlights.length > 0 && (
             <HighlightCarousel
@@ -211,6 +249,15 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
               onAll={() => ui.push({ type: 'highlights' })}
             />
           )}
+          <Group title="Dernières séances">
+            {recent.map((s) => (
+              <SessionCell key={s.id} s={s} onOpen={() => ui.push({ type: 'session', id: s.id })} />
+            ))}
+            <Row label="Toutes les séances" value={`${total}`} chevron onClick={() => ui.push({ type: 'sessions' })} />
+          </Group>
+        </>
+      ) : (
+        <>
           <div className="pr-period">
             <Segmented value={period} options={[...PERIODS]} onChange={onPeriod} label="Période" />
           </div>
@@ -227,13 +274,6 @@ export function PracticeScreen({ active: _active }: { active: boolean }) {
           <div className={statsBusy ? 'pr-busy' : undefined} aria-busy={statsBusy}>
             <Dashboard stats={stats} profile={data.profile} totalRanges={me.ranges} onOpen={(metric: DashMetric) => ui.push({ type: 'stat', metric })} />
           </div>
-
-          <Group title="Dernières séances">
-            {recent.map((s) => (
-              <SessionCell key={s.id} s={s} onOpen={() => ui.push({ type: 'session', id: s.id })} />
-            ))}
-            <Row label="Toutes les séances" value={`${total}`} chevron onClick={() => ui.push({ type: 'sessions' })} />
-          </Group>
         </>
       )}
     </Screen>
