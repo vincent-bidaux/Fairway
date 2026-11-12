@@ -4,8 +4,8 @@ import type { PlaySession, SessionKind } from '../../../shared/practice';
 import { Segmented } from '../../components/Controls';
 import { Screen } from '../../components/Screen';
 import { useUi } from '../../ui';
-import { newId, nowLocal, saveSession } from '../api';
-import { touchData } from '../account';
+import { confirmPars, golfHoles, newId, nowLocal, saveSession } from '../api';
+import { touchData, useAccount } from '../account';
 import { ConfirmSheet } from '../ConfirmSheet';
 import { clearDraft, readDraft, writeDraft } from '../drafts';
 import { PracticeForm } from '../PracticeForm';
@@ -50,6 +50,21 @@ function toPayload(s: PlaySession): PlaySession {
 }
 
 type Step = 'setup' | 'entry';
+type ParChange = { hole: number; par: number; old: number | null };
+
+/** Pars joués qui diffèrent de la base (ou saisis à la main là où la base n'a rien). */
+async function parChanges(s: PlaySession, touched: Set<number>): Promise<ParChange[]> {
+  if (s.kind !== 'round' || s.golf_id == null) return [];
+  const rows = await golfHoles(s.golf_id).catch(() => null);
+  if (!rows) return [];
+  const course = s.course ?? '';
+  const own = rows.filter((r) => r.course === course);
+  const base = new Map((own.length ? own : rows.filter((r) => r.course === '')).map((r) => [r.hole, r.par]));
+  return (s.hole_entries ?? [])
+    .filter((e) => e.strokes != null)
+    .map((e) => ({ hole: e.hole, par: e.par, old: base.get(e.hole) ?? null }))
+    .filter((c) => (c.old != null ? c.old !== c.par : touched.has(c.hole)));
+}
 type Sync = 'ok' | 'pending' | 'error';
 
 export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind; session?: PlaySession }) {
@@ -75,6 +90,10 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
   const [confirmEmpty, setConfirmEmpty] = useState(false);
   const [moodOpen, setMoodOpen] = useState(false);
   const [rev, setRev] = useState(0);
+  const account = useAccount();
+  const parVoter = account.status === 'in' && !account.me.demo && !account.me.admin;
+  const parTouched = useRef(new Set<number>());
+  const [parAsk, setParAsk] = useState<ParChange[] | null>(null);
 
   const latest = useRef(s);
   latest.current = s;
@@ -186,12 +205,20 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
   };
 
   // --- Fin -----------------------------------------------------------------------
-  const doFinish = async () => {
+  /** pars : réponse du joueur à « Mettre à jour Fairway ? » (undefined = pas encore demandé). */
+  const doFinish = async (pars?: { confirm: boolean; changes: ParChange[] }) => {
     if (busy) return;
     const snap = latest.current;
     if (snap.kind === 'range' && snap.golf_id == null && !(snap.place ?? '').trim()) {
       ui.toast('Indiquez le lieu de la séance');
       return;
+    }
+    if (!pars && parVoter && snap.kind === 'round') {
+      const changes = await parChanges(snap, parTouched.current);
+      if (changes.length) {
+        setParAsk(changes);
+        return;
+      }
     }
     setBusy(true);
     try {
@@ -201,7 +228,19 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
       synced.current = false;
       clearDraft(snap.id);
       touchData();
-      ui.toast(snap.kind === 'round' ? 'Partie enregistrée' : 'Séance enregistrée');
+      let applied = 0;
+      if (pars?.confirm && pars.changes.length) {
+        applied = await confirmPars(snap.id, pars.changes.map(({ hole, par }) => ({ hole, par })))
+          .then((r) => r.applied)
+          .catch(() => 0);
+      }
+      ui.toast(
+        snap.kind === 'round'
+          ? applied > 0
+            ? `Partie enregistrée · ${applied} par${applied > 1 ? 's' : ''} mis à jour, merci !`
+            : 'Partie enregistrée'
+          : 'Séance enregistrée',
+      );
       ui.back();
       if (isNew) window.setTimeout(() => ui.push({ type: 'session', id: snap.id }), 160);
     } catch (e) {
@@ -282,6 +321,7 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
           onFinish={finish}
           onBack={leave}
           isNew={isNew}
+          onParTouched={(h) => parTouched.current.add(h)}
         />
       ) : (
         <PracticeForm s={s} update={update} setGolfN={setGolfN} busy={busy} onSave={finish} onBack={leave} isNew={isNew} />
@@ -334,6 +374,48 @@ export function SessionEditor({ kind: kindProp, session }: { kind?: SessionKind;
               }}
             >
               Passer
+            </button>
+          </div>
+        </div>
+      </Sheet>
+      <Sheet open={parAsk != null} onClose={() => setParAsk(null)} title="Pars modifiés" right={<span />}>
+        <div className="sheet-pad">
+          <p className="confirm-msg">
+            Vous avez modifié le par de {parAsk?.length === 1 ? 'ce trou' : `ces ${parAsk?.length ?? 0} trous`}. Êtes-vous sûr de ces informations ? Les autres
+            joueurs en profiteront dès leur prochaine partie sur ce golf.
+          </p>
+          <ul className="par-changes" aria-label="Pars modifiés">
+            {parAsk?.map((c) => (
+              <li key={c.hole}>
+                <span>Trou {c.hole}</span>
+                <span>
+                  {c.old != null ? <s>Par {c.old}</s> : <em>non renseigné</em>} → <strong>Par {c.par}</strong>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="confirm-actions">
+            <button
+              type="button"
+              className="btn btn--block"
+              onClick={() => {
+                const changes = parAsk ?? [];
+                setParAsk(null);
+                void doFinish({ confirm: true, changes });
+              }}
+            >
+              Oui, mettre à jour Fairway
+            </button>
+            <button
+              type="button"
+              className="btn btn--block btn--secondary"
+              onClick={() => {
+                const changes = parAsk ?? [];
+                setParAsk(null);
+                void doFinish({ confirm: false, changes });
+              }}
+            >
+              Non, seulement pour ma partie
             </button>
           </div>
         </div>

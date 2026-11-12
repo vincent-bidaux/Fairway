@@ -197,42 +197,82 @@ meApi.put('/sessions/:id', async (c) => {
     });
   }
 
-  // Chaque par saisi est un vote : la base des pars s'améliore avec les parties de tous (sauf le compte de démo).
-  if (golfId && !isDemo(uid)) {
+  // Chaque par saisi est un vote silencieux (hors démo et admin). Il ne modifie pas la base des pars :
+  // seule une confirmation du joueur (POST /sessions/:id/pars) le fait.
+  if (golfId && parVoter(c.env, uid, c.get('userEmail'))) {
     for (const v of parVotes) {
       stmts.push(
         db
           .prepare(`INSERT INTO par_votes (user_id, golf_id, course, hole, par) VALUES (?,?,?,?,?)
-                    ON CONFLICT(user_id, golf_id, course, hole) DO UPDATE SET par = excluded.par, voted_at = datetime('now')`)
+                    ON CONFLICT(user_id, golf_id, course, hole) DO UPDATE SET
+                      confirmed = CASE WHEN excluded.par = par_votes.par THEN par_votes.confirmed ELSE 0 END,
+                      par = excluded.par, voted_at = datetime('now')`)
           .bind(uid, golfId, course, v.hole, v.par),
       );
     }
-    if (parVotes.length) stmts.push(...consensusStatements(db, golfId, course));
   }
 
   await db.batch(stmts);
   return c.json(await loadSession(c.env, uid, id));
 });
 
-/** Recalcule le par retenu : la valeur la plus votée gagne si elle a au moins 2 votes de plus que la source actuelle. */
-function consensusStatements(db: D1Database, golfId: number, course: string): D1PreparedStatement[] {
-  return [
-    db
-      .prepare(
-        `INSERT INTO golf_holes (golf_id, course, hole, par, source, votes)
-         SELECT golf_id, course, hole, par, 'players', n FROM (
-           SELECT golf_id, course, hole, par, COUNT(*) AS n,
-                  ROW_NUMBER() OVER (PARTITION BY hole ORDER BY COUNT(*) DESC, MAX(voted_at) DESC) AS rk
-           FROM par_votes WHERE golf_id = ? AND course = ? GROUP BY hole, par
-         ) WHERE rk = 1
-         ON CONFLICT(golf_id, course, hole) DO UPDATE SET
-           par = CASE WHEN golf_holes.source = 'players' OR excluded.par = golf_holes.par OR excluded.votes >= 2 THEN excluded.par ELSE golf_holes.par END,
-           source = CASE WHEN golf_holes.source <> 'players' AND excluded.par <> golf_holes.par AND excluded.votes >= 2 THEN 'players' ELSE golf_holes.source END,
-           votes = excluded.votes, updated_at = datetime('now')`,
-      )
-      .bind(golfId, course),
-  ];
+/** Les votes du compte de démo et des comptes admin ne comptent pas. */
+function parVoter(env: Env, uid: string, email: string | null | undefined) {
+  return !isDemo(uid) && !isAdminEmail(env, email);
 }
+
+/** Le joueur confirme les pars qu'il a modifiés : ils remplacent tout de suite ceux de la base (1 vote suffit). */
+meApi.post('/sessions/:id/pars', async (c) => {
+  const uid = c.get('userId');
+  if (!parVoter(c.env, uid, c.get('userEmail'))) return c.json({ ok: true, applied: 0, skipped: 'account' });
+  const db = c.env.DB;
+  const sess = await db
+    .prepare(`SELECT golf_id, course FROM play_sessions WHERE id = ? AND user_id = ? AND deleted_at IS NULL`)
+    .bind(c.req.param('id'), uid)
+    .first<{ golf_id: number | null; course: string | null }>();
+  if (!sess) return c.json({ error: 'Séance introuvable' }, 404);
+  if (!sess.golf_id) return c.json({ ok: true, applied: 0 });
+  const b = await c.req.json<{ pars?: Array<{ hole: number; par: number }> }>().catch(() => null);
+  const pars = (b?.pars ?? [])
+    .map((p) => ({ hole: int(p.hole, 1, 18), par: int(p.par, 3, 6) }))
+    .filter((p): p is { hole: number; par: number } => p.hole != null && p.par != null)
+    .slice(0, 18);
+  if (!pars.length) return c.json({ ok: true, applied: 0 });
+  const golfId = sess.golf_id;
+  const course = sess.course ?? '';
+  const current = await db
+    .prepare(`SELECT hole, par, source FROM golf_holes WHERE golf_id = ? AND course = ?`)
+    .bind(golfId, course)
+    .all<{ hole: number; par: number; source: string }>();
+  const byHole = new Map(current.results.map((r) => [r.hole, r]));
+  const stmts: D1PreparedStatement[] = [];
+  let applied = 0;
+  for (const p of pars) {
+    stmts.push(
+      db
+        .prepare(`INSERT INTO par_votes (user_id, golf_id, course, hole, par, confirmed) VALUES (?,?,?,?,?,1)
+                  ON CONFLICT(user_id, golf_id, course, hole) DO UPDATE SET par = excluded.par, confirmed = 1, voted_at = datetime('now')`)
+        .bind(uid, golfId, course, p.hole, p.par),
+    );
+    const old = byHole.get(p.hole);
+    if (old && old.par === p.par) continue;
+    applied++;
+    stmts.push(
+      db
+        .prepare(`INSERT INTO golf_holes (golf_id, course, hole, par, source, votes) VALUES (?,?,?,?,'players',1)
+                  ON CONFLICT(golf_id, course, hole) DO UPDATE SET par = excluded.par, source = 'players',
+                    votes = (SELECT COUNT(*) FROM par_votes v WHERE v.golf_id = excluded.golf_id AND v.course = excluded.course
+                             AND v.hole = excluded.hole AND v.par = excluded.par AND v.confirmed = 1),
+                    updated_at = datetime('now')`)
+        .bind(golfId, course, p.hole, p.par),
+      db
+        .prepare(`INSERT INTO par_changes (golf_id, course, hole, old_par, old_source, new_par, user_id, session_id) VALUES (?,?,?,?,?,?,?,?)`)
+        .bind(golfId, course, p.hole, old?.par ?? null, old?.source ?? null, p.par, uid, c.req.param('id')),
+    );
+  }
+  await db.batch(stmts);
+  return c.json({ ok: true, applied });
+});
 
 meApi.delete('/sessions/:id', async (c) => {
   const r = await c.env.DB.prepare(`UPDATE play_sessions SET deleted_at = datetime('now') WHERE id = ? AND user_id = ? AND deleted_at IS NULL`)

@@ -487,3 +487,4 @@
 .adm-title-out {
   margin: 0 var(--gutter) 7px;
 }
+.adm-reverted { text-decoration: line-through; color: var(--label3); }

@@ -51,3 +51,31 @@ export function getTests(days: number, signal?: AbortSignal): Promise<TestsDashb
 export function isForbidden(e: unknown): boolean {
   return e instanceof ApiError && (e.status === 401 || e.status === 403);
 }
+
+export interface ParChangeRow {
+  id: number;
+  golf_id: number;
+  golf_name: string;
+  course: string;
+  hole: number;
+  old_par: number | null;
+  old_source: string | null;
+  new_par: number;
+  origin: 'confirm' | 'backfill';
+  created_at: string;
+  reverted_at: string | null;
+  session_id: string | null;
+  user_label: string | null;
+}
+
+export function getParChanges(signal?: AbortSignal): Promise<ParChangeRow[]> {
+  return get<ParChangeRow[]>('/api/admin/pars', signal);
+}
+
+export async function revertParChange(id: number): Promise<void> {
+  const res = await fetch(`/api/admin/pars/${id}/revert`, { method: 'POST', headers: { Accept: 'application/json' } });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new ApiError(res.status, data?.error ?? `Erreur ${res.status}`);
+  }
+}

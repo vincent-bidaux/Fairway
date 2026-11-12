@@ -83,6 +83,14 @@ export function AdminHome() {
           chevron
           onClick={() => ui.push({ type: 'admin-tests' })}
         />
+        <Row
+          icon={<Icon name="flag" size={18} />}
+          iconColor="var(--orange)"
+          label="Pars corrigés"
+          sub="Pars modifiés et confirmés par les testeurs"
+          chevron
+          onClick={() => ui.push({ type: 'admin-pars' })}
+        />
       </Group>
 
       <div className="sheet-pad sheet-pad--screen">

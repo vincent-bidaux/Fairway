@@ -110,6 +110,9 @@ export interface GolfHole {
   votes: number;
 }
 export const golfHoles = (golfId: number) => call<GolfHole[]>(`/api/golfs/${golfId}/holes`);
+/** Pars modifiés et confirmés par le joueur : propagés dans la base Fairway. */
+export const confirmPars = (sessionId: string, pars: Array<{ hole: number; par: number }>) =>
+  call<{ ok: boolean; applied: number }>(`/api/me/sessions/${sessionId}/pars`, 'POST', { pars });
 
 export const newId = () =>
   typeof crypto.randomUUID === 'function'

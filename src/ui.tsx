@@ -13,6 +13,7 @@ export type Route =
   | { type: 'admin-device'; id: string }
   | { type: 'admin-tests' }
   | { type: 'admin-thread'; id: string }
+  | { type: 'admin-pars' }
   // Programme testeurs : retours du joueur (Réglages > Retours)
   | { type: 'feedback' }
   // « Mes parties »

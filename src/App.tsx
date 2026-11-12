@@ -31,6 +31,7 @@ import { HighlightsList } from './practice/screens/HighlightsList';
 import { setScreen, startTracking } from './track';
 import { AdminTests } from './admin/AdminTests';
 import { AdminThread } from './admin/AdminThread';
+import { AdminPars } from './admin/AdminPars';
 import { FeedbackScreen } from './feedback/FeedbackScreen';
 import { refreshAccount, useAccount } from './practice/account';
 import type { SplashAudience } from './components/Splash';
@@ -148,6 +149,7 @@ export function App() {
             {r.type === 'admin-device' && <AdminDevice id={r.id} />}
             {r.type === 'admin-tests' && <AdminTests />}
             {r.type === 'admin-thread' && <AdminThread id={r.id} />}
+            {r.type === 'admin-pars' && <AdminPars />}
             {r.type === 'feedback' && <FeedbackScreen />}
             {r.type === 'session' && <SessionDetail id={r.id} />}
             {r.type === 'session-editor' && <SessionEditor kind={r.kind} session={r.session} />}

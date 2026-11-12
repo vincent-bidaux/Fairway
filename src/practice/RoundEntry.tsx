@@ -204,9 +204,11 @@ export interface RoundEntryProps {
   onFinish: () => void;
   onBack: () => void;
   isNew: boolean;
+  /** Le joueur a changé le par d'un trou (pour proposer de corriger la base à la fin). */
+  onParTouched?: (hole: number) => void;
 }
 
-export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGolfN, sync, busy, onFinish, onBack, isNew }: RoundEntryProps) {
+export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGolfN, sync, busy, onFinish, onBack, isNew, onParTouched }: RoundEntryProps) {
   const ui = useUi();
   const entries = s.hole_entries ?? [];
   const n = entries.length;
@@ -293,6 +295,7 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
   const onPar = (i: number, p: number) => {
     const e = entriesRef.current[i];
     parTouched.current.add(e.hole);
+    onParTouched?.(e.hole);
     patchEntry(i, { par: p, ...(p === 3 ? { fairway: null } : {}) });
   };
 

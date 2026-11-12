@@ -181,3 +181,45 @@ adminApi.post('/plans/refresh', async (c) => {
   });
   return c.json({ results });
 });
+
+// ---------------------------------------------------------------- pars corrigés par les joueurs
+adminApi.get('/pars', async (c) => {
+  const rows = await c.env.DB.prepare(
+    `SELECT pc.id, pc.golf_id, g.name AS golf_name, pc.course, pc.hole, pc.old_par, pc.old_source, pc.new_par, pc.origin,
+            pc.created_at, pc.reverted_at, pc.session_id,
+            COALESCE(NULLIF(p.display_name, ''), NULLIF(TRIM(COALESCE(p.first_name, '') || ' ' || COALESCE(p.last_name, '')), ''), NULLIF(u.name, ''), u.email) AS user_label
+     FROM par_changes pc
+     JOIN golfs g ON g.id = pc.golf_id
+     LEFT JOIN "user" u ON u.id = pc.user_id
+     LEFT JOIN player_profiles p ON p.user_id = pc.user_id
+     ORDER BY pc.created_at DESC, pc.id DESC LIMIT 300`,
+  ).all();
+  return c.json(rows.results);
+});
+
+/** Annule une correction : le trou reprend son ancien par (ou disparaît s'il n'était pas renseigné). */
+adminApi.post('/pars/:id{[0-9]+}/revert', async (c) => {
+  const db = c.env.DB;
+  const ch = await db
+    .prepare(`SELECT * FROM par_changes WHERE id = ? AND reverted_at IS NULL`)
+    .bind(Number(c.req.param('id')))
+    .first<{ id: number; golf_id: number; course: string; hole: number; old_par: number | null; old_source: string | null; new_par: number; user_id: string | null }>();
+  if (!ch) return c.json({ error: 'Correction introuvable ou déjà annulée' }, 404);
+  const stmts: D1PreparedStatement[] = [
+    ch.old_par == null
+      ? db.prepare(`DELETE FROM golf_holes WHERE golf_id = ? AND course = ? AND hole = ?`).bind(ch.golf_id, ch.course, ch.hole)
+      : db
+          .prepare(`UPDATE golf_holes SET par = ?, source = ?, updated_at = datetime('now') WHERE golf_id = ? AND course = ? AND hole = ?`)
+          .bind(ch.old_par, ch.old_source ?? 'players', ch.golf_id, ch.course, ch.hole),
+    db.prepare(`UPDATE par_changes SET reverted_at = datetime('now') WHERE id = ?`).bind(ch.id),
+  ];
+  if (ch.user_id) {
+    stmts.push(
+      db
+        .prepare(`UPDATE par_votes SET confirmed = 0 WHERE user_id = ? AND golf_id = ? AND course = ? AND hole = ? AND par = ?`)
+        .bind(ch.user_id, ch.golf_id, ch.course, ch.hole, ch.new_par),
+    );
+  }
+  await db.batch(stmts);
+  return c.json({ ok: true });
+});
