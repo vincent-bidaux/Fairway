@@ -92,17 +92,13 @@ interface HoleViewProps {
   onPar: (p: number) => void;
   onUnlock: () => void;
   onPatch: (p: Partial<HoleEntry>, penTouched?: boolean) => void;
-  onChipTouch: () => void;
 }
 
-const HoleView = memo(function HoleView({ e, golfId, loop, active, locked, penTouched, onScore, onPar, onUnlock, onPatch, onChipTouch }: HoleViewProps) {
+const HoleView = memo(function HoleView({ e, golfId, loop, active, locked, penTouched, onScore, onPar, onUnlock, onPatch }: HoleViewProps) {
   const gir = girOf(e);
   const hp = useHolePlan(golfId, e.hole, true, loop);
   const [sel, setSel] = useState<number | null>(null);
-  const patch = (p: Partial<HoleEntry>, pen?: boolean) => {
-    onChipTouch();
-    onPatch(p, pen);
-  };
+  const patch = (p: Partial<HoleEntry>, pen?: boolean) => onPatch(p, pen);
   const girState = e.gir != null ? 'Saisi' : gir != null ? 'Déduit de votre score et de vos putts' : 'Indiquez les putts pour le déduire';
   return (
     <div className="hv">
@@ -226,8 +222,6 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
   const [unlocked, setUnlocked] = useState<number[]>([]);
   const parTouched = useRef(new Set<number>());
   const [card, setCard] = useState(false);
-  const [arming, setArming] = useState<number | null>(null);
-  const advTimer = useRef<number | undefined>(undefined);
   const entriesRef = useRef(entries);
   entriesRef.current = entries;
 
@@ -271,8 +265,6 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [known]);
 
-  useEffect(() => () => window.clearTimeout(advTimer.current), []);
-
   const goTo = useCallback((i: number) => {
     const el = panesRef.current;
     if (!el) return;
@@ -286,11 +278,7 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
     const el = panesRef.current;
     if (!el || Date.now() < navLock.current) return;
     const i = Math.round(el.scrollLeft / el.clientWidth);
-    if (i !== curRef.current && i >= 0 && i < entriesRef.current.length) {
-      window.clearTimeout(advTimer.current);
-      setArming(null);
-      setCur(i);
-    }
+    if (i !== curRef.current && i >= 0 && i < entriesRef.current.length) setCur(i);
   };
 
   const patchEntry = useCallback(
@@ -299,24 +287,8 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
     [update],
   );
 
-  const cancelAdvance = useCallback(() => {
-    window.clearTimeout(advTimer.current);
-    setArming(null);
-  }, []);
-
-  const onScore = (i: number, v: number) => {
-    const e = entriesRef.current[i];
-    const first = e.strokes == null;
-    patchEntry(i, { strokes: v });
-    window.clearTimeout(advTimer.current);
-    if (first && i < entriesRef.current.length - 1) {
-      setArming(i);
-      advTimer.current = window.setTimeout(() => {
-        setArming(null);
-        if (curRef.current === i) goTo(i + 1);
-      }, 900);
-    } else setArming(null);
-  };
+  // Pas d'avance automatique : on ne change de trou qu'avec « Trou suivant », la flèche ou le bandeau.
+  const onScore = (i: number, v: number) => patchEntry(i, { strokes: v });
 
   const onPar = (i: number, p: number) => {
     const e = entriesRef.current[i];
@@ -386,7 +358,6 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
                   onScore={(v) => onScore(i, v)}
                   onPar={(p) => onPar(i, p)}
                   onUnlock={() => setUnlocked((u) => [...u, e.hole])}
-                  onChipTouch={cancelAdvance}
                   onPatch={(p, pen) => {
                     patchEntry(i, p);
                     if (pen !== undefined) setPenTouched((t) => (pen ? (t.includes(e.hole) ? t : [...t, e.hole]) : t.filter((h) => h !== e.hole)));
@@ -412,11 +383,8 @@ export function RoundEntry({ s, update, penTouched, setPenTouched, golfN, setGol
           ) : (
             <button
               type="button"
-              className={`btn re-next${entries[cur]?.strokes == null ? ' btn--secondary' : ''}${arming === cur ? ' is-arming' : ''}`}
-              onClick={() => {
-                cancelAdvance();
-                goTo(cur + 1);
-              }}
+              className={`btn re-next${entries[cur]?.strokes == null ? ' btn--secondary' : ''}`}
+              onClick={() => goTo(cur + 1)}
             >
               Trou suivant
               <Icon name="chevron" size={14} strokeWidth={2.8} />

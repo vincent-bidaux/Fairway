@@ -63,7 +63,8 @@
 
 .re-panes {
   flex: 1; min-height: 0; display: flex;
-  overflow-x: auto; overflow-y: hidden;
+  /* Pas de glissement entre les trous : navigation par les boutons et le bandeau uniquement. */
+  overflow: hidden;
   scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
   scrollbar-width: none; -webkit-overflow-scrolling: touch;
 }
@@ -159,11 +160,6 @@
 .re-nav { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--fill); flex-shrink: 0; color: var(--label); }
 .re-card-btn { display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 16px; border-radius: 999px; background: var(--fill); font-weight: 600; font-size: 16px; flex-shrink: 0; }
 .re-next { flex: 1; min-height: 48px; position: relative; overflow: hidden; }
-.re-next.is-arming::after {
-  content: ''; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%;
-  background: currentColor; opacity: 0.55; transform-origin: left; animation: arm 0.9s linear forwards;
-}
-@keyframes arm { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 /* Carte de score */
 .card-pad { padding: 4px var(--gutter) 18px; }
@@ -280,7 +276,6 @@
 @media (prefers-reduced-motion: reduce) {
   .rl-cell.is-sel .rl-num { transform: none; }
   .par-arrow.is-holding svg { animation: none; }
-  .re-next.is-arming::after { animation-duration: 0.01ms; }
 }
 
 .par-label svg { position: absolute; left: -14px; top: 50%; margin-top: -6px; }
