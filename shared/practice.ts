@@ -116,6 +116,8 @@ export interface PlaySession {
   body: number | null;
   weather: number | null;
   notes: string | null;
+  /** Partie mise en favori (1). */
+  favorite?: number;
   updated_at?: string;
   hole_entries?: HoleEntry[];
   drills?: Drill[];

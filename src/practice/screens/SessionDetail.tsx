@@ -9,7 +9,7 @@ import { BackButton, Screen } from '../../components/Screen';
 import { ErrorState } from '../../components/States';
 import { useUi } from '../../ui';
 import { useDataVersion, touchData } from '../account';
-import { deleteSession, getSession, getStats } from '../api';
+import { deleteSession, getSession, getStats, setSessionFavorite } from '../api';
 import { ConfirmSheet } from '../ConfirmSheet';
 import { useGolfPlan } from '../holePlan';
 import { fmtDuration, focusLabel } from '../PracticeForm';
@@ -210,8 +210,30 @@ export function SessionDetail({ id }: { id: string }) {
     }
   };
 
+  const fav = !!s.favorite;
+  const toggleFav = async () => {
+    setS((x) => (x ? { ...x, favorite: fav ? 0 : 1 } : x));
+    try {
+      await setSessionFavorite(s.id, !fav);
+      ui.toast(fav ? 'Retirée des favoris' : 'Ajoutée aux favoris');
+      touchData();
+    } catch (e) {
+      setS((x) => (x ? { ...x, favorite: fav ? 1 : 0 } : x));
+      ui.toast((e as Error).message);
+    }
+  };
+
   const right = (
     <>
+      <button
+        type="button"
+        className={`nav-btn nav-btn--icon nav-star${fav ? ' is-on' : ''}`}
+        aria-pressed={fav}
+        aria-label={fav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+        onClick={() => void toggleFav()}
+      >
+        <Icon name="star" size={22} fill={fav} />
+      </button>
       <button type="button" className="nav-btn nav-btn--icon" aria-label="Partager le résumé" onClick={share}>
         <Icon name="share" size={22} />
       </button>

@@ -1374,3 +1374,6 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+.sess-fav { flex-shrink: 0; color: var(--orange); margin-left: 4px; }
+.nav-star.is-on { color: var(--orange); }

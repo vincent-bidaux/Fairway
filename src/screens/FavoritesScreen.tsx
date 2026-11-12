@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import type { PlaySession } from '../../shared/practice';
 import type { Golf, GolfEvent } from '../../shared/types';
 import { ApiError, getEvent, getGolf } from '../api';
 import { Group, Segmented } from '../components/Controls';
@@ -9,8 +10,11 @@ import { EmptyState, ErrorState } from '../components/States';
 import { isUpcoming } from '../lib';
 import { toggleFavorite, toggleGolfFavorite, useGolfFavorites, usePrefs } from '../store';
 import { useUi } from '../ui';
+import { useAccount, useDataVersion } from '../practice/account';
+import { listSessions } from '../practice/api';
+import { SessionCell } from '../practice/SessionCell';
 
-type Tab = 'events' | 'golfs';
+type Tab = 'events' | 'golfs' | 'parties';
 
 /** Récupère en parallèle les éléments pas encore connus ; les 404 sont ignorés. */
 function useFavItems<T>(ids: number[], active: boolean, fetcher: (id: number) => Promise<T>) {
@@ -71,6 +75,33 @@ export function FavoritesScreen({ active }: { active: boolean }) {
   const ui = useUi();
   const [tab, setTab] = useState<Tab>('events');
   const [editing, setEditing] = useState(false);
+
+  const account = useAccount();
+  const signedIn = account.status === 'in';
+  const version = useDataVersion();
+  const [parties, setParties] = useState<PlaySession[] | null>(null);
+  const [partiesError, setPartiesError] = useState<string | null>(null);
+  const [partiesTick, setPartiesTick] = useState(0);
+  useEffect(() => {
+    if (!signedIn) {
+      setParties(null);
+      if (tab === 'parties') setTab('events');
+      return;
+    }
+    if (!active) return;
+    let live = true;
+    listSessions(undefined, { favorite: true })
+      .then((l) => {
+        if (!live) return;
+        setParties(l);
+        setPartiesError(null);
+      })
+      .catch((e: Error) => live && setPartiesError(e.message));
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signedIn, active, version, partiesTick]);
 
   const ev = useFavItems<GolfEvent>(favorites, active, (id) => getEvent(id));
   const gf = useFavItems<Golf>(golfFavs, active, (id) => getGolf(id));
@@ -179,7 +210,23 @@ export function FavoritesScreen({ active }: { active: boolean }) {
       </>
     );
 
-  const hasItems = tab === 'events' ? events.length > 0 : golfs.length > 0;
+  const partiesBody =
+    partiesError && !parties ? (
+      <ErrorState message={partiesError} onRetry={() => setPartiesTick((t) => t + 1)} />
+    ) : !parties ? (
+      <p className="list-footnote">Chargement…</p>
+    ) : parties.length === 0 ? (
+      <EmptyState icon="star" title="Aucune partie favorite" text="Touchez l'étoile en haut d'une partie pour la retrouver ici." />
+    ) : (
+      <Group className="group-wrap--flush">
+        {parties.map((p) => (
+          <SessionCell key={p.id} s={p} onOpen={() => ui.push({ type: 'session', id: p.id })} />
+        ))}
+      </Group>
+    );
+
+  // Les parties se retirent depuis leur fiche (étoile) : pas de mode « Modifier » sur cet onglet.
+  const hasItems = tab === 'events' ? events.length > 0 : tab === 'golfs' ? golfs.length > 0 : false;
 
   return (
     <Screen
@@ -204,10 +251,11 @@ export function FavoritesScreen({ active }: { active: boolean }) {
           options={[
             { value: 'events', label: 'Compétitions' },
             { value: 'golfs', label: 'Golfs' },
+            ...(signedIn ? [{ value: 'parties' as const, label: 'Parties' }] : []),
           ]}
         />
       </div>
-      {tab === 'events' ? eventsBody : golfsBody}
+      {tab === 'events' ? eventsBody : tab === 'golfs' ? golfsBody : partiesBody}
     </Screen>
   );
 }

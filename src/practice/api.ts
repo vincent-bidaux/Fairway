@@ -95,7 +95,15 @@ export const putIndex = (asOf: string, hcp_index: number) => call(`/api/me/index
 export const deleteIndex = (asOf: string) => call(`/api/me/index/${asOf}`, 'DELETE');
 
 // ---------------------------------------------------------------- séances
-export const listSessions = (kind?: 'round' | 'range') => call<PlaySession[]>(`/api/me/sessions${kind ? `?kind=${kind}` : ''}`);
+export const listSessions = (kind?: 'round' | 'range', opts: { favorite?: boolean; golfId?: number } = {}) => {
+  const q = new URLSearchParams();
+  if (kind) q.set('kind', kind);
+  if (opts.favorite) q.set('favorite', '1');
+  if (opts.golfId) q.set('golf_id', String(opts.golfId));
+  const qs = q.toString();
+  return call<PlaySession[]>(`/api/me/sessions${qs ? `?${qs}` : ''}`);
+};
+export const setSessionFavorite = (id: string, favorite: boolean) => call(`/api/me/sessions/${id}/favorite`, 'PUT', { favorite });
 export const getSession = (id: string) => call<PlaySession>(`/api/me/sessions/${id}`);
 export const saveSession = (s: PlaySession) => call<PlaySession>(`/api/me/sessions/${s.id}`, 'PUT', s);
 export const deleteSession = (id: string) => call(`/api/me/sessions/${id}`, 'DELETE');

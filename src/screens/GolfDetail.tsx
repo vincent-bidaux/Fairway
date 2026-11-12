@@ -14,6 +14,7 @@ import { useAsync } from '../hooks';
 import { deptName, golfDirections, holesLabel } from '../lib';
 import { toggleFavorite, toggleGolfFavorite, useGolfFavorites, usePrefs } from '../store';
 import { useUi } from '../ui';
+import { MyRoundsHere } from '../practice/MyRoundsHere';
 
 export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
   const ui = useUi();
@@ -151,6 +152,8 @@ export function GolfDetail({ id, initial }: { id: number; initial?: Golf }) {
           />
         ))}
       </Group>
+
+      <MyRoundsHere golfId={golf.id} golfName={golf.name} />
 
       {hasPlan && <GolfBanner golf={golf} />}
 

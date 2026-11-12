@@ -10,7 +10,7 @@ export function SessionCell({ s, onOpen }: { s: PlaySession; onOpen: () => void 
   const sum = s.summary;
   const hasScore = isRound && !!sum && sum.played > 0;
   const relative = hasScore ? sum!.strokes - sum!.par : 0;
-  const label = `${isRound ? 'Partie' : 'Practice'}${s.event_title ? `, ${s.event_title}` : ''}, ${sessionPlace(s)}, ${fmtDateFull(s.played_at)}`;
+  const label = `${isRound ? 'Partie' : 'Practice'}${s.event_title ? `, ${s.event_title}` : ''}, ${sessionPlace(s)}, ${fmtDateFull(s.played_at)}${s.favorite ? ', favori' : ''}`;
   return (
     <div className="cell">
       <button type="button" className="cell-main sess-main" onClick={onOpen} aria-label={label}>
@@ -25,6 +25,7 @@ export function SessionCell({ s, onOpen }: { s: PlaySession; onOpen: () => void 
                   <TrophyGlyph size={15} />
                 </span>
                 <span className="sess-title">{s.event_title}</span>
+                {!!s.favorite && <Icon name="star" size={13} fill className="sess-fav" />}
               </span>
               <span className="cell-sub sess-sub">
                 <span className="sess-sub-golf">{sessionPlace(s)}</span>
@@ -33,7 +34,10 @@ export function SessionCell({ s, onOpen }: { s: PlaySession; onOpen: () => void 
             </>
           ) : (
             <>
-              <span className="sess-title">{sessionPlace(s)}</span>
+              <span className="sess-title-row">
+                <span className="sess-title">{sessionPlace(s)}</span>
+                {!!s.favorite && <Icon name="star" size={13} fill className="sess-fav" />}
+              </span>
               <span className="cell-sub">{fmtDateFull(s.played_at)}</span>
             </>
           )}

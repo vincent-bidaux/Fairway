@@ -46,7 +46,7 @@ meApi.get('/', async (c) => {
 
 // ---------------------------------------------------------------- séances
 const SESSION_COLS = `s.id, s.kind, s.golf_id, g.name AS golf_name, g.city AS golf_city, s.course, s.place, s.played_at, s.holes,
-  s.start_hole, s.tee, s.duration_min, s.balls, s.focus, s.feeling, s.event_id, s.event_title, s.mood, s.body, s.weather, s.notes, s.updated_at`;
+  s.start_hole, s.tee, s.duration_min, s.balls, s.focus, s.feeling, s.event_id, s.event_title, s.mood, s.body, s.weather, s.notes, s.favorite, s.updated_at`;
 
 meApi.get('/sessions', async (c) => {
   const uid = c.get('userId');
@@ -56,6 +56,12 @@ meApi.get('/sessions', async (c) => {
   if (kind === 'round' || kind === 'range') {
     where.push('s.kind = ?');
     params.push(kind);
+  }
+  if (c.req.query('favorite') === '1') where.push('s.favorite = 1');
+  const golfFilter = int(c.req.query('golf_id'), 1, 1e9);
+  if (golfFilter) {
+    where.push('s.golf_id = ?');
+    params.push(golfFilter);
   }
   const rows = await c.env.DB.prepare(
     `SELECT ${SESSION_COLS},
@@ -276,6 +282,15 @@ meApi.post('/sessions/:id/pars', async (c) => {
   }
   await db.batch(stmts);
   return c.json({ ok: true, applied });
+});
+
+/** Mettre une séance en favori (onglet Favoris > Parties). */
+meApi.put('/sessions/:id/favorite', async (c) => {
+  const b = await c.req.json<{ favorite?: boolean }>().catch(() => null);
+  const r = await c.env.DB.prepare(`UPDATE play_sessions SET favorite = ? WHERE id = ? AND user_id = ? AND deleted_at IS NULL`)
+    .bind(b?.favorite ? 1 : 0, c.req.param('id'), c.get('userId'))
+    .run();
+  return r.meta.changes ? c.json({ ok: true, favorite: !!b?.favorite }) : c.json({ error: 'Séance introuvable' }, 404);
 });
 
 meApi.delete('/sessions/:id', async (c) => {
