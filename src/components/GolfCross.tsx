@@ -20,8 +20,8 @@ export function GolfCross({ golf, size = 56 }: { golf: Golf; size?: number }) {
       className={`golf-avatar${home ? ' golf-avatar--home' : ''}`}
       style={{ width: size, height: size, padding: ring }}
       role="img"
-      aria-label={`Photo : ${golf.name}${home ? ' (votre golf d’attache)' : ''}`}
-      title={home ? 'Votre golf d’attache' : undefined}
+      aria-label={`Photo : ${golf.name}${home ? ' (mon club)' : ''}`}
+      title={home ? 'Mon club' : undefined}
     >
       <span className="golf-avatar-inner">
         {showPhoto ? (

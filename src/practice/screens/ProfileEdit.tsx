@@ -209,7 +209,7 @@ export function ProfileEdit() {
         <Field label="Pseudo">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Affiché sur votre carte" autoComplete="nickname" maxLength={60} />
         </Field>
-        <Row label="Golf d’attache" value={golfName ?? 'Choisir'} chevron onClick={() => setGolfSheet(true)} />
+        <Row label="Mon club" value={golfName ?? 'Choisir'} chevron onClick={() => setGolfSheet(true)} />
         <Field label="Ville">
           <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ville" autoComplete="address-level2" maxLength={80} />
         </Field>
@@ -279,7 +279,7 @@ export function ProfileEdit() {
       <GolfPicker
         open={golfSheet}
         onClose={() => setGolfSheet(false)}
-        title="Golf d’attache"
+        title="Mon club"
         selectedId={golfId}
         onPick={(g) => {
           setGolfId(g.id);
@@ -288,7 +288,7 @@ export function ProfileEdit() {
         }}
         allowOther={golfId != null}
         otherSelected={false}
-        otherLabel="Aucun golf d’attache"
+        otherLabel="Aucun club"
         otherSub=""
         onOther={() => {
           setGolfId(null);

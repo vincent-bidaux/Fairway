@@ -73,7 +73,7 @@ export function PlayerCard({
           <span className="pcard-who">
             <span className="pcard-name">{name}</span>
             <span className="pcard-club">
-              {club.length ? club.join(' · ') : 'Ajoutez votre golf d’attache'}
+              {club.length ? club.join(' · ') : 'Ajoutez votre club'}
             </span>
             {profile?.licence && <span className="pcard-licence">Licence ffgolf {profile.licence}</span>}
           </span>

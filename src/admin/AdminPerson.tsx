@@ -29,7 +29,7 @@ const PROFILE_LABELS: Record<string, string> = {
   handedness: 'Latéralité',
   licence: 'Licence ffgolf',
   started_year: 'Joue depuis',
-  home_golf_id: "Golf d'attache",
+  home_golf_id: 'Mon club',
   bag: 'Sac',
 };
 // Champs d'identité testeur : affichés dans le groupe « Identité », pas répétés dans « Infos ».
