@@ -37,7 +37,11 @@ meApi.get('/', async (c) => {
     .all<{ kind: string; n: number }>();
   const counts = Object.fromEntries(n.results.map((r) => [r.kind, r.n]));
   const feedbackUnread = await unreadReplies(c.env, uid).catch(() => 0);
-  return c.json({ user: u, demo: isDemo(uid), admin: isAdminEmail(c.env, c.get('userEmail')), feedbackUnread, rounds: counts.round ?? 0, ranges: counts.range ?? 0 });
+  const prof = await c.env.DB.prepare(`SELECT home_golf_id FROM player_profiles WHERE user_id = ?`).bind(uid).first<{ home_golf_id: number | null }>();
+  return c.json({
+    user: u, demo: isDemo(uid), admin: isAdminEmail(c.env, c.get('userEmail')), feedbackUnread, rounds: counts.round ?? 0, ranges: counts.range ?? 0,
+    homeGolfId: prof?.home_golf_id ?? null,
+  });
 });
 
 // ---------------------------------------------------------------- séances

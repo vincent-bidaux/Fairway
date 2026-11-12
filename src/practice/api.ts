@@ -62,6 +62,8 @@ export interface Me {
   feedbackUnread?: number;
   rounds: number;
   ranges: number;
+  /** Golf d'attache du profil (anneau doré sur son badge). */
+  homeGolfId?: number | null;
 }
 export const getMe = () => call<Me>('/api/me');
 export const deleteAccount = () => call('/api/me', 'DELETE');

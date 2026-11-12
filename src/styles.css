@@ -2025,6 +2025,11 @@ input[type='range']::-moz-range-thumb {
   background: linear-gradient(145deg, #4ade80, #1e8e3e);
 }
 
+/* Golf d'attache : anneau doré (même or que les coups de maître). */
+.golf-avatar--home {
+  background: linear-gradient(145deg, #ffd95e, #c98a00);
+}
+
 .golf-avatar-inner {
   display: flex;
   align-items: center;

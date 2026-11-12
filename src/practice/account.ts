@@ -73,3 +73,9 @@ export function useDataVersion(): number {
 }
 
 if (typeof window !== 'undefined') void refreshAccount();
+
+/** Golf d'attache du joueur connecté (null si aucun ou déconnecté). */
+export function useHomeGolfId(): number | null {
+  const a = useAccount();
+  return a.status === 'in' ? (a.me.homeGolfId ?? null) : null;
+}
